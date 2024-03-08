@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<VBox prefHeight="732.0" prefWidth="584.0" styleClass="vbox-container" xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.java.consejofacil.controller.ABMExpediente.FormularioExpedienteController">
+    <stylesheets>
+        <URL value="@../../styles/_config.css"/>
+        <URL value="@../../styles/_formulario.css"/>
+        <URL value="@../../styles/_styles.css"/>
+        <URL value="@../../styles/_container.css"/>
+    </stylesheets>
+    <AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" styleClass="view-container">
+        <VBox alignment="TOP_CENTER" layoutX="48.0" layoutY="24.0" prefHeight="672.0" prefWidth="524.0"
+              spacing="30.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0"
+              AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+            <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="titulo-principal-container">
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Datos del expediente"/>
+                <Line endX="200.0"/>
+            </HBox>
+            <VBox alignment="CENTER" spacing="25.0">
+                <GridPane hgap="10.0" layoutX="48.0" layoutY="74.0" prefHeight="185.0" prefWidth="524.0"
+                          vgap="20.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity"/>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                    <Label styleClass="label-formulario" text="Iniciante:"/>
+                    <ComboBox fx:id="cmbIniciante" editable="true" maxWidth="1.7976931348623157E308"
+                              prefHeight="31.0" prefWidth="218.0" styleClass="combo-personalizado"
+                              GridPane.columnIndex="1"/>
+                    <Button mnemonicParsing="false"
+                            onAction="#seleccionarIniciante" GridPane.columnIndex="2">
+                        <styleClass>
+                            <String fx:value="btn-personalizado"/>
+                            <String fx:value="buscar"/>
+                        </styleClass>
+                        <graphic>
+                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                       preserveRatio="true">
+                                <Image url="@../../images/icons/buscar.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Label styleClass="label-formulario" text="Estado:" GridPane.rowIndex="2"/>
+                    <ComboBox fx:id="cmbEstadoExpediente" maxWidth="1.7976931348623157E308"
+                              prefHeight="31.0" styleClass="combo-personalizado"
+                              GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                    <DatePicker fx:id="dtpFechaIngreso" editable="false"
+                                maxWidth="1.7976931348623157E308" styleClass="datepicker-personalizado"
+                                GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <Label styleClass="label-formulario" text="Fecha de Ingreso:"
+                           GridPane.rowIndex="1"/>
+                </GridPane>
+                <VBox layoutX="542.0" layoutY="94.0" spacing="10.0">
+                    <Label layoutX="542.0" layoutY="94.0" styleClass="label-formulario"
+                           text="Texto Nota:"/>
+                    <TextArea fx:id="txtTextoNota" layoutX="542.0" layoutY="217.0" prefHeight="297.0"
+                              prefWidth="250.0" styleClass="text-area-personalizado" wrapText="true"/>
+                </VBox>
+                <GridPane>
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                    <Button mnemonicParsing="false" onAction="#guardarExpediente"
+                            styleClass="btn-personalizado" text="Guardar"/>
+                    <Button mnemonicParsing="false" onAction="#nuevoExpediente"
+                            text="Nuevo" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
+                        <graphic>
+                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                       preserveRatio="true">
+                                <Image url="@../../images/icons/nuevo.png"/>
+                            </ImageView>
+                        </graphic>
+                        <styleClass>
+                            <String fx:value="btn-personalizado"/>
+                            <String fx:value="nuevo"/>
+                        </styleClass>
+                    </Button>
+                </GridPane>
+            </VBox>
+        </VBox>
+    </AnchorPane>
+</VBox>

@@ -1,0 +1,32 @@
+/* Botón personalizado */
+.btn-personalizado {
+    -fx-background-color: -primary;
+    -fx-text-fill: white;
+    -fx-font-size: 1.2em;
+    -fx-font-weight: bold;
+    -fx-border-color: transparent;
+    -fx-border-radius: 5px;
+    -fx-padding: 10;
+    -fx-opacity: 0.8;
+    -fx-transition: opacity 0.3s;
+}
+.btn-personalizado:hover{
+    -fx-cursor: hand;
+    -fx-opacity: 1;
+}
+.btn-personalizado:pressed{
+    -fx-opacity: 0.8;
+}
+
+/* Titulo principal */
+.titulo-principal-container Text{
+    -fx-font-size: 2em;
+    -fx-font-weight: bold;
+}
+.titulo-principal-container Line{
+    -fx-stroke: -primary;
+    -fx-stroke-width: 3;
+}
+
+
+

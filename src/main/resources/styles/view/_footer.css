@@ -1,0 +1,23 @@
+/* Contenedor del footer */
+.footer-container{
+    -fx-background-color: -fondo-gris;
+}
+
+/* Texto del footer */
+.footer-text-container{
+    -fx-background-color: transparent;
+}
+.footer-container Line{
+    -fx-stroke: -gris;
+    -fx-stroke-width: 1;
+}
+.footer-container Text{
+    -fx-font-size: 1.2em;
+    -fx-font-weight: bold;
+}
+.footer-container .copyright{
+    -fx-fill: -gris-fuerte;
+}
+.footer-container .detalles{
+    -fx-fill: -gris;
+}

@@ -1,0 +1,117 @@
+/* Logo del menu */
+.menu-logo-container{
+    -fx-alignment: center;
+}
+.menu-logo-container .logo{
+    -fx-background-image: url('/images/logo2.png');
+}
+.menu-logo-container Text{
+    -fx-fill: black;
+    -fx-font-size: 1.8em;
+    -fx-font-weight: bold;
+}
+
+/* Navegación del menu */
+.menu-items-container{
+    -fx-spacing: 5;
+    -fx-alignment: top_center;
+}
+.menu-items-container Line{
+    -fx-stroke: -gris-suave;
+    -fx-stroke-width: 1;
+}
+
+/* Perfil */
+.menu-items-container .menu-perfil-container{
+    -fx-alignment: center;
+    -fx-padding: 10;
+    fx-transition: background-color 0.3s;
+}
+.menu-items-container .menu-perfil-container:hover{
+    -fx-background-color: -gris-claro;
+    -fx-cursor: hand;
+}
+.menu-items-container .menu-perfil-container ImageView{
+    -fx-background-image: url('/images/default.png');
+}
+.menu-items-container .menu-perfil-container .detalles-miembro{
+    -fx-alignment: center_left;
+}
+.menu-items-container .menu-perfil-container .detalles-miembro .nombre{
+    -fx-text-fill: black;
+    -fx-font-size: 1.2em;
+    -fx-font-weight: bold;
+}
+.menu-items-container .menu-perfil-container .detalles-miembro .cargo{
+    -fx-text-fill: -gris;
+    -fx-font-size: 1.1em;
+}
+
+/* Módulos del menu */
+.menu-items-container .btn-link {
+    -fx-text-fill: -negro-claro;
+    -fx-font-size: 1.2em;
+    -fx-alignment: center_left;
+    -fx-pref-width: 280;
+    -fx-background-color: white;
+    -fx-padding: 10px 40px;
+    -fx-transition: text-fill 0.3s;
+    -fx-transition: background-color 0.3s;
+}
+.menu-items-container .btn-link:hover{
+    -fx-text-fill: black;
+    -fx-background-color: -gris-claro;
+    -fx-cursor: hand;
+}
+.menu-items-container .btn-link.actual{
+    -fx-text-fill: black;
+    -fx-background-color: -gris-claro;
+}
+.menu-items-container .btn-link ImageView{
+    -fx-opacity: 0.5;
+    -fx-transition: opacity 0.3s;
+    -fx-padding: 0 15 0 0;
+}
+.menu-items-container .btn-link:hover ImageView{
+    -fx-opacity: 1;
+}
+.menu-items-container .btn-link.actual ImageView{
+    -fx-opacity: 1;
+}
+/* Insertamos los iconos a los ImageView */
+.menu-items-container .btn-link ImageView#iconoInicio{
+    -fx-background-image: url('/images/icons/inicio.png');
+}
+.menu-items-container .btn-link ImageView#iconoExpedientes{
+    -fx-background-image: url('/images/icons/expedientes.png');
+}
+.menu-items-container .btn-link ImageView#iconoReuniones{
+    -fx-background-image: url('/images/icons/reuniones.png');
+}
+.menu-items-container .btn-link ImageView#iconoInvolucrados{
+    -fx-background-image: url('/images/icons/involucrados.png');
+}
+.menu-items-container .btn-link ImageView#iconoAcciones{
+    -fx-background-image: url('/images/icons/acciones.png');
+}
+.menu-items-container .btn-link ImageView#iconoMinutas{
+    -fx-background-image: url('/images/icons/minutas.png');
+}
+.menu-items-container .btn-link ImageView#iconoMiembros{
+    -fx-background-image: url('/images/icons/miembros.png');
+}
+.menu-items-container .btn-link ImageView#iconoAsistencias{
+    -fx-background-image: url('/images/icons/asistencias.png');
+}
+.menu-items-container .btn-link ImageView#iconoRevisiones{
+    -fx-background-image: url('/images/icons/revisiones.png');
+}
+.menu-items-container .btn-link ImageView#iconoOperaciones{
+    -fx-background-image: url('/images/icons/operaciones.png');
+}
+.menu-items-container .btn-link ImageView#iconoLogout{
+    -fx-background-image: url('/images/icons/logout.png');
+}
+.menu-items-container .btn-link ImageView#fotoPerfil{
+    -fx-background-image: url('/images/default.png');
+}

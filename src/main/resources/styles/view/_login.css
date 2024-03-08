@@ -1,0 +1,31 @@
+/* Contenedor del Login */
+.login-container{
+    -fx-background-color: -fondo-gris;
+}
+
+/* Logo del Login */
+.login-logo-container{
+    -fx-background-color: -primary;
+    -fx-alignment: center;
+}
+.login-logo-container Text{
+    -fx-font-size: 2em;
+    -fx-fill: -fondo-gris;
+    -fx-font-weight: bold;
+}
+.login-logo-container .logo{
+    -fx-background-image: url('/images/logo.png');
+    -fx-max-width: 90px;
+    -fx-max-height: 100px;
+}
+
+/*  Enlace si se olvidó la contraseña */
+.login-formulario-grid Text{
+    -fx-font-size: 1em;
+    -fx-fill: -link;
+    -fx-transition: fill 0.3s;
+}
+.login-formulario-grid Text:hover{
+    -fx-fill: -link-hover;
+    -fx-underline: true;
+}

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<VBox maxHeight="-Infinity" prefHeight="750.0" prefWidth="320.0" styleClass="vbox-container"
+      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.java.consejofacil.controller.MenuController">
+    <stylesheets>
+        <URL value="@../styles/_config.css"/>
+        <URL value="@../styles/view/_menu.css"/>
+        <URL value="@../styles/_container.css"/>
+    </stylesheets>
+    <AnchorPane maxWidth="-Infinity" prefHeight="730.0" prefWidth="300.0" styleClass="view-container"
+                stylesheets="@../styles/view/_menu.css">
+        <VBox layoutY="20.0" spacing="10.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0"
+              AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+            <HBox alignment="CENTER" layoutX="26.0" layoutY="20.0" prefWidth="280.0" spacing="10.0"
+                  styleClass="menu-logo-container" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="20.0">
+                <ImageView fitHeight="60.0" fitWidth="50.0" styleClass="logo">
+                    <Image url="@../images/logo2.png"/>
+                </ImageView>
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Consejo Fácil">
+                    <VBox.margin>
+                        <Insets top="5.0"/>
+                    </VBox.margin>
+                </Text>
+            </HBox>
+            <VBox prefWidth="300.0" styleClass="menu-items-container" AnchorPane.leftAnchor="0.0"
+                  AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0">
+                <Line endX="250.0"/>
+                <HBox fx:id="btnPerfil" maxWidth="260.0" prefWidth="260.0" spacing="10.0"
+                      styleClass="menu-perfil-container">
+                    <!-- Circle para redondear la imagen -->
+                    <ImageView fx:id="fotoPerfil" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true"
+                               preserveRatio="true" styleClass="image-view">
+                        <Image url="@../images/default.png"/>
+                    </ImageView>
+
+                    <VBox alignment="CENTER" maxWidth="200.0" prefWidth="200.0" spacing="5.0"
+                          styleClass="detalles-miembro">
+                        <Label maxWidth="220.0" styleClass="nombre" text="Joaquín Küster"
+                               wrapText="true"/>
+                        <Label maxWidth="220.0" styleClass="cargo"
+                               text="Director del Dept. Informática"/>
+                    </VBox>
+                </HBox>
+                <Line endX="250.0"/>
+                <Button fx:id="btnInicio" mnemonicParsing="false" text="Inicio">
+                    <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" opacity="0.52" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <Image url="@../images/icons/inicio.png"/>
+                        </ImageView>
+                    </graphic>
+                    <styleClass>
+                        <String fx:value="btn-link"/>
+                        <String fx:value="actual"/>
+                    </styleClass>
+                </Button>
+                <Button fx:id="btnExpedientes" mnemonicParsing="false" styleClass="btn-link" text="Expedientes">
+                    <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <Image url="@../images/icons/expedientes.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnReuniones" mnemonicParsing="false" styleClass="btn-link" text="Reuniones">
+                    <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <Image url="@../images/icons/reuniones.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnInvolucrados" mnemonicParsing="false" styleClass="btn-link"
+                        text="Involucrados">
+                    <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <Image url="@../images/icons/involucrados.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnAcciones" mnemonicParsing="false" styleClass="btn-link" text="Acciones">
+                    <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <Image url="@../images/icons/acciones.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnMinutas" mnemonicParsing="false" styleClass="btn-link" text="Minutas">
+                    <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <Image url="@../images/icons/minutas.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnMiembros" mnemonicParsing="false" styleClass="btn-link" text="Miembros">
+                    <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <Image url="@../images/icons/miembros.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnAsistencias" mnemonicParsing="false" styleClass="btn-link" text="Asistencias">
+                    <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <Image url="@../images/icons/asistencias.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnRevisiones" mnemonicParsing="false" styleClass="btn-link" text="Revisiones">
+                    <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0"
+                                   pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../images/icons/revisiones.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnHistorialCambios" mnemonicParsing="false" styleClass="btn-link"
+                        text="Historial de cambios" wrapText="true">
+                    <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <Image url="@../images/icons/operaciones.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Line endX="250.0">
+                    <VBox.margin>
+                        <Insets bottom="10.0"/>
+                    </VBox.margin>
+                </Line>
+                <Button fx:id="btnLogout" mnemonicParsing="false" styleClass="btn-personalizado"
+                        stylesheets="@../styles/_styles.css" text="Cerrar Sesión">
+                    <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <Image url="@../images/icons/logout.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </VBox>
+        </VBox>
+    </AnchorPane>
+</VBox>

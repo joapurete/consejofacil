@@ -1,0 +1,22 @@
+/* Acciones del Center */
+.center-acciones-container{
+    -fx-alignment: center_left;
+}
+
+/* Insertamos los iconos a las acciones (agregar, modificar y eliminar) */
+.btn-personalizado.agregar ImageView{
+    -fx-background-image: url('/images/icons/agregar.png');
+}
+.btn-personalizado.eliminar{
+    -fx-background-color: -rojo;
+}
+.btn-personalizado.eliminar ImageView{
+    -fx-background-image: url('/images/icons/eliminar.png');
+}
+.btn-personalizado.modificar{
+    -fx-text-fill: black;
+    -fx-background-color: -amarillo;
+}
+.btn-personalizado.modificar ImageView{
+    -fx-background-image: url('/images/icons/modificar.png');
+}

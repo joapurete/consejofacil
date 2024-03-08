@@ -1,0 +1,37 @@
+/* Estilos generales */
+
+/* Reseteamos márgenes y rellenos */
+.root {
+    -fx-padding: 0;
+    -fx-spacing: 0;
+}
+
+/* Establecemos fuente predeterminada */
+* {
+    -fx-font-family: "Poppins Medium", sans-serif;
+}
+
+/* Colores principales */
+* {
+    -primary: rgb(31, 107, 183);
+    -primary-light_x1: rgba(31, 107, 183, 0.1);
+    -primary-light_x3: rgba(31, 107, 183, 0.3);
+    -primary-light_x8: rgba(31, 107, 183, 0.8);
+
+    -borde-claro: #e0e0e0;
+    -fondo-gris: #eee;
+    -sombra-gris: #aaa;
+
+    -gris-claro: #f0f0f0;
+    -gris-suave: #ccc;
+    -gris: #999;
+    -gris-fuerte: #555;
+
+    -rojo: #DC3545;
+    -amarillo: #FFD700;
+
+    -negro-claro: rgba(0, 0, 0, 0.5);
+
+    -link: #0C8CE9;
+    -link-hover: #0A78C9;
+}
