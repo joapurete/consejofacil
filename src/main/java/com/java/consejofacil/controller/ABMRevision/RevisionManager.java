@@ -17,6 +17,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -186,7 +187,7 @@ public class RevisionManager {
 
     // Metodos para agregar, modificar y eliminar revisiones
 
-    public Revision obtenerDatosFormulario(){
+    public Revision obtenerDatosFormulario() {
         // Obtenemos la información en los campos
         Reunion reunion = abmRevisionControlador.getCmbReunion().getValue();
         Expediente expediente = abmRevisionControlador.getCmbExpediente().getValue();
@@ -426,7 +427,7 @@ public class RevisionManager {
 
             // Verificamos que los detalles no supere los 500 caracteres
             if (controlador.getTxtDetallesRevision().getLength() > 500) {
-                errores.add("Los detalles del involucrado no pueden tener más de 500 caracteres.");
+                errores.add("Los detalles de la revisión no pueden tener más de 500 caracteres.");
             }
 
             // Verificamos que la revisión no esté repetida en el sistema
@@ -485,7 +486,7 @@ public class RevisionManager {
 
         // Verificamos que los detalles no supere los 500 caracteres
         if (rev.getDetallesRevision().length() > 500) {
-            errores.add("Los detalles del involucrado no pueden tener más de 500 caracteres.");
+            errores.add("Los detalles de la revisión no pueden tener más de 500 caracteres.");
         }
 
         // En caso de que haya errores, agregarlo a la lista de errores para mostrarlos en pantalla
@@ -531,8 +532,8 @@ public class RevisionManager {
         }
 
         if (controlador instanceof FormularioListaRevisionController) {
-            // Limpiamos la tabla de revisiones
-            abmListaRevisionControlador.getTblRevisiones().getItems().clear();
+            // Cargamos la lista de revisiones sin una reunion seleccionada
+            cargarListaRevisiones(null);
         }
     }
 
@@ -569,11 +570,14 @@ public class RevisionManager {
         helpers.configurarEstadoExpediente(abmListaRevisionControlador.getColEstado());
 
         // Configuramos el TextField para que pueda modificar en tiempo de ejecucion los detalles de la revision
-        helpers.configurarTextFieldTableCell(abmListaRevisionControlador.getColDetallesRevision());
+        helpers.configurarTxtFieldTabla(abmListaRevisionControlador.getColDetallesRevision());
 
         // Configuramos el CheckBox para que pueda seleccionar nuevas revisiones a la lista
         helpers.configurarCheckTableCell(abmListaRevisionControlador.getColSeleccionar(),
                 abmListaRevisionControlador.getExpedientesSeleccionados());
+
+        // Cargamos la lista de revisiones
+        cargarListaRevisiones(null);
     }
 
     public void inicializarFiltrosListaRevisiones() {
@@ -593,9 +597,7 @@ public class RevisionManager {
 
     public void buscarExpedientesPorReunion() {
         // Agregamos los expedientes asociados a la reunión seleccionada
-        if (abmListaRevisionControlador.getCmbReunion().getValue() != null) {
-            cargarListaRevisiones(abmListaRevisionControlador.getCmbReunion().getValue());
-        }
+        cargarListaRevisiones(abmListaRevisionControlador.getCmbReunion().getValue());
 
         // Actualizamos la tabla de revisiones
         abmListaRevisionControlador.getTblRevisiones().refresh();
@@ -619,11 +621,13 @@ public class RevisionManager {
         abmListaRevisionControlador.getFiltroRevisiones().clear();
         abmListaRevisionControlador.getExpedientesSeleccionados().clear();
 
-        // Cargamos la lista de revisiones seleccionadas por reunion
-        abmListaRevisionControlador.getRevisiones().addAll(revisionService.encontrarRevisionesPorReunion(reunion));
+        if (reunion != null) {
+            // Cargamos la lista de revisiones seleccionadas por reunion
+            abmListaRevisionControlador.getRevisiones().addAll(revisionService.encontrarRevisionesPorReunion(reunion));
 
-        // Cargamos la lista de expedientes seleccionados
-        cargarExpedientesSeleccionados();
+            // Cargamos la lista de expedientes seleccionados
+            cargarExpedientesSeleccionados();
+        }
 
         // Obtenemos todos los expedientes
         List<Expediente> listaExpedientes = expedienteService.findAll();
@@ -653,7 +657,7 @@ public class RevisionManager {
 
     // Metodos para filtrar las revisiones seleccionadas
 
-    public boolean mostrarExpedientesSeleccionados(Revision rev) {
+    public boolean mostrarExpedienteSeleccionado(Revision rev) {
         // Verificamos si el CheckBox de mostrar seleccionados está presionado
         // En ese caso, mostrar solo aquellos que esten contenidos en la lista, y no los haya que eliminar
         return (abmListaRevisionControlador.getExpedientesSeleccionados().containsKey(rev.getExpediente())
@@ -667,7 +671,7 @@ public class RevisionManager {
 
         // Filtramos todas las revisiones según el criterio especificado
         for (Revision rev : abmListaRevisionControlador.getRevisiones()) {
-            if (mostrarExpedientesSeleccionados(rev)) {
+            if (mostrarExpedienteSeleccionado(rev)) {
                 if (aplicarFiltroListaRevisiones(rev)) {
                     abmListaRevisionControlador.getFiltroRevisiones().add(rev);
                 }
@@ -693,7 +697,7 @@ public class RevisionManager {
                 && (detallesRevision == null || rev.getDetallesRevision().toLowerCase().contains(detallesRevision.toLowerCase()));
     }
 
-    public void limpiarFiltrosListaExpedientes() {
+    public void limpiarFiltrosListaRevisiones() {
         // Guardamos los eventos de los filtros
         EventHandler<ActionEvent> handlerEstado = abmListaRevisionControlador.getCmbEstado().getOnAction();
         EventHandler<ActionEvent> handlerFechaIngreso = abmListaRevisionControlador.getDtpFechaIngreso().getOnAction();

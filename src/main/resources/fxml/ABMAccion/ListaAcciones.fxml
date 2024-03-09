@@ -26,11 +26,11 @@
             <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" spacing="20.0"
                   styleClass="titulo-principal-container" AnchorPane.leftAnchor="20.0"
                   AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+
                 <Line endX="100.0" startX="-100.0"/>
                 <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titulo-principal"
                       text="Lista de Acciones"/>
                 <Line endX="100.0" startX="-100.0"/>
-
             </HBox>
             <GridPane hgap="10.0" layoutX="10.0" layoutY="76.0" vgap="30.0" AnchorPane.leftAnchor="20.0"
                       AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="76.0">
@@ -50,10 +50,9 @@
                 <Label styleClass="label-formulario" text="Expediente:" GridPane.columnIndex="2"
                        GridPane.halignment="CENTER"/>
                 <ComboBox fx:id="cmbExpediente" editable="true" maxWidth="1.7976931348623157E308"
-                          onAction="#filtrarPorExpediente" prefHeight="154.0"
-                          styleClass="combo-personalizado" GridPane.columnIndex="3"/>
-                <Button mnemonicParsing="false"
-                        onAction="#seleccionarExpediente" GridPane.columnIndex="4">
+                          onAction="#filtrarPorExpediente" prefHeight="154.0" styleClass="combo-personalizado"
+                          GridPane.columnIndex="3"/>
+                <Button mnemonicParsing="false" onAction="#seleccionarExpediente" GridPane.columnIndex="4">
                     <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                    preserveRatio="true">
@@ -72,9 +71,8 @@
                             GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                 <TextField fx:id="txtDetalles" onKeyReleased="#filtrarPorDetalles" promptText="..."
                            styleClass="text-field-personalizado" GridPane.columnIndex="1"/>
-                <Button mnemonicParsing="false" onAction="#limpiarFiltro"
-                        text="Limpiar" GridPane.columnIndex="4" GridPane.halignment="CENTER"
-                        GridPane.rowIndex="1">
+                <Button mnemonicParsing="false" onAction="#limpiarFiltro" text="Limpiar"
+                        GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                     <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                    preserveRatio="true">
@@ -102,11 +100,10 @@
                 </columnResizePolicy>
             </TableView>
             <VBox layoutX="20.0" layoutY="667.0" spacing="10.0">
-                <HBox spacing="10.0" styleClass="center-acciones-container"
-                      AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0">
-                    <Button layoutX="43.0" layoutY="673.0" mnemonicParsing="false"
-                            onAction="#agregarAccion" stylesheets="@../../styles/_styles.css"
-                            text="Agregar">
+                <HBox spacing="10.0" styleClass="center-acciones-container" AnchorPane.bottomAnchor="20.0"
+                      AnchorPane.leftAnchor="20.0">
+                    <Button layoutX="43.0" layoutY="673.0" mnemonicParsing="false" onAction="#agregarAccion"
+                            stylesheets="@../../styles/_styles.css" text="Agregar">
                         <graphic>
                             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                        preserveRatio="true">

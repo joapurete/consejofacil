@@ -24,7 +24,7 @@
               AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0"
               AnchorPane.topAnchor="20.0">
             <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="titulo-principal-container">
-                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Datos de la revisión"/>
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Datos de las revisiones"/>
                 <Line endX="200.0"/>
             </HBox>
             <GridPane hgap="10.0">
@@ -41,8 +41,7 @@
                 <ComboBox fx:id="cmbReunion" editable="true" maxWidth="1.7976931348623157E308"
                           onAction="#buscarExpedientesPorReunion" prefHeight="154.0"
                           styleClass="combo-personalizado" GridPane.columnIndex="1"/>
-                <Button mnemonicParsing="false" onAction="#seleccionarReunion"
-                        GridPane.columnIndex="2">
+                <Button mnemonicParsing="false" onAction="#seleccionarReunion" GridPane.columnIndex="2">
                     <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                    preserveRatio="true">
@@ -54,8 +53,7 @@
                         <String fx:value="buscar"/>
                     </styleClass>
                 </Button>
-                <Button mnemonicParsing="false" onAction="#nuevaReunion" text="Nuevo"
-                        GridPane.columnIndex="3">
+                <Button mnemonicParsing="false" onAction="#nuevaReunion" text="Nuevo" GridPane.columnIndex="3">
                     <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                    preserveRatio="true">
@@ -91,9 +89,8 @@
                           styleClass="combo-personalizado" GridPane.columnIndex="3"/>
                 <TextField fx:id="txtNota" maxWidth="1.7976931348623157E308" onKeyReleased="#filtrarPorNota"
                            promptText="..." styleClass="text-field-personalizado" GridPane.columnIndex="1"/>
-                <Button mnemonicParsing="false" onAction="#limpiarFiltro"
-                        text="Limpiar" GridPane.columnIndex="4" GridPane.halignment="CENTER"
-                        GridPane.rowIndex="1">
+                <Button mnemonicParsing="false" onAction="#limpiarFiltro" text="Limpiar"
+                        GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                     <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                    preserveRatio="true">
@@ -137,8 +134,8 @@
                 <rowConstraints>
                     <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
-                <Button layoutX="23.0" layoutY="584.0" mnemonicParsing="false"
-                        onAction="#guardarRevisiones" styleClass="btn-personalizado" text="Guardar"/>
+                <Button layoutX="23.0" layoutY="584.0" mnemonicParsing="false" onAction="#guardarRevisiones"
+                        styleClass="btn-personalizado" text="Guardar"/>
                 <CheckBox fx:id="checkSeleccionarTodo" mnemonicParsing="false" onAction="#seleccionarTodos"
                           styleClass="check-box-personalizado" text="Seleccionar todo"
                           GridPane.columnIndex="1"/>

@@ -67,6 +67,8 @@ public class ListaAsistenciaController implements Initializable {
     private ObservableList<Reunion> reuniones = FXCollections.observableArrayList();
     @Getter
     private ObservableList<Miembro> miembros = FXCollections.observableArrayList();
+    @Getter
+    private ObservableList<EstadoAsistencia> estadosAsistencias = FXCollections.observableArrayList();
 
     @Autowired
     @Lazy

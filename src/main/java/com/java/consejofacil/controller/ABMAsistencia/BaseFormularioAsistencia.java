@@ -27,6 +27,7 @@ public class BaseFormularioAsistencia {
     private final ObservableList<Asistencia> asistencias = FXCollections.observableArrayList();
     private final ObservableList<Reunion> reuniones = FXCollections.observableArrayList();
     private final ObservableList<Miembro> miembros = FXCollections.observableArrayList();
+    private final ObservableList<EstadoAsistencia> estadosAsistencias = FXCollections.observableArrayList();
 
     // Asistencia
     @Setter

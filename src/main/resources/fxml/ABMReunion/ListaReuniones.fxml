@@ -26,11 +26,11 @@
             <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" spacing="20.0"
                   styleClass="titulo-principal-container" AnchorPane.leftAnchor="20.0"
                   AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+
                 <Line endX="100.0" startX="-100.0"/>
                 <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titulo-principal"
                       text="Lista de Reuniones"/>
                 <Line endX="100.0" startX="-100.0"/>
-
             </HBox>
             <GridPane hgap="10.0" layoutX="10.0" layoutY="76.0" vgap="30.0" AnchorPane.leftAnchor="20.0"
                       AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="76.0">
@@ -48,8 +48,8 @@
                        GridPane.halignment="CENTER"/>
                 <DatePicker fx:id="dtpFechaReunion" editable="false" onAction="#filtrarPorFechaReunion"
                             prefWidth="274.0" styleClass="datepicker-personalizado" GridPane.columnIndex="3"/>
-                <Button mnemonicParsing="false" onAction="#limpiarFiltros"
-                        text="Limpiar" GridPane.columnIndex="4" GridPane.halignment="CENTER">
+                <Button mnemonicParsing="false" onAction="#limpiarFiltros" text="Limpiar"
+                        GridPane.columnIndex="4" GridPane.halignment="CENTER">
                     <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                    preserveRatio="true">
@@ -82,7 +82,8 @@
                 <HBox alignment="BOTTOM_LEFT" spacing="10.0" styleClass="center-acciones-container"
                       AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0">
                     <Button layoutX="43.0" layoutY="673.0" mnemonicParsing="false"
-                            onAction="#agregarReunion" stylesheets="@../../styles/_styles.css" text="Agregar">
+                            onAction="#agregarReunion" stylesheets="@../../styles/_styles.css"
+                            text="Agregar">
                         <graphic>
                             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                        preserveRatio="true">

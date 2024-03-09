@@ -131,5 +131,5 @@ public class FormularioListaRevisionController extends BaseFormularioRevision im
     private void nuevaReunion() { getRevisionManager().limpiarFormulario(this); }
 
     @FXML
-    private void limpiarFiltro() { getRevisionManager().limpiarFiltrosListaExpedientes(); }
+    private void limpiarFiltro() { getRevisionManager().limpiarFiltrosListaRevisiones(); }
 }

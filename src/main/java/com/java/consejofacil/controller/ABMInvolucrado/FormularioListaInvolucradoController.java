@@ -97,7 +97,7 @@ public class FormularioListaInvolucradoController extends BaseFormularioInvolucr
         // Inicializamos combos
         involucradoManager.inicializarCombosFormulario(this);
         // Inicializamos filtros de la tabla
-        involucradoManager.inicializarFiltrosListaMiembros();
+        involucradoManager.inicializarFiltrosListaInvolucrados();
         // Inicializamos cadenas de strings
         involucradoManager.inicializarCadenasTexto();
     }
@@ -115,16 +115,16 @@ public class FormularioListaInvolucradoController extends BaseFormularioInvolucr
     // Filtramos por la información seleccionada
 
     @FXML
-    private void filtrarPorNombre() { involucradoManager.filtrarListaMiembros(); }
+    private void filtrarPorNombre() { involucradoManager.filtrarListaInvolucrados(); }
 
     @FXML
-    private void filtrarPorCargo() { involucradoManager.filtrarListaMiembros(); }
+    private void filtrarPorCargo() { involucradoManager.filtrarListaInvolucrados(); }
 
     @FXML
-    private void filtrarPorEstado() { involucradoManager.filtrarListaMiembros(); }
+    private void filtrarPorEstado() { involucradoManager.filtrarListaInvolucrados(); }
 
     @FXML
-    private void filtrarPorDetalles() { involucradoManager.filtrarListaMiembros(); }
+    private void filtrarPorDetalles() { involucradoManager.filtrarListaInvolucrados(); }
 
     // Metodos de los CheckBox
 
@@ -132,7 +132,7 @@ public class FormularioListaInvolucradoController extends BaseFormularioInvolucr
     private void seleccionarTodos() { involucradoManager.seleccionarTodosLosMiembros(); }
 
     @FXML
-    void mostrarInvolucradosSeleccionados() { involucradoManager.filtrarListaMiembros(); }
+    void mostrarInvolucradosSeleccionados() { involucradoManager.filtrarListaInvolucrados(); }
 
     // Metodos de busqueda avanzada de los combos
 
@@ -148,6 +148,6 @@ public class FormularioListaInvolucradoController extends BaseFormularioInvolucr
 
     @FXML
     private void limpiarFiltros() {
-        involucradoManager.limpiarFiltrosListaMiembros();
+        involucradoManager.limpiarFiltrosListaInvolucrados();
     }
 }

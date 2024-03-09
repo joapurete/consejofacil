@@ -18,6 +18,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -186,7 +187,7 @@ public class InvolucradoManager {
 
     // Metodos para agregar, modificar y eliminar involucrados
 
-    public Involucrado obtenerDatosFormulario(){
+    public Involucrado obtenerDatosFormulario() {
         // Obtenemos la información de los campos
         Expediente expediente = abmInvolucradoControlador.getCmbExpediente().getValue();
         Miembro miembro = abmInvolucradoControlador.getCmbInvolucrado().getValue();
@@ -447,14 +448,14 @@ public class InvolucradoManager {
             errores.add("El involucrado " + inv.getMiembro().toString() + " no se encuentra en la base de datos.");
         } else {
             if (!involucrado.getEstadoMiembro().getEstadoMiembro().equals("Activo")) {
-                errores.add("El involucrado " + inv.getMiembro().toString() + " se encuentra inactivo.");
+                errores.add("El involucrado " + inv.getMiembro().toString() + " se encuentra inactivo o en espera.");
                 errores.add("Debe seleccionar un involucrado activo en el sistema.");
             }
         }
 
         // Verificamos que los detalles no supere los 500 caracteres
         if (inv.getDetallesInvolucrado().length() > 500) {
-            errores.add("Los detalles del involucrado no pueden tener más de 500 caracteres.");
+            errores.add("Los detalles del involucrado " + inv.getMiembro().toString() + " no pueden tener más de 500 caracteres.");
         }
 
         // En caso de que haya errores, agregarlo a la lista de errores para mostrarlos en pantalla
@@ -500,8 +501,8 @@ public class InvolucradoManager {
         }
 
         if (controlador instanceof FormularioListaInvolucradoController) {
-            // Limpiamos la tabla de involucrados
-            abmListaInvolucradoControlador.getTblInvolucrados().getItems().clear();
+            // Cargamos la tabla de involucrados sin un expediente seleccionado
+            cargarListaInvolucrados(null);
         }
     }
 
@@ -542,14 +543,17 @@ public class InvolucradoManager {
         helpers.configurarEstadoMiembro(abmListaInvolucradoControlador.getColEstado());
 
         // Configuramos el TextField para que pueda modificar en tiempo de ejecucion los detalles del involucrado
-        helpers.configurarTextFieldTableCell(abmListaInvolucradoControlador.getColDetallesInvolucrado());
+        helpers.configurarTxtFieldTabla(abmListaInvolucradoControlador.getColDetallesInvolucrado());
 
         // Configuramos el CheckBox para que pueda seleccionar nuevos involucrados a la lista
         helpers.configurarCheckTableCell(abmListaInvolucradoControlador.getColSeleccionar(),
                 abmListaInvolucradoControlador.getMiembrosSeleccionados());
+
+        // Cargamos la lista de involucrados
+        cargarListaInvolucrados(null);
     }
 
-    public void inicializarFiltrosListaMiembros() {
+    public void inicializarFiltrosListaInvolucrados() {
         // Cargamos lista y combo de cargos
         abmListaInvolucradoControlador.getCargos().clear();
         abmListaInvolucradoControlador.getCargos().addAll(cargoService.findAll());
@@ -639,9 +643,7 @@ public class InvolucradoManager {
 
     public void buscarInvolucradosPorExpediente() {
         // Cargamos los involucrados asociados al expediente seleccionado
-        if (abmListaInvolucradoControlador.getCmbExpediente().getValue() != null) {
-            cargarListaInvolucrados(abmListaInvolucradoControlador.getCmbExpediente().getValue());
-        }
+        cargarListaInvolucrados(abmListaInvolucradoControlador.getCmbExpediente().getValue());
 
         // Actualizamos la tabla
         abmListaInvolucradoControlador.getTblInvolucrados().refresh();
@@ -665,11 +667,13 @@ public class InvolucradoManager {
         abmListaInvolucradoControlador.getFiltroInvolucrados().clear();
         abmListaInvolucradoControlador.getMiembrosSeleccionados().clear();
 
-        // Cargamos la lista de involucrados seleccionados por expedientes
-        abmListaInvolucradoControlador.getInvolucrados().addAll(involucradoService.encontrarInvolucradosPorExpediente(expediente));
+        if (expediente != null) {
+            // Cargamos la lista de involucrados seleccionados por expedientes
+            abmListaInvolucradoControlador.getInvolucrados().addAll(involucradoService.encontrarInvolucradosPorExpediente(expediente));
 
-        // Cargamos la lista de miembros seleccionados a partir de los involucrados
-        cargarMiembrosSeleccionados();
+            // Cargamos la lista de miembros seleccionados a partir de los involucrados
+            cargarMiembrosSeleccionados();
+        }
 
         // Obtenemos todos los miembros
         List<Miembro> listaMiembros = miembroService.findAll();
@@ -699,7 +703,7 @@ public class InvolucradoManager {
 
     // Metodos para filtrar los involucrados seleccionados
 
-    public boolean mostrarMiembrosSeleccionados(Involucrado inv) {
+    public boolean mostrarMiembroSeleccionado(Involucrado inv) {
         // Verificamos si el CheckBox de mostrar seleccionados está presionado
         // En ese caso, mostrar solo aquellos que esten contenidos en la lista, y no los haya que eliminar
         return (abmListaInvolucradoControlador.getMiembrosSeleccionados().containsKey(inv.getMiembro())
@@ -707,14 +711,14 @@ public class InvolucradoManager {
                 || !abmListaInvolucradoControlador.getCheckMostrarSeleccionados().isSelected();
     }
 
-    public void filtrarListaMiembros() {
+    public void filtrarListaInvolucrados() {
         // Limpiamos la lista filtro de miembros
         abmListaInvolucradoControlador.getFiltroInvolucrados().clear();
 
         // Filtramos todos los miembros según el criterio especificado
         for (Involucrado inv : abmListaInvolucradoControlador.getInvolucrados()) {
-            if (mostrarMiembrosSeleccionados(inv)) {
-                if (aplicarFiltroListaMiembros(inv)) {
+            if (mostrarMiembroSeleccionado(inv)) {
+                if (aplicarFiltroListaInvolucrados(inv)) {
                     abmListaInvolucradoControlador.getFiltroInvolucrados().add(inv);
                 }
             }
@@ -724,7 +728,7 @@ public class InvolucradoManager {
         abmListaInvolucradoControlador.getTblInvolucrados().refresh();
     }
 
-    public boolean aplicarFiltroListaMiembros(Involucrado inv) {
+    public boolean aplicarFiltroListaInvolucrados(Involucrado inv) {
         // Obtenemos los filtros
         String nombre = abmListaInvolucradoControlador.getTxtNombre().getText();
         Cargo cargo = abmListaInvolucradoControlador.getCmbCargo().getValue();
@@ -739,7 +743,7 @@ public class InvolucradoManager {
                 && (detallesInvolucrado == null || inv.getDetallesInvolucrado().toLowerCase().contains(detallesInvolucrado.toLowerCase()));
     }
 
-    public void limpiarFiltrosListaMiembros() {
+    public void limpiarFiltrosListaInvolucrados() {
         // Guardamos los eventos de los filtros
         EventHandler<ActionEvent> handlerCargo = abmListaInvolucradoControlador.getCmbCargo().getOnAction();
         EventHandler<ActionEvent> handlerEstado = abmListaInvolucradoControlador.getCmbEstado().getOnAction();
@@ -755,7 +759,7 @@ public class InvolucradoManager {
         abmListaInvolucradoControlador.getCmbEstado().setValue(null);
 
         // Filtramos miembros
-        filtrarListaMiembros();
+        filtrarListaInvolucrados();
 
         // Restauramos los eventos asociados a los filtros
         abmListaInvolucradoControlador.getCmbCargo().setOnAction(handlerCargo);

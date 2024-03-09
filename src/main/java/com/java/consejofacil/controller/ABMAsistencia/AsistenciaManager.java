@@ -1,16 +1,12 @@
 package com.java.consejofacil.controller.ABMAsistencia;
 
 import com.java.consejofacil.config.StageManager;
-import com.java.consejofacil.controller.ABMAccion.FormularioAccionController;
 import com.java.consejofacil.helpers.Helpers;
 import com.java.consejofacil.model.*;
 import com.java.consejofacil.service.Asistencia.AsistenciaServiceImpl;
 import com.java.consejofacil.service.Cargo.CargoServiceImpl;
-import com.java.consejofacil.service.EstadoAsistencia.EstadoAsistenciaService;
 import com.java.consejofacil.service.EstadoAsistencia.EstadoAsistenciaServiceImpl;
 import com.java.consejofacil.service.EstadoMiembro.EstadoMiembroServiceImpl;
-import com.java.consejofacil.service.Expediente.ExpedienteServiceImpl;
-import com.java.consejofacil.service.Involucrado.InvolucradoServiceImpl;
 import com.java.consejofacil.service.Miembro.MiembroServiceImpl;
 import com.java.consejofacil.service.Reunion.ReunionServiceImpl;
 import com.java.consejofacil.view.FXMLView;
@@ -24,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +34,9 @@ public class AsistenciaManager {
     @Autowired
     @Lazy
     private Helpers helpers;
+
+    // Variables de control
+    DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     // Servicios necesarios
     @Autowired
@@ -107,6 +108,11 @@ public class AsistenciaManager {
         listaAsistenciasControlador.getMiembros().addAll(miembroService.encontrarMiembrosActivos());
         listaAsistenciasControlador.getCmbMiembro().setItems(listaAsistenciasControlador.getMiembros());
         helpers.configurarComboEditable(listaAsistenciasControlador.getCmbMiembro());
+
+        // Cargamos lista y combo de estados de asistencias
+        listaAsistenciasControlador.getEstadosAsistencias().clear();
+        listaAsistenciasControlador.getEstadosAsistencias().addAll(estadoAsistenciaService.findAll());
+        listaAsistenciasControlador.getCmbEstado().setItems(listaAsistenciasControlador.getEstadosAsistencias());
     }
 
     public void inicializarCombosFormulario(BaseFormularioAsistencia controlador) {
@@ -122,6 +128,11 @@ public class AsistenciaManager {
             controlador.getMiembros().addAll(miembroService.encontrarMiembrosActivos());
             controlador.getCmbMiembro().setItems(controlador.getMiembros());
             helpers.configurarComboEditable(controlador.getCmbMiembro());
+
+            // Cargamos lista y combos de estados de asistencias
+            controlador.getEstadosAsistencias().clear();
+            controlador.getEstadosAsistencias().addAll(estadoAsistenciaService.findAll());
+            controlador.getCmbEstado().setItems(controlador.getEstadosAsistencias());
         }
     }
 
@@ -372,57 +383,71 @@ public class AsistenciaManager {
 
     // Metdodos para validar los campos de los formularios
 
-    private boolean validarCamposFormulario(BaseFormularioInvolucrado controlador) {
+    private boolean validarCamposFormulario(BaseFormularioAsistencia controlador) {
         ArrayList<String> errores = new ArrayList<>();
-        Involucrado aux = new Involucrado();
+        Asistencia aux = new Asistencia();
 
-        // Verificamos que haya seleccionado un expediente
-        if (controlador.getCmbExpediente().getValue() == null) {
-            errores.add("Por favor, seleccione un expediente.");
+        // Verificamos que haya seleccionado una reunión
+        if (controlador.getCmbReunion().getValue() == null) {
+            errores.add("Por favor, seleccione un reunión.");
         } else {
-            Expediente expediente = expedienteService.findById(controlador.getCmbExpediente().getValue().getId());
-            if (expediente == null) {
-                errores.add("El expediente seleccionado no se encuentra en la base de datos.");
-            } else if (controlador instanceof FormularioInvolucradoController) {
-                // Establecemos expediente al auxiliar
-                aux.setExpediente(expediente);
+            Reunion reunion = reunionService.findById(controlador.getCmbReunion().getValue().getId());
+            if (reunion == null) {
+                errores.add("La reunión seleccionada no se encuentra en la base de datos.");
+            } else if (controlador instanceof FormularioAsistenciaController) {
+                // Establecemos reunión al auxiliar
+                aux.setReunion(reunion);
             }
         }
 
         // Validaciones específicas del formulario original
 
-        if (controlador instanceof FormularioInvolucradoController) {
+        if (controlador instanceof FormularioAsistenciaController) {
 
-            // Verificamos que haya seleccionado un involucrado y que no esté inactivo en el sistema
-            if (controlador.getCmbInvolucrado().getValue() == null) {
-                errores.add("Por favor, seleccione un involucrado.");
+            // Verificamos que haya seleccionado un miembro y que no esté inactivo en el sistema
+            if (controlador.getCmbMiembro().getValue() == null) {
+                errores.add("Por favor, seleccione un miembro del consejo.");
             } else {
-                Miembro involucrado = miembroService.findById(controlador.getCmbInvolucrado().getValue().getDni());
-                if (involucrado == null) {
-                    errores.add("El involucrado seleccionado no se encuentra en la base de datos.");
+                Miembro miembro = miembroService.findById(controlador.getCmbMiembro().getValue().getDni());
+                if (miembro == null) {
+                    errores.add("El miembro del consejo seleccionado no se encuentra en la base de datos.");
                 } else {
-                    if (!involucrado.getEstadoMiembro().getEstadoMiembro().equals("Activo")) {
-                        errores.add("Debe seleccionar un involucrado activo en el sistema.");
+                    if (!miembro.getEstadoMiembro().getEstadoMiembro().equals("Activo")) {
+                        errores.add("Debe seleccionar un miembro del consejo activo en el sistema.");
                     }
-                    // Establecemos involucrado al auxiliar
-                    aux.setMiembro(involucrado);
+                    // Establecemos miembro al auxiliar
+                    aux.setMiembro(miembro);
                 }
             }
 
-            // Verificamos que los detalles no supere los 500 caracteres
-            if (controlador.getTxtDetallesInvolucrado().getLength() > 500) {
-                errores.add("Los detalles del involucrado no pueden tener más de 500 caracteres.");
+            // Verificamos que haya seleccionado un estado de asistencia
+            if (controlador.getCmbEstado().getValue() == null) {
+                errores.add("Por favor, seleccione un estado de asistencia.");
+            } else {
+                EstadoAsistencia estadoAsistencia = estadoAsistenciaService.findById(controlador.getCmbEstado().getValue().getId());
+                if (estadoAsistencia == null) {
+                    errores.add("El estado de asistencia seleccionado no se encuentra en la base de datos.");
+                } else {
+                    // Verificamos que la asistencia no se marcada como presente en reuniones que aun no han ocurrido
+                    if (aux.getReunion() != null) {
+                        if (aux.getReunion().getFechaReunion().isAfter(LocalDate.now()) &&
+                                estadoAsistencia.getEstadoAsistencia().equals("Presente")) {
+                            errores.add("La asistencia no puede ser marcada como presente en reuniones " +
+                                    "futuras al día de hoy " + LocalDate.now().format(formatoFecha) + ".");
+                        }
+                    }
+                }
             }
 
-            // Verificamos que el involucrado no esté repetido en el sistema
-            if (aux.getExpediente() != null && aux.getMiembro() != null) {
-                boolean esNuevoInvolucrado = controlador.getInvolucrado() == null;
-                boolean esDiferente = esNuevoInvolucrado ||
-                        !controlador.getInvolucrado().getExpediente().equals(aux.getExpediente()) ||
-                        !controlador.getInvolucrado().getMiembro().equals(aux.getMiembro());
-                if (esNuevoInvolucrado || esDiferente) {
-                    if (involucradoService.existeDuplicado(aux.getExpediente().getId(), aux.getMiembro().getDni()) >= 1) {
-                        errores.add("El involucrado ya está asociado al expediente seleccionado.");
+            // Verificamos que la asistencia no esté repetida en el sistema
+            if (aux.getReunion() != null && aux.getMiembro() != null) {
+                boolean esNuevaAsistencia = controlador.getAsistencia() == null;
+                boolean esDiferente = esNuevaAsistencia ||
+                        !controlador.getAsistencia().getReunion().equals(aux.getReunion()) ||
+                        !controlador.getAsistencia().getMiembro().equals(aux.getMiembro());
+                if (esNuevaAsistencia || esDiferente) {
+                    if (asistenciaService.existeDuplicado(aux.getReunion().getId(), aux.getMiembro().getDni()) >= 1) {
+                        errores.add("La asistencia ya está asociada a la reunión seleccionada.");
                     }
                 }
             }
@@ -430,10 +455,10 @@ public class AsistenciaManager {
 
         // Validaciones específicas del formulario por lista
 
-        if (controlador instanceof FormularioListaInvolucradoController) {
-            // Verificamos que haya agregado al menos un involucrado a la lista
-            if (abmListaInvolucradoControlador.getMiembrosSeleccionados().isEmpty()) {
-                errores.add("Por favor, seleccione un involucrado.");
+        if (controlador instanceof FormularioListaAsistenciaController) {
+            // Verificamos que haya agregado al menos un miembro a la lista
+            if (abmListaAsistenciaControlador.getMiembrosSeleccionados().isEmpty()) {
+                errores.add("Por favor, seleccione un miembro del consejo.");
             }
         }
 
@@ -446,29 +471,34 @@ public class AsistenciaManager {
         return true;
     }
 
-    private boolean validarInvolucrado(Involucrado inv) {
+    private boolean validarAsistencia(Asistencia asis) {
         // Creamos un array de errores
         ArrayList<String> errores = new ArrayList<>();
 
-        // Verificamos que haya seleccionado un involucrado y que no esté inactivo en el sistema
-        Miembro involucrado = miembroService.findById(inv.getMiembro().getDni());
-        if (involucrado == null) {
-            errores.add("El involucrado " + inv.getMiembro().toString() + " no se encuentra en la base de datos.");
+        // Verificamos que haya seleccionado un miembro y que no esté inactivo en el sistema
+        Miembro miembro = miembroService.findById(asis.getMiembro().getDni());
+        if (miembro == null) {
+            errores.add("El miembro del consejo " + asis.getMiembro().toString() + " no se encuentra en la base de datos.");
         } else {
-            if (!involucrado.getEstadoMiembro().getEstadoMiembro().equals("Activo")) {
-                errores.add("El involucrado " + inv.getMiembro().toString() + " se encuentra inactivo.");
-                errores.add("Debe seleccionar un involucrado activo en el sistema.");
+            if (!miembro.getEstadoMiembro().getEstadoMiembro().equals("Activo")) {
+                errores.add("El miembro del consejo " + asis.getMiembro().toString() + " se encuentra inactivo o en espera.");
+                errores.add("Debe seleccionar un miembro del consejo activo en el sistema.");
             }
         }
 
-        // Verificamos que los detalles no supere los 500 caracteres
-        if (inv.getDetallesInvolucrado().length() > 500) {
-            errores.add("Los detalles del involucrado no pueden tener más de 500 caracteres.");
+        // Verificamos que haya seleccionado un estado de asistencia
+        if (asis.getEstadoAsistencia() == null) {
+            errores.add("Debe seleccionar un estado de asistencia para el miembro del consejo " + asis.getMiembro().toString() + ".");
+        } else {
+            EstadoAsistencia estadoAsistencia = estadoAsistenciaService.findById(asis.getEstadoAsistencia().getId());
+            if (estadoAsistencia == null) {
+                errores.add("El estado de asistencia seleccionado para el miembro del consejo " + asis.getMiembro().toString() + "  no se encuentra en la base de datos.");
+            }
         }
 
         // En caso de que haya errores, agregarlo a la lista de errores para mostrarlos en pantalla
         if (!errores.isEmpty()) {
-            abmListaInvolucradoControlador.getCadenaErrores().addAll(errores);
+            abmListaAsistenciaControlador.getCadenaErrores().addAll(errores);
             return false;
         }
 
@@ -479,45 +509,48 @@ public class AsistenciaManager {
 
     public void limpiarFiltros() {
         // Guardamos los eventos de los filtros
-        EventHandler<ActionEvent> handlerExpediente = listaInvolucradosControlador.getCmbExpediente().getOnAction();
-        EventHandler<ActionEvent> handlerInvolucrado = listaInvolucradosControlador.getCmbInvolucrado().getOnAction();
+        EventHandler<ActionEvent> handlerEstado = listaAsistenciasControlador.getCmbEstado().getOnAction();
+        EventHandler<ActionEvent> handlerReunion = listaAsistenciasControlador.getCmbReunion().getOnAction();
+        EventHandler<ActionEvent> handlerMiembro = listaAsistenciasControlador.getCmbMiembro().getOnAction();
 
         // Desactivamos los eventos asociados a los filtros
-        listaInvolucradosControlador.getCmbExpediente().setOnAction(null);
-        listaInvolucradosControlador.getCmbInvolucrado().setOnAction(null);
+        listaAsistenciasControlador.getCmbEstado().setOnAction(null);
+        listaAsistenciasControlador.getCmbReunion().setOnAction(null);
+        listaAsistenciasControlador.getCmbMiembro().setOnAction(null);
 
         // Limpiamos los filtros
-        listaInvolucradosControlador.getCmbExpediente().setValue(null);
-        listaInvolucradosControlador.getCmbInvolucrado().setValue(null);
-        listaInvolucradosControlador.getTxtDetallesInvolucrado().clear();
+        listaAsistenciasControlador.getCmbEstado().setValue(null);
+        listaAsistenciasControlador.getCmbReunion().setValue(null);
+        listaAsistenciasControlador.getCmbMiembro().setValue(null);
 
         // Filtramos los involucrados
-        filtrarInvolucrados();
+        filtrarAsistencias();
 
         // Restauramos los eventos asociados a los filtros
-        listaInvolucradosControlador.getCmbExpediente().setOnAction(handlerExpediente);
-        listaInvolucradosControlador.getCmbInvolucrado().setOnAction(handlerInvolucrado);
+        listaAsistenciasControlador.getCmbEstado().setOnAction(handlerEstado);
+        listaAsistenciasControlador.getCmbReunion().setOnAction(handlerReunion);
+        listaAsistenciasControlador.getCmbMiembro().setOnAction(handlerMiembro);
     }
 
-    public void limpiarFormulario(BaseFormularioInvolucrado controlador) {
+    public void limpiarFormulario(BaseFormularioAsistencia controlador) {
         // Limpiamos el formulario
-        controlador.getCmbExpediente().setValue(null);
+        controlador.getCmbReunion().setValue(null);
 
-        if (controlador instanceof FormularioInvolucradoController) {
-            controlador.getCmbInvolucrado().setValue(null);
-            controlador.getTxtDetallesInvolucrado().clear();
+        if (controlador instanceof FormularioAsistenciaController) {
+            controlador.getCmbMiembro().setValue(null);
+            controlador.getCmbEstado().setValue(null);
         }
 
-        if (controlador instanceof FormularioListaInvolucradoController) {
-            // Limpiamos la tabla de involucrados
-            abmListaInvolucradoControlador.getTblInvolucrados().getItems().clear();
+        if (controlador instanceof FormularioListaAsistenciaController) {
+            // Cargamos la lista de asistencias sin una reunion seleccionada
+            cargarListaAsistencias(null);
         }
     }
 
     // Metodos para interactuar con los selectores
 
-    public void seleccionarExpediente(ComboBox<Expediente> combo) throws Exception {
-        helpers.seleccionarExpediente(combo);
+    public void seleccionarReunion(ComboBox<Reunion> combo) throws Exception {
+        helpers.seleccionarReunion(combo);
     }
 
     public void seleccionarMiembro(ComboBox<Miembro> combo) throws Exception {
@@ -540,92 +573,107 @@ public class AsistenciaManager {
 
     // Metodos adicionales para el formulario con lista
 
-    public void inicializarListaInvolucrados() {
+    public void inicializarListaAsistencias() {
         // Asociamos las columnas de la tabla
-        abmListaInvolucradoControlador.getColNombre().setCellValueFactory(new PropertyValueFactory<>("miembro"));
-        abmListaInvolucradoControlador.getColDetallesInvolucrado().setCellValueFactory(new PropertyValueFactory<>("detallesInvolucrado"));
+        abmListaAsistenciaControlador.getColNombre().setCellValueFactory(new PropertyValueFactory<>("miembro"));
+        abmListaAsistenciaControlador.getColEstadoAsistencia().setCellValueFactory(new PropertyValueFactory<>("estadoAsistencia"));
 
         // Configuramos las columnas en relacion con el miembro
-        helpers.configurarDniMiembro(abmListaInvolucradoControlador.getColDni());
-        helpers.configurarCargoMiembro(abmListaInvolucradoControlador.getColCargo());
-        helpers.configurarEstadoMiembro(abmListaInvolucradoControlador.getColEstado());
+        helpers.configurarDniMiembro(abmListaAsistenciaControlador.getColDni());
+        helpers.configurarCargoMiembro(abmListaAsistenciaControlador.getColCargo());
+        helpers.configurarEstadoMiembro(abmListaAsistenciaControlador.getColEstadoMiembro());
 
-        // Configuramos el TextField para que pueda modificar en tiempo de ejecucion los detalles del involucrado
-        helpers.configurarTextFieldTableCell(abmListaInvolucradoControlador.getColDetallesInvolucrado());
+        // Configuramos el ComboBox para que pueda modificar en tiempo de ejecucion el estado de asistencia
+        cargarListaEstadosAsistencias();
+        helpers.configurarCmbTablaEstadoAsistencia(abmListaAsistenciaControlador.getColEstadoAsistencia(),
+                abmListaAsistenciaControlador.getEstadosAsistencias());
 
-        // Configuramos el CheckBox para que pueda seleccionar nuevos involucrados a la lista
-        helpers.configurarCheckTableCell(abmListaInvolucradoControlador.getColSeleccionar(),
-                abmListaInvolucradoControlador.getMiembrosSeleccionados());
+        // Configuramos el CheckBox para que pueda seleccionar nuevas asistencias a la lista
+        helpers.configurarCheckTableCell(abmListaAsistenciaControlador.getColSeleccionar(),
+                abmListaAsistenciaControlador.getMiembrosSeleccionados());
+
+        // Cargamos la lista de asistencias
+        cargarListaAsistencias(null);
     }
 
-    public void inicializarFiltrosListaMiembros() {
-        // Cargamos lista y combo de cargos
-        abmListaInvolucradoControlador.getCargos().clear();
-        abmListaInvolucradoControlador.getCargos().addAll(cargoService.findAll());
-        abmListaInvolucradoControlador.getCmbCargo().setItems(abmListaInvolucradoControlador.getCargos());
+    public void cargarListaEstadosAsistencias() {
+        abmListaAsistenciaControlador.getEstadosAsistencias().clear();
+        abmListaAsistenciaControlador.getEstadosAsistencias().addAll(estadoAsistenciaService.findAll());
+    }
 
-        // Cargamos lista y combo de estados
-        abmListaInvolucradoControlador.getEstadosMiembros().clear();
-        abmListaInvolucradoControlador.getEstadosMiembros().addAll(estadoMiembroService.findAll());
-        abmListaInvolucradoControlador.getCmbEstado().setItems(abmListaInvolucradoControlador.getEstadosMiembros());
+    public void inicializarFiltrosListaAsistencias() {
+        // Cargamos lista y combo de cargos
+        abmListaAsistenciaControlador.getCargos().clear();
+        abmListaAsistenciaControlador.getCargos().addAll(cargoService.findAll());
+        abmListaAsistenciaControlador.getCmbCargo().setItems(abmListaAsistenciaControlador.getCargos());
+
+        // Cargamos lista y combo de estados de miembros
+        abmListaAsistenciaControlador.getEstadosMiembros().clear();
+        abmListaAsistenciaControlador.getEstadosMiembros().addAll(estadoMiembroService.findAll());
+        abmListaAsistenciaControlador.getCmbEstadoMiembro().setItems(abmListaAsistenciaControlador.getEstadosMiembros());
+
+        // Cargamos lista y combo de estados de asistencias
+        abmListaAsistenciaControlador.getCmbEstadoAsistencia().setItems(abmListaAsistenciaControlador.getEstadosAsistencias());
     }
 
     public void inicializarCadenasTexto() {
         // Limpiamos cadenas de errores e infos
-        abmListaInvolucradoControlador.getCadenaErrores().clear();
-        abmListaInvolucradoControlador.getCadenaInfos().clear();
+        abmListaAsistenciaControlador.getCadenaErrores().clear();
+        abmListaAsistenciaControlador.getCadenaInfos().clear();
     }
 
-    // Metodo para guardar lista de involucrados
+    // Metodo para guardar lista de asistencias
 
-    public void guardarListaInvolucrados() {
-        // Validamos los campos y que la lista de involucrados seleccionados no este vacia
-        if (validarCamposFormulario(abmListaInvolucradoControlador)) {
+    public void guardarListaAsistencias() {
+        // Validamos los campos y que la lista de asistencias seleccionadas no este vacia
+        if (validarCamposFormulario(abmListaAsistenciaControlador)) {
 
             // Iteramos todos los miembros seleccionados
-            for (Map.Entry<Miembro, Integer> entry : abmListaInvolucradoControlador.getMiembrosSeleccionados().entrySet()) {
+            for (Map.Entry<Miembro, Integer> entry : abmListaAsistenciaControlador.getMiembrosSeleccionados().entrySet()) {
 
-                // Obtenemos el involucrado seleccionado, junto con su flag
-                Involucrado involucrado = buscarInvolucradoPorMiembro(entry.getKey());
+                // Obtenemos la asistencia seleccionada, junto con su flag
+                Asistencia asistencia = buscarAsistenciaPorMiembro(entry.getKey());
                 int flag = entry.getValue();
 
-                // Verificamos si el involucrado es diferente de nulo
-                if (involucrado != null) {
+                // Verificamos si la asistencia es diferente de nulo
+                if (asistencia != null) {
 
                     // Si esta seleccionado, queremos agregar o modificar
                     if (flag != helpers.FLAG_ELIMINAR) {
-                        // Validamos la información del involucrado
-                        if (validarInvolucrado(involucrado)) {
+                        // Validamos la información de la asistencia
+                        if (validarAsistencia(asistencia)) {
 
-                            // Verificamos que los detalles no esten vacios
-                            if (involucrado.getDetallesInvolucrado().isEmpty()) {
-                                involucrado.setDetallesInvolucrado("No hay detalles para mostrar.");
+                            // Verificamos que la asistencia no se marcada como presente en reuniones que aun no han ocurrido
+                            if (asistencia.getReunion().getFechaReunion().isAfter(LocalDate.now()) && asistencia.getEstadoAsistencia().getEstadoAsistencia().equals("Presente")) {
+                                abmListaAsistenciaControlador.getCadenaErrores().add("La asistencia del miembro del consejo " + asistencia.getMiembro().toString()
+                                        + " no puede ser marcada como presente en reuniones futuras al día de hoy " + LocalDate.now().format(formatoFecha) + ".");
+                                asistencia.setEstadoAsistencia(abmListaAsistenciaControlador.getEstadosAsistencias().getLast());
                             }
 
                             // Si el ID es diferente de 0, quiere decir que ya existe
-                            if (involucrado.getId() != 0 || flag == helpers.FLAG_MODIFICAR) {
-                                // Modificamos el involucrado
-                                if (modificarInvolucrado(involucrado)) {
-                                    abmListaInvolucradoControlador.getCadenaInfos().add("Se ha modificado el involucrado " + involucrado.getMiembro().toString() + " correctamente!");
+                            if (asistencia.getId() != 0 || flag == helpers.FLAG_MODIFICAR) {
+                                // Modificamos la asistencia
+                                if (modificarAsistencia(asistencia)) {
+                                    abmListaAsistenciaControlador.getCadenaInfos().add("Se ha modificado la asistencia del miembro del consejo " + asistencia.getMiembro().toString() + " correctamente!");
                                 } else {
-                                    abmListaInvolucradoControlador.getCadenaErrores().add("No se pudo modificar el involucrado " + involucrado.getMiembro().toString() + " correctamente!");
+                                    abmListaAsistenciaControlador.getCadenaErrores().add("No se pudo modificar la asistencia del miembro del consejo " + asistencia.getMiembro().toString() + " correctamente!");
                                 }
                             } else {
-                                // Agregamos el involucrado
-                                if (agregarInvolucrado(involucrado)) {
-                                    abmListaInvolucradoControlador.getCadenaInfos().add("Se ha agregado el involucrado " + involucrado.getMiembro().toString() + " correctamente!");
+                                // Agregamos la asistencia
+                                if (agregarAsistencia(asistencia)) {
+                                    abmListaAsistenciaControlador.getCadenaInfos().add("Se ha agregado la asistencia del miembro del consejo " + asistencia.getMiembro().toString() + " correctamente!");
                                 } else {
-                                    abmListaInvolucradoControlador.getCadenaErrores().add("No se pudo agregar el involucrado " + involucrado.getMiembro().toString() + " correctamente!");
+                                    abmListaAsistenciaControlador.getCadenaErrores().add("No se pudo agregar la asistencia del miembro del consejo " + asistencia.getMiembro().toString() + " correctamente!");
                                 }
                             }
                         }
                     } else {
-                        // Si no está dentro de los involucrados seleccionados, queremos eliminar
-                        // Eliminamos el involucrado
-                        if (eliminarInvolucrado(involucrado, true)) {
-                            abmListaInvolucradoControlador.getCadenaInfos().add("Se ha eliminado el involucrado " + involucrado.getMiembro().toString() + " correctamente!");
+                        // Si no está dentro de los miembros seleccionados, queremos eliminar
+                        // Eliminamos la asistencia
+                        if (eliminarAsistencia(asistencia, true)) {
+                            abmListaAsistenciaControlador.getCadenaInfos().add("Se ha eliminado la asistencia del miembro del consejo " + asistencia.getMiembro().toString() + " correctamente!");
                         } else {
-                            abmListaInvolucradoControlador.getCadenaErrores().add("No se pudo eliminar el involucrado " + involucrado.getMiembro().toString() + " correctamente!");
+                            abmListaAsistenciaControlador.getCadenaErrores().add("No se pudo eliminar la asistencia del miembro del consejo " + asistencia.getMiembro().toString() + " correctamente!");
 
                         }
                     }
@@ -633,52 +681,52 @@ public class AsistenciaManager {
             }
 
             // Mostramos cadenas de errores e infos en pantalla
-            mostrarCadenaMensajes(abmListaInvolucradoControlador.getCadenaErrores(), "Se ha producido uno o varios errores:", Alert.AlertType.ERROR, "Error");
-            mostrarCadenaMensajes(abmListaInvolucradoControlador.getCadenaInfos(), "Se ha producido una o varias modificaciones:", Alert.AlertType.INFORMATION, "Info");
+            mostrarCadenaMensajes(abmListaAsistenciaControlador.getCadenaErrores(), "Se ha producido uno o varios errores:", Alert.AlertType.ERROR, "Error");
+            mostrarCadenaMensajes(abmListaAsistenciaControlador.getCadenaInfos(), "Se ha producido una o varias modificaciones:", Alert.AlertType.INFORMATION, "Info");
 
             // Actualizamos la tabla de involucrados
-            listaInvolucradosControlador.getTblInvolucrados().refresh();
+            listaAsistenciasControlador.getTblAsistencias().refresh();
 
             // Salimos del modal
-            stageManager.closeModal(FXMLView.FormularioListaInvolucrado.getKey());
+            stageManager.closeModal(FXMLView.FormularioListaAsistencia.getKey());
         }
     }
 
-    // Metodos para buscar y seleccionar nuevos expedientes
+    // Metodos para buscar y seleccionar nuevos miembros
 
-    public void buscarInvolucradosPorExpediente() {
+    public void buscarAsistenciasPorReunion() {
         // Cargamos los involucrados asociados al expediente seleccionado
-        if (abmListaInvolucradoControlador.getCmbExpediente().getValue() != null) {
-            cargarListaInvolucrados(abmListaInvolucradoControlador.getCmbExpediente().getValue());
-        }
+        cargarListaAsistencias(abmListaAsistenciaControlador.getCmbReunion().getValue());
 
         // Actualizamos la tabla
-        abmListaInvolucradoControlador.getTblInvolucrados().refresh();
+        abmListaAsistenciaControlador.getTblAsistencias().refresh();
     }
 
-    public Involucrado buscarInvolucradoPorMiembro(Miembro miembro) {
-        // Filtramos la lista de involucrados por el miembro proporcionado
-        Optional<Involucrado> optionalInvolucrado = abmListaInvolucradoControlador.getInvolucrados().stream()
-                .filter(inv -> inv.getMiembro().equals(miembro))
+    public Asistencia buscarAsistenciaPorMiembro(Miembro miembro) {
+        // Filtramos la lista de asistencias por el miembro proporcionado
+        Optional<Asistencia> optionalAsistencia = abmListaAsistenciaControlador.getAsistencias().stream()
+                .filter(asis -> asis.getMiembro().equals(miembro))
                 .findFirst();
 
         // Devolvemos el involucrado encontrado
-        return optionalInvolucrado.orElse(null);
+        return optionalAsistencia.orElse(null);
     }
 
-    // Metodos para cargar la lista de involucrados y miembros seleccionados
+    // Metodos para cargar la lista de asistencias y miembros seleccionados
 
-    public void cargarListaInvolucrados(Expediente expediente) {
+    public void cargarListaAsistencias(Reunion reunion) {
         // Limpiamos las listas
-        abmListaInvolucradoControlador.getInvolucrados().clear();
-        abmListaInvolucradoControlador.getFiltroInvolucrados().clear();
-        abmListaInvolucradoControlador.getMiembrosSeleccionados().clear();
+        abmListaAsistenciaControlador.getAsistencias().clear();
+        abmListaAsistenciaControlador.getFiltroAsistencias().clear();
+        abmListaAsistenciaControlador.getMiembrosSeleccionados().clear();
 
-        // Cargamos la lista de involucrados seleccionados por expedientes
-        abmListaInvolucradoControlador.getInvolucrados().addAll(involucradoService.encontrarInvolucradosPorExpediente(expediente));
+        if (reunion != null) {
+            // Cargamos la lista de asistencias seleccionadas por reunion
+            abmListaAsistenciaControlador.getAsistencias().addAll(asistenciaService.encontrarAsistenciasPorReunion(reunion));
 
-        // Cargamos la lista de miembros seleccionados a partir de los involucrados
-        cargarMiembrosSeleccionados();
+            // Cargamos la lista de miembros seleccionados a partir de las asistencias
+            cargarMiembrosSeleccionados();
+        }
 
         // Obtenemos todos los miembros
         List<Miembro> listaMiembros = miembroService.findAll();
@@ -686,105 +734,123 @@ public class AsistenciaManager {
         // Iteramos todos los miembros para mostrar aquellos que no esten seleccionados en pantalla
         for (Miembro miembro : listaMiembros) {
             // Verificamos si el miembro seleccionado ya se encuentra en la lista
-            if (buscarInvolucradoPorMiembro(miembro) == null) {
+            if (buscarAsistenciaPorMiembro(miembro) == null) {
                 // Si no se encuentra presente, lo agregamos
-                abmListaInvolucradoControlador.getInvolucrados().add(new Involucrado(expediente, miembro, "--"));
+                abmListaAsistenciaControlador.getAsistencias().add(new Asistencia(reunion, miembro, abmListaAsistenciaControlador.getEstadosAsistencias().getLast()));
             }
         }
 
-        // Cargamos la lista que contiene el filtro de involucrados
-        abmListaInvolucradoControlador.getFiltroInvolucrados().addAll(abmListaInvolucradoControlador.getInvolucrados());
+        // Cargamos la lista que contiene el filtro de asistencias
+        abmListaAsistenciaControlador.getFiltroAsistencias().addAll(abmListaAsistenciaControlador.getAsistencias());
 
-        // Establecemos los elementos en la tabla de involucrados
-        abmListaInvolucradoControlador.getTblInvolucrados().setItems(abmListaInvolucradoControlador.getFiltroInvolucrados());
+        // Establecemos los elementos en la tabla de asistencias
+        abmListaAsistenciaControlador.getTblAsistencias().setItems(abmListaAsistenciaControlador.getFiltroAsistencias());
     }
 
     public void cargarMiembrosSeleccionados() {
         // Cargamos la lista de miembros seleccionados
-        for (Involucrado involucrado : abmListaInvolucradoControlador.getInvolucrados()) {
-            abmListaInvolucradoControlador.getMiembrosSeleccionados().put(involucrado.getMiembro(), helpers.FLAG_MODIFICAR);
+        for (Asistencia asistencia : abmListaAsistenciaControlador.getAsistencias()) {
+            abmListaAsistenciaControlador.getMiembrosSeleccionados().put(asistencia.getMiembro(), helpers.FLAG_MODIFICAR);
         }
     }
 
     // Metodos para filtrar los involucrados seleccionados
 
-    public boolean mostrarMiembrosSeleccionados(Involucrado inv) {
+    public boolean mostrarMiembroSeleccionado(Asistencia asis) {
         // Verificamos si el CheckBox de mostrar seleccionados está presionado
         // En ese caso, mostrar solo aquellos que esten contenidos en la lista, y no los haya que eliminar
-        return (abmListaInvolucradoControlador.getMiembrosSeleccionados().containsKey(inv.getMiembro())
-                && abmListaInvolucradoControlador.getMiembrosSeleccionados().get(inv.getMiembro()) != helpers.FLAG_ELIMINAR)
-                || !abmListaInvolucradoControlador.getCheckMostrarSeleccionados().isSelected();
+        return (abmListaAsistenciaControlador.getMiembrosSeleccionados().containsKey(asis.getMiembro())
+                && abmListaAsistenciaControlador.getMiembrosSeleccionados().get(asis.getMiembro()) != helpers.FLAG_ELIMINAR);
     }
 
-    public void filtrarListaMiembros() {
-        // Limpiamos la lista filtro de miembros
-        abmListaInvolucradoControlador.getFiltroInvolucrados().clear();
+    public void filtrarListaAsistencias() {
+        // Limpiamos la lista filtro de asistencias
+        abmListaAsistenciaControlador.getFiltroAsistencias().clear();
 
         // Filtramos todos los miembros según el criterio especificado
-        for (Involucrado inv : abmListaInvolucradoControlador.getInvolucrados()) {
-            if (mostrarMiembrosSeleccionados(inv)) {
-                if (aplicarFiltroListaMiembros(inv)) {
-                    abmListaInvolucradoControlador.getFiltroInvolucrados().add(inv);
+        for (Asistencia asis : abmListaAsistenciaControlador.getAsistencias()) {
+            if (mostrarMiembroSeleccionado(asis) || !abmListaAsistenciaControlador.getCheckMostrarSeleccionados().isSelected()) {
+                if (aplicarFiltroListaAsistencias(asis)) {
+                    abmListaAsistenciaControlador.getFiltroAsistencias().add(asis);
                 }
             }
         }
 
         // Actualizamos la tabla
-        abmListaInvolucradoControlador.getTblInvolucrados().refresh();
+        abmListaAsistenciaControlador.getTblAsistencias().refresh();
     }
 
-    public boolean aplicarFiltroListaMiembros(Involucrado inv) {
+    public boolean aplicarFiltroListaAsistencias(Asistencia asis) {
         // Obtenemos los filtros
-        String nombre = abmListaInvolucradoControlador.getTxtNombre().getText();
-        Cargo cargo = abmListaInvolucradoControlador.getCmbCargo().getValue();
-        EstadoMiembro estado = abmListaInvolucradoControlador.getCmbEstado().getValue();
-        String detallesInvolucrado = abmListaInvolucradoControlador.getTxtDetalles().getText();
+        String nombre = abmListaAsistenciaControlador.getTxtNombre().getText();
+        Cargo cargo = abmListaAsistenciaControlador.getCmbCargo().getValue();
+        EstadoMiembro estadoMiembro = abmListaAsistenciaControlador.getCmbEstadoMiembro().getValue();
+        EstadoAsistencia estadoAsistencia = abmListaAsistenciaControlador.getCmbEstadoAsistencia().getValue();
 
         // Filtramos basándonos en el filtro obtenido
-        return (nombre == null || String.valueOf(inv.getMiembro().getDni()).toLowerCase().contains(nombre.toLowerCase())
-                || inv.getMiembro().toString().toLowerCase().contains(nombre.toLowerCase()))
-                && (cargo == null || cargo.equals(inv.getMiembro().getCargo()))
-                && (estado == null || estado.equals(inv.getMiembro().getEstadoMiembro()))
-                && (detallesInvolucrado == null || inv.getDetallesInvolucrado().toLowerCase().contains(detallesInvolucrado.toLowerCase()));
+        return (nombre == null || String.valueOf(asis.getMiembro().getDni()).toLowerCase().contains(nombre.toLowerCase())
+                || asis.getMiembro().toString().toLowerCase().contains(nombre.toLowerCase()))
+                && (cargo == null || cargo.equals(asis.getMiembro().getCargo()))
+                && (estadoMiembro == null || estadoMiembro.equals(asis.getMiembro().getEstadoMiembro()))
+                && (estadoAsistencia == null || estadoAsistencia.equals(asis.getEstadoAsistencia()));
     }
 
-    public void limpiarFiltrosListaMiembros() {
+    public void limpiarFiltrosListaAsistencias() {
         // Guardamos los eventos de los filtros
-        EventHandler<ActionEvent> handlerCargo = abmListaInvolucradoControlador.getCmbCargo().getOnAction();
-        EventHandler<ActionEvent> handlerEstado = abmListaInvolucradoControlador.getCmbEstado().getOnAction();
+        EventHandler<ActionEvent> handlerCargo = abmListaAsistenciaControlador.getCmbCargo().getOnAction();
+        EventHandler<ActionEvent> handlerEstadoMiembro = abmListaAsistenciaControlador.getCmbEstadoMiembro().getOnAction();
+        EventHandler<ActionEvent> handlerEstadoAsistencia = abmListaAsistenciaControlador.getCmbEstadoAsistencia().getOnAction();
 
         // Desactivamos los eventos asociados a los filtros
-        abmListaInvolucradoControlador.getCmbCargo().setOnAction(null);
-        abmListaInvolucradoControlador.getCmbEstado().setOnAction(null);
+        abmListaAsistenciaControlador.getCmbCargo().setOnAction(null);
+        abmListaAsistenciaControlador.getCmbEstadoMiembro().setOnAction(null);
+        abmListaAsistenciaControlador.getCmbEstadoAsistencia().setOnAction(null);
 
         // Limpiamos los filtros
-        abmListaInvolucradoControlador.getTxtNombre().clear();
-        abmListaInvolucradoControlador.getTxtDetalles().clear();
-        abmListaInvolucradoControlador.getCmbCargo().setValue(null);
-        abmListaInvolucradoControlador.getCmbEstado().setValue(null);
+        abmListaAsistenciaControlador.getTxtNombre().clear();
+        abmListaAsistenciaControlador.getCmbCargo().setValue(null);
+        abmListaAsistenciaControlador.getCmbEstadoMiembro().setValue(null);
+        abmListaAsistenciaControlador.getCmbEstadoAsistencia().setValue(null);
 
-        // Filtramos miembros
-        filtrarListaMiembros();
+        // Filtramos asistencias
+        filtrarListaAsistencias();
 
         // Restauramos los eventos asociados a los filtros
-        abmListaInvolucradoControlador.getCmbCargo().setOnAction(handlerCargo);
-        abmListaInvolucradoControlador.getCmbEstado().setOnAction(handlerEstado);
+        abmListaAsistenciaControlador.getCmbCargo().setOnAction(handlerCargo);
+        abmListaAsistenciaControlador.getCmbEstadoMiembro().setOnAction(handlerEstadoMiembro);
+        abmListaAsistenciaControlador.getCmbEstadoAsistencia().setOnAction(handlerEstadoAsistencia);
     }
 
     // Metodos de los CheckBox del formulario con lista
 
     public void seleccionarTodosLosMiembros() {
         // Guardamos el valor del CheckBox
-        boolean valorActual = abmListaInvolucradoControlador.getCheckSeleccionarTodo().isSelected();
-        // Creamos una copia de la lista de miembros (para evitar bugs)
-        List<Involucrado> copiaInvolucrados = new ArrayList<>(abmListaInvolucradoControlador.getFiltroInvolucrados());
+        boolean valorActual = abmListaAsistenciaControlador.getCheckSeleccionarTodo().isSelected();
+        // Creamos una copia de la lista de asistencias (para evitar bugs)
+        List<Asistencia> copiaAsistencias = new ArrayList<>(abmListaAsistenciaControlador.getFiltroAsistencias());
 
         // Iteramos sobre la copia de la lista
-        for (Involucrado involucrado : copiaInvolucrados) {
-            helpers.seleccionarItemCheckTableCell(involucrado.getMiembro(), abmListaInvolucradoControlador.getMiembrosSeleccionados(), valorActual);
+        for (Asistencia asistencia : copiaAsistencias) {
+            helpers.seleccionarItemCheckTableCell(asistencia.getMiembro(), abmListaAsistenciaControlador.getMiembrosSeleccionados(), valorActual);
         }
 
         // Actualizamos la tabla
-        abmListaInvolucradoControlador.getTblInvolucrados().refresh();
+        abmListaAsistenciaControlador.getTblAsistencias().refresh();
+    }
+
+    public void marcarPresentePorDefecto() {
+        // Iteramos la lista de asistencias para buscar aquellas que no esten seleccionadas y cambiarles el estado de asistencia por defecto
+        for (Asistencia asistencia : abmListaAsistenciaControlador.getAsistencias()) {
+            if (!mostrarMiembroSeleccionado(asistencia)) {
+                if (abmListaAsistenciaControlador.getCheckMarcarPresentePorDefecto().isSelected()) {
+                    asistencia.setEstadoAsistencia(abmListaAsistenciaControlador.getEstadosAsistencias().getFirst());
+                } else {
+                    asistencia.setEstadoAsistencia(abmListaAsistenciaControlador.getEstadosAsistencias().getLast());
+                }
+            }
+        }
+
+        // Actualizamos la tabla de asistencias
+        abmListaAsistenciaControlador.getTblAsistencias().refresh();
     }
 }

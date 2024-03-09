@@ -22,7 +22,7 @@
 .combo-personalizado{
     -fx-font-size: 1.2em;
     -fx-text-fill: black;
-    -fx-background-color: transparent;
+    -fx-background-color: white;
     -fx-border-color: lightgray;
     -fx-border-width: 0 0 3 0;
     -fx-padding: 0 5;
@@ -37,7 +37,7 @@
     -fx-faint-focus-color: transparent;
     -fx-background-insets: 0;
     -fx-effect: null;
-    -fx-background-color: transparent;
+    -fx-background-color: white;
     -fx-padding: 5;
 }
 .combo-personalizado .text-field .right-button{

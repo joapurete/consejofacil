@@ -25,7 +25,7 @@
               AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0"
               AnchorPane.topAnchor="20.0">
             <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="titulo-principal-container">
-                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Datos del involucrado"/>
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Datos de los involucrados"/>
                 <Line endX="200.0"/>
             </HBox>
             <GridPane hgap="10.0">
@@ -42,8 +42,7 @@
                 <ComboBox fx:id="cmbExpediente" editable="true" maxWidth="1.7976931348623157E308"
                           onAction="#buscarInvolucradosPorExpediente" prefHeight="154.0"
                           styleClass="combo-personalizado" GridPane.columnIndex="1"/>
-                <Button mnemonicParsing="false"
-                        onAction="#seleccionarExpediente" GridPane.columnIndex="2">
+                <Button mnemonicParsing="false" onAction="#seleccionarExpediente" GridPane.columnIndex="2">
                     <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                    preserveRatio="true">
@@ -95,9 +94,8 @@
                           GridPane.rowIndex="1"/>
                 <TextField fx:id="txtNombre" onKeyReleased="#filtrarPorNombre" promptText="..."
                            styleClass="text-field-personalizado" GridPane.columnIndex="1"/>
-                <Button mnemonicParsing="false" onAction="#limpiarFiltros"
-                        text="Limpiar" GridPane.columnIndex="4" GridPane.halignment="CENTER"
-                        GridPane.rowIndex="1">
+                <Button mnemonicParsing="false" onAction="#limpiarFiltros" text="Limpiar"
+                        GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                     <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                    preserveRatio="true">
@@ -138,8 +136,8 @@
                 <rowConstraints>
                     <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
-                <Button layoutX="23.0" layoutY="584.0" mnemonicParsing="false"
-                        onAction="#guardarInvolucrados" styleClass="btn-personalizado" text="Guardar"/>
+                <Button layoutX="23.0" layoutY="584.0" mnemonicParsing="false" onAction="#guardarInvolucrados"
+                        styleClass="btn-personalizado" text="Guardar"/>
                 <CheckBox fx:id="checkSeleccionarTodo" mnemonicParsing="false" onAction="#seleccionarTodos"
                           styleClass="check-box-personalizado" text="Seleccionar todo"
                           GridPane.columnIndex="1"/>

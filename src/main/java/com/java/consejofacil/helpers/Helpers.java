@@ -7,11 +7,13 @@ import com.java.consejofacil.controller.ABMReunion.SelectorReunionController;
 import com.java.consejofacil.model.*;
 import com.java.consejofacil.view.FXMLView;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
@@ -123,23 +125,11 @@ public class Helpers {
     public <T, S> void configurarCheckTableCell(TableColumn<T, Boolean> columna, Map<S, Integer> lista) {
         columna.setCellValueFactory(features -> {
             T item = features.getValue();
-            S key = null;
-            boolean isPresent = false;
-
             // Obtenemos la key a partir del item seleccionado
-            if (item instanceof Involucrado involucrado) {
-                key = (S) involucrado.getMiembro();
-            } else if (item instanceof Revision revision) {
-                key = (S) revision.getExpediente();
-            }
+            S key = (S) getKey(item);
 
-            // Si key es diferente de nulo, el CheckBox se seleccionará si está contenido dentro de la lista
-            // Y si está presente, que no sea para ser eliminado
-            if (key != null) {
-                isPresent = lista.containsKey(key) && lista.get(key) != FLAG_ELIMINAR;
-            }
-
-            return new SimpleBooleanProperty(isPresent);
+            // El CheckBox se seleccionará si key está contenido dentro de la lista
+            return new SimpleBooleanProperty(lista.containsKey(key) && lista.get(key) != FLAG_ELIMINAR);
         });
 
         columna.setCellFactory(param -> new CheckBoxTableCell<>() {
@@ -153,14 +143,9 @@ public class Helpers {
                 // Agregamos un listener para que guarde la información al presionar el CheckBox
                 checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
                     T item = getTableRow().getItem();
-                    S key = null;
 
                     // Obtenemis la key a partir del elemento seleccionado
-                    if (item instanceof Involucrado involucrado) {
-                        key = (S) involucrado.getMiembro();
-                    } else if (item instanceof Revision revision) {
-                        key = (S) revision.getExpediente();
-                    }
+                    S key = (S) getKey(item);
 
                     // Si key es diferente de nulo, seleccionamos el item con la key asociada
                     if (key != null) {
@@ -184,6 +169,21 @@ public class Helpers {
                 }
             }
         });
+    }
+
+    // Esto es para obtener la key de la lista a partir del item seleccionado
+
+    private <T> Object getKey(T item) {
+        Object key = null;
+
+        if (item instanceof Involucrado involucrado) {
+            key = involucrado.getMiembro();
+        } else if (item instanceof Revision revision) {
+            key = revision.getExpediente();
+        } else if (item instanceof Asistencia asistencia) {
+            key = asistencia.getMiembro();
+        }
+        return key;
     }
 
     public <T> void seleccionarItemCheckTableCell(T item, Map<T, Integer> lista, Boolean newValue) {
@@ -217,9 +217,11 @@ public class Helpers {
         }
     }
 
-    // Esto es para configurar celdas String y Boolean
+    // Esto es para configurar fabricas de celdas
 
-    public <T> void configurarTextFieldTableCell(TableColumn<T, String> columna) {
+    // Esto es para configurar un TextField dentro de una tabla
+
+    public <T> void configurarTxtFieldTabla(TableColumn<T, String> columna) {
 
         columna.setCellFactory(param -> new TextFieldTableCell<>(new DefaultStringConverter()) {
 
@@ -268,6 +270,60 @@ public class Helpers {
             }
         });
     }
+
+    // Esto es para configurar un ComboBox dentro de una tabla para seleccionar estados de asistencias
+
+    public <T> void configurarCmbTablaEstadoAsistencia(TableColumn<T, EstadoAsistencia> columna, ObservableList<EstadoAsistencia> opciones) {
+
+        columna.setCellFactory(param -> new ComboBoxTableCell<>(opciones) {
+
+            // Creamos un ComboBox
+            private final ComboBox<EstadoAsistencia> comboBox = new ComboBox<>();
+
+            {
+                // Configuramos el ComboBox con las opciones proporcionadas
+                comboBox.getItems().addAll(opciones);
+                // Le damos estilos personalizados
+                comboBox.getStyleClass().add("combo-personalizado");
+                // Establecemos el ancho preferido del ComboBox al ancho de la celda
+                comboBox.prefWidthProperty().bind(columna.widthProperty().subtract(10));
+                // Agregamos un listener para que guarde la información al finalizar la edición
+                comboBox.setOnAction(event -> commitEdit(comboBox.getValue()));
+            }
+
+            @Override
+            public void updateItem(EstadoAsistencia item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (item == null || empty) {
+                    comboBox.setValue(null);
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    // Establecemos el ComboBox como gráfico
+                    comboBox.setValue(item);
+                    setText(item.toString());
+                    setGraphic(comboBox);
+                }
+            }
+
+            @Override
+            public void commitEdit(EstadoAsistencia newValue) {
+                super.commitEdit(newValue);
+
+                // Obtenemos el elemento seleccionado
+                T item = getTableRow().getItem();
+
+                if (item != null) {
+                    // Actualizamos los detalles del elemento seleccionado
+                    if (item instanceof Asistencia asistencia) {
+                        asistencia.setEstadoAsistencia(newValue);
+                    }
+                }
+            }
+        });
+    }
+
 
     // Esto es para mostrar el nombre completo de la persona en la tabla
 
@@ -356,13 +412,21 @@ public class Helpers {
                     setText(null);
                 } else {
                     T item = getTableView().getItems().get(getIndex());
-
-                    if (item instanceof Involucrado involucrado) {
-                        // Si es diferente de nulo, mostramos el DNI correspodiente
-                        assert involucrado.getMiembro() != null;
-                        setText(String.valueOf(involucrado.getMiembro().getDni()));
-                    }
+                    setText(getString(item));
                 }
+            }
+
+            private static <T> String getString(T item) {
+                String dni = null;
+
+                if (item instanceof Involucrado involucrado && involucrado.getMiembro() != null) {
+                    // Si es diferente de nulo, mostramos el DNI correspodiente
+                    dni = String.valueOf(involucrado.getMiembro().getDni());
+                } else if (item instanceof Asistencia asistencia && asistencia.getMiembro() != null) {
+                    // Si es diferente de nulo, mostramos el DNI correspodiente
+                    dni = String.valueOf(asistencia.getMiembro().getDni());
+                }
+                return dni;
             }
         });
     }
@@ -380,13 +444,21 @@ public class Helpers {
                     setText(null);
                 } else {
                     T item = getTableView().getItems().get(getIndex());
-
-                    if (item instanceof Involucrado involucrado) {
-                        // Si es diferente de nulo, mostramos el cargo correspodiente
-                        assert involucrado.getMiembro() != null;
-                        setText(involucrado.getMiembro().getCargo().toString());
-                    }
+                    setText(getString(item));
                 }
+            }
+
+            private static <T> String getString(T item) {
+                String cargo = null;
+
+                if (item instanceof Involucrado involucrado && involucrado.getMiembro() != null) {
+                    // Si es diferente de nulo, mostramos el cargo correspodiente
+                    cargo = involucrado.getMiembro().getCargo().toString();
+                } else if (item instanceof Asistencia asistencia && asistencia.getMiembro() != null) {
+                    // Si es diferente de nulo, mostramos el cargo correspodiente
+                    cargo = asistencia.getMiembro().getCargo().toString();
+                }
+                return cargo;
             }
         });
     }
@@ -404,13 +476,20 @@ public class Helpers {
                     setText(null);
                 } else {
                     T item = getTableView().getItems().get(getIndex());
-
-                    if (item instanceof Involucrado involucrado) {
-                        // Si es diferente de nulo, mostramos el estado correspodiente
-                        assert involucrado.getMiembro() != null;
-                        setText(involucrado.getMiembro().getEstadoMiembro().toString());
-                    }
+                    setText(getString(item));
                 }
+            }
+
+            private static <T> String getString(T item) {
+                String estado = null;
+
+                if (item instanceof Involucrado involucrado && involucrado.getMiembro() != null) {
+                    // Si es diferente de nulo, mostramos el estado correspodiente
+                    estado = involucrado.getMiembro().getEstadoMiembro().toString();
+                } else if (item instanceof Asistencia asistencia && asistencia.getMiembro() != null) {
+                    estado = asistencia.getMiembro().getEstadoMiembro().toString();
+                }
+                return estado;
             }
         });
     }
