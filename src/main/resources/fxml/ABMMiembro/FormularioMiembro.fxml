@@ -67,7 +67,7 @@
                                           <Label styleClass="label-formulario" text="Teléfono:" GridPane.rowIndex="2" />
                                           <DatePicker fx:id="dtpFechaNac" editable="false" maxWidth="1.7976931348623157E308" promptText="Opcional" styleClass="datepicker-personalizado" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                                           <Label styleClass="label-formulario" text="Apellido/s:" GridPane.rowIndex="1" />
-                                          <Label styleClass="label-formulario" text="Cargo:" GridPane.rowIndex="4" />
+                                          <Label fx:id="lblCargo" styleClass="label-formulario" text="Cargo:" GridPane.rowIndex="4" />
                                           <TextField fx:id="txtDni" styleClass="text-field-personalizado" GridPane.columnIndex="1" />
                                           <TextField fx:id="txtNombre" styleClass="text-field-personalizado" GridPane.columnIndex="3" />
                                           <Label prefHeight="21.0" styleClass="label-formulario" text="Nombre/s:" GridPane.columnIndex="2" />
@@ -82,7 +82,7 @@
                                           <Label styleClass="label-formulario" text="Correo:" GridPane.rowIndex="3" />
                                           <ComboBox fx:id="cmbCargo" maxWidth="1.7976931348623157E308" styleClass="combo-personalizado" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                           <ComboBox fx:id="cmbEstado" maxWidth="1.7976931348623157E308" styleClass="combo-personalizado" GridPane.columnIndex="3" GridPane.rowIndex="4" />
-                                          <Label styleClass="label-formulario" text="Estado:" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                          <Label fx:id="lblEstado" styleClass="label-formulario" text="Estado:" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                                       </children>
                                    </GridPane>
                               <GridPane hgap="20.0">

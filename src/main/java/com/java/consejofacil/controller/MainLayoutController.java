@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
@@ -19,6 +20,8 @@ public class MainLayoutController implements Initializable {
     // BorderPane del contenedor principal
     @FXML
     private BorderPane bpMainLayout;
+    @Getter
+    private FXMLView viewCentro;
 
     // Stage Manager
     @Autowired
@@ -27,7 +30,8 @@ public class MainLayoutController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        // Establecemos la vista central inicial
+        viewCentro = FXMLView.ListaExpedientes;
     }
 
     public void cambiarCentro(FXMLView view)  {
@@ -35,6 +39,9 @@ public class MainLayoutController implements Initializable {
         Node centroActual = bpMainLayout.getCenter();
         // Obtenemos el nodo raiz del nuevo centro a colocar en el contenedor
         Node nuevoCentro = stageManager.loadView(view.getFxmlFile());
+
+        // Guardamos la vista del nuevo centro
+        viewCentro = view;
 
         // Cambiamos el título de la ventana principal
         stageManager.setTitle(view.getTitle());

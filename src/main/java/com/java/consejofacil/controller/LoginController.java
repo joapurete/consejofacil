@@ -1,5 +1,6 @@
 package com.java.consejofacil.controller;
 
+import com.java.consejofacil.controller.ABMMiembro.MiembroManager;
 import com.java.consejofacil.security.SecurityConfig;
 import com.java.consejofacil.config.StageManager;
 import com.java.consejofacil.helper.Alertas.AlertHelper;
@@ -9,9 +10,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -25,6 +30,11 @@ public class LoginController implements Initializable {
     @FXML
     private PasswordField txtContrasena;
 
+    // Controladores de los fxml
+    @Autowired
+    @Lazy
+    private MiembroManager miembroManager;
+
     // Stage Manager
     @Autowired
     @Lazy
@@ -34,6 +44,10 @@ public class LoginController implements Initializable {
     @Autowired
     @Lazy
     private SecurityConfig securityConfig;
+
+    // Logger para mostrar informacion
+    @Getter
+    private final Logger log = LoggerFactory.getLogger(LoginController.class);
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -58,6 +72,7 @@ public class LoginController implements Initializable {
 
     @FXML
     void crearCuenta() {
+        miembroManager.cargarFormulario(null, this);
     }
 
     private boolean validarCamposFormulario() {
@@ -89,7 +104,6 @@ public class LoginController implements Initializable {
 
     @FXML
     private void olvidasteContrasena() {
-
-
+        AlertHelper.mostrarMensaje(false, "Info", "Por favor, comunícate con el personal administrativo para obtener ayuda y recuperar el acceso a tu cuenta.");
     }
 }

@@ -24,6 +24,8 @@ public class ListaMiembrosController extends BaseTablaMiembros implements Initia
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        getMiembroManager().validarAccesoMiembro();
         // Inicializamos la tabla de miembros
         getMiembroManager().inicializarTablaMiembros(this);
         // Inicializamos los filtros
@@ -31,7 +33,7 @@ public class ListaMiembrosController extends BaseTablaMiembros implements Initia
     }
 
     @FXML
-    private void agregarMiembro() { getMiembroManager().cargarFormulario(null); }
+    private void agregarMiembro() { getMiembroManager().cargarFormulario(null, this); }
 
     @FXML
     private void eliminarMiembro() {
@@ -59,7 +61,7 @@ public class ListaMiembrosController extends BaseTablaMiembros implements Initia
         if (miembro == null) {
             getMiembroManager().mostrarMensaje(true, "Error", "Debes seleccionar un miembro!");
         } else {
-            getMiembroManager().cargarFormulario(miembro);
+            getMiembroManager().cargarFormulario(miembro, this);
         }
     }
 

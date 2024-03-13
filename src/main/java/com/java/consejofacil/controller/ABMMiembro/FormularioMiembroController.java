@@ -66,6 +66,12 @@ public class FormularioMiembroController implements Initializable {
     @FXML
     @Getter
     private Label lblContrasena;
+    @FXML
+    @Getter
+    private Label lblCargo;
+    @FXML
+    @Getter
+    private Label lblEstado;
 
     // Foto de perfil
     @Getter
@@ -79,7 +85,7 @@ public class FormularioMiembroController implements Initializable {
     private ObservableList<EstadoMiembro> estadosMiembros = FXCollections.observableArrayList();
 
     // Miembro
-    @Getter
+    @Getter @Setter
     private Miembro miembro;
 
     @Autowired
@@ -124,7 +130,7 @@ public class FormularioMiembroController implements Initializable {
 
     // Metodo para determinar si se está agregando un nuevo miembro
 
-    public boolean esNuevoMiembro(){
+    public boolean esNuevoMiembro() {
         return miembro == null;
     }
 

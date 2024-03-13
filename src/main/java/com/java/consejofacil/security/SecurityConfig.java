@@ -1,5 +1,6 @@
 package com.java.consejofacil.security;
 
+import com.java.consejofacil.controller.SessionController;
 import com.java.consejofacil.helper.Alertas.AlertHelper;
 import com.java.consejofacil.model.Miembro;
 import com.java.consejofacil.service.Miembro.MiembroServiceImpl;
@@ -16,7 +17,7 @@ public class SecurityConfig {
 
     @Autowired
     @Lazy
-    private SessionInfo sessionInfo;
+    private SessionController sessionControlador;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -32,28 +33,40 @@ public class SecurityConfig {
         // Verificamos si existe
         if (miembro != null) {
 
-            // Validamos la contrasena ingresada y si ambas coinciden
-            if (validarContrasena(clave, miembro.getClave())) {
-                // Mostramos un mensaje de exito
-                AlertHelper.mostrarMensaje(false, "Info", "Se ha iniciado sesión correctamente!");
+            String estadoMiembro = miembro.getEstadoMiembro().getEstadoMiembro();
 
-                // Guardamos la información del usuario
-                sessionInfo.setUsuario(miembro);
+            // Verificamos que el usuario este activo en el sistema
+            if (estadoMiembro.equals("Activo")) {
 
-                // Indicamos que el incio de sesion fue exitosa
-                return true;
+                // Validamos la contrasena ingresada y si ambas coinciden
+                if (validarContrasena(clave, miembro.getClave())) {
+
+                    // Abrimos la sesion del usuario
+                    sessionControlador.abrirSesion(miembro);
+
+                    // Indicamos que el incio de sesion fue exitosa
+                    return true;
+                } else {
+                    // Mostramos en un mensaje, en caso de validacion incorrecta
+                    mostrarMensaje("La contraseña ingresada es incorrecta. Vuelva a intentarlo.");
+                }
             } else {
-                // Mostramos en un mensaje, en caso de validacion incorrecta
-                AlertHelper.mostrarMensaje(true, "Error", "La contraseña ingresada es incorrecta. Vuelva a intentarlo.");
+                switch (estadoMiembro) {
+                    case "Inactivo" -> mostrarMensaje("El miembro del consejo " + miembro + " se encuentra inactivo.");
+                    case "En espera" -> mostrarMensaje("El miembro del consejo " + miembro + " se encuentra en espera de registración.");
+                    default -> mostrarMensaje("El miembro del consejo " + miembro + " no se encuentra activo en el sistema.");
+                }
             }
         } else {
             // Mostramos un mensaje, en caso de no encontrar el miembro
-            AlertHelper.mostrarMensaje(true, "Error", "No se encontró ningún miembro con el DNI especificado.");
+            mostrarMensaje("No se encontró ningún miembro con el DNI especificado.");
         }
 
         // Indicamos que hubo un error
         return false;
     }
+
+    private void mostrarMensaje(String contenido) { AlertHelper.mostrarMensaje(true, "Error", contenido); }
 
     // Metodo para codificar y validar contrasenas
 
@@ -61,7 +74,5 @@ public class SecurityConfig {
         return passwordEncoder.encode(rawPassword);
     }
 
-    public boolean validarContrasena(String rawPassword, String encodedPassword) {
-        return passwordEncoder.matches(rawPassword, encodedPassword);
-    }
+    public boolean validarContrasena(String rawPassword, String encodedPassword) { return passwordEncoder.matches(rawPassword, encodedPassword); }
 }

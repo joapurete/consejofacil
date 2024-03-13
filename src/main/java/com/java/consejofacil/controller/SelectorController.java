@@ -12,7 +12,9 @@ import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Controller;
 
+@Controller
 public class SelectorController {
 
     // Controladores de los selectores

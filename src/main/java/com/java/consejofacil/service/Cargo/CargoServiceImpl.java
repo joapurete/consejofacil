@@ -47,4 +47,6 @@ public class CargoServiceImpl implements CargoService, CrudService<Cargo> {
     @Override
     public List<Cargo> findAll()  { return repository.findAll(); }
 
+    @Override
+    public List<Cargo> encontrarCargosPorPrioridad(int prioridad) { return repository.findByPrioridad(prioridad); };
 }

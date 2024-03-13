@@ -18,7 +18,6 @@ public class Miembro {
 
     @Id
     @Column(name = "dni_miembro", nullable = false, unique = true)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int dni;
     @Column(name = "nombre", length = 50, nullable = false)
     private String nombre;

@@ -19,6 +19,7 @@ public class SelectorMiembroController extends BaseTablaMiembros implements Init
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
         // Inicializamos la tabla de miembros
         getMiembroManager().inicializarTablaMiembros(this);
         // Inicializamos los filtros

@@ -43,6 +43,9 @@ public class CambiarContrasenaMiembroController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        miembroManager.validarAccesoMiembro();
+
         // Estblecemos en nulo aL miembro
         miembro = null;
     }

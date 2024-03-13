@@ -21,9 +21,12 @@ public class Cargo {
     private int id;
     @Column(name = "cargo", length = 50, nullable = false)
     private String cargo;
+    @Column(name = "prioridad", nullable = false)
+    private int prioridad;
 
-    public Cargo(String cargo) {
+    public Cargo(String cargo, int prioridad) {
         this.cargo = cargo;
+        this.prioridad = prioridad;
     }
 
     @Override

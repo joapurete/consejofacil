@@ -1,6 +1,7 @@
 package com.java.consejofacil.config;
 
 import com.java.consejofacil.controller.SelectorController;
+import com.java.consejofacil.controller.SessionController;
 import com.java.consejofacil.security.SecurityConfig;
 import com.java.consejofacil.security.SessionInfo;
 import javafx.stage.Stage;
@@ -42,5 +43,6 @@ public class AppConfig {
 
     @Bean
     @Lazy
-    public SelectorController selectorControlador() { return new SelectorController(); }
+    public SessionController sessionController() { return new SessionController(); }
+    //public SelectorController selectorControlador() { return new SelectorController(); }
 }

@@ -46,7 +46,7 @@
                         <children>
                             <Label prefHeight="27.0" styleClass="label-formulario" text="Buscar nombre:" GridPane.halignment="CENTER" />
                             <Label styleClass="label-formulario" text="Cargo:" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
-                            <ComboBox fx:id="cmbCargo" editable="true" maxWidth="1.7976931348623157E308" onAction="#filtrarPorCargo" prefHeight="154.0" styleClass="combo-personalizado" GridPane.columnIndex="3" />
+                            <ComboBox fx:id="cmbCargo" maxWidth="1.7976931348623157E308" onAction="#filtrarPorCargo" prefHeight="154.0" styleClass="combo-personalizado" GridPane.columnIndex="3" />
                             <Label styleClass="label-formulario" text="Fecha Nac:" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
                             <DatePicker fx:id="dtpFechaNac" editable="false" maxWidth="1.7976931348623157E308" onAction="#filtrarPorFechaNac" styleClass="datepicker-personalizado" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                             <Label styleClass="label-formulario" text="Estado:" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />

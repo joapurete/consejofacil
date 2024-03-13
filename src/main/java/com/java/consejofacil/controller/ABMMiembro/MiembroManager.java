@@ -1,6 +1,7 @@
 package com.java.consejofacil.controller.ABMMiembro;
 
 import com.java.consejofacil.config.StageManager;
+import com.java.consejofacil.controller.SessionController;
 import com.java.consejofacil.helper.Alertas.AlertHelper;
 import com.java.consejofacil.helper.Componentes.TableCellFactoryHelper;
 import com.java.consejofacil.helper.Utilidades.DateFormatterHelper;
@@ -24,10 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import javafx.scene.image.Image;
+
 import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class MiembroManager {
@@ -36,6 +39,11 @@ public class MiembroManager {
     @Autowired
     @Lazy
     private SecurityConfig securityConfig;
+
+    // Componente para obtener información de sesion
+    @Autowired
+    @Lazy
+    private SessionController sessionControlador;
 
     // Servicios utilizados
     @Autowired
@@ -67,6 +75,12 @@ public class MiembroManager {
     @Lazy
     private StageManager stageManager;
 
+    // Metodo para validar el acceso del miembro
+
+    public void validarAccesoMiembro() {
+        sessionControlador.validarAccesoMiembro();
+    }
+
     // Metodos de inicialización de componentes
 
     public void inicializarTablaMiembros(BaseTablaMiembros controlador) {
@@ -84,14 +98,36 @@ public class MiembroManager {
             // Formateamos la fecha de nacimiento
             TableCellFactoryHelper.configurarCeldaFecha(controlador.getColFechaNac());
 
-            // Cargamos listas
+            // Limpiamos las listas listas
             controlador.getMiembros().clear();
             controlador.getFiltroMiembros().clear();
-            controlador.getMiembros().addAll(miembroService.findAll());
+
+            // Obtenemos todos los miembros
+            List<Miembro> miembros = miembroService.findAll();
+
+            // Cargamos las listas basandonos en el controlador
+            if (controlador instanceof SelectorMiembroController) {
+                controlador.getMiembros().addAll(miembros);
+            } else if (controlador instanceof ListaMiembrosController){
+
+                // Obtenemos la prioridad del miembro
+                int prioridad = sessionControlador.getUsuario() != null ?
+                        sessionControlador.getUsuario().getCargo().getPrioridad() : 0;
+
+                // Iteramos los miembros y agregamos aquellos que tengan menor prioridad
+                for (Miembro miembro : miembros) {
+                    if (prioridad > miembro.getCargo().getPrioridad()) {
+                        controlador.getMiembros().add(miembro);
+                    }
+                }
+            }
+
+            // Cargamos el filtro de miembros
             controlador.getFiltroMiembros().addAll(controlador.getMiembros());
 
             // Cargamos la tabla
             controlador.getTblMiembros().setItems(controlador.getFiltroMiembros());
+
         } catch (Exception e) {
             controlador.getLog().error(e.getMessage());
         }
@@ -110,26 +146,35 @@ public class MiembroManager {
     }
 
     public void inicializarCombosFormulario() {
-        // Cargamos lista y combo de cargos
-        abmMiembroControlador.getCargos().clear();
-        abmMiembroControlador.getCargos().addAll(cargoService.findAll());
-        abmMiembroControlador.getCmbCargo().setItems(abmMiembroControlador.getCargos());
-
         // Cargamos lista y combo de estados
         abmMiembroControlador.getEstadosMiembros().clear();
         abmMiembroControlador.getEstadosMiembros().addAll(estadoMiembroService.findAll());
         abmMiembroControlador.getCmbEstado().setItems(abmMiembroControlador.getEstadosMiembros());
     }
 
+    public void inicializarComboCargoFormulario(int prioridad) {
+        // Cargamos lista y combo de cargos
+        abmMiembroControlador.getCargos().clear();
+        abmMiembroControlador.getCargos().addAll(cargoService.encontrarCargosPorPrioridad(prioridad));
+        abmMiembroControlador.getCmbCargo().setItems(abmMiembroControlador.getCargos());
+    }
+
     // Metodo para cargar el ABM
 
-    public void cargarFormulario(Miembro miembro) {
+    public void cargarFormulario(Miembro miembro, Object controlador) {
         try {
-            boolean autocompletadoSeleccionado = listaMiembrosControlador.getCheckAutocompletado().isSelected();
-            String nombre = listaMiembrosControlador.getTxtNombre().getText().trim();
-            LocalDate fechaNacSeleccionada = listaMiembrosControlador.getDtpFechaNac().getValue();
-            Cargo cargoSeleccionado = listaMiembrosControlador.getCmbCargo().getValue();
-            EstadoMiembro estadoMiembroSeleccionado = listaMiembrosControlador.getCmbEstado().getValue();
+            // Definimos si estamos dentro del módulo
+            boolean inModule = controlador instanceof ListaMiembrosController;
+
+            boolean autocompletadoSeleccionado = inModule && listaMiembrosControlador.getCheckAutocompletado().isSelected();
+            Miembro aux = new Miembro();
+
+            if (inModule) {
+                aux.setNombre(listaMiembrosControlador.getTxtNombre().getText().trim());
+                aux.setFechaNac(listaMiembrosControlador.getDtpFechaNac().getValue());
+                aux.setCargo(listaMiembrosControlador.getCmbCargo().getValue());
+                aux.setEstadoMiembro(listaMiembrosControlador.getCmbEstado().getValue());
+            }
 
             // Cargamos FXML de ABMMiembro
             Parent rootNode = stageManager.loadView(FXMLView.FormularioMiembro.getFxmlFile());
@@ -138,9 +183,12 @@ public class MiembroManager {
                 abmMiembroControlador.establecerMiembro(miembro);
             } else if (autocompletadoSeleccionado) {
                 // Autocompletamos el formulario si el CheckBox está seleccionado
-                autocompletarFormulario(new Miembro(nombre, "", "", fechaNacSeleccionada, "",
-                        "", "", cargoSeleccionado, estadoMiembroSeleccionado));
+                autocompletarFormulario(aux);
             }
+
+            // Inicializamos el combo de cargos basandonos en la prioridad del usuario
+            int prioridad = sessionControlador.getUsuario().getCargo().getPrioridad();
+            inicializarComboCargoFormulario(miembro != null ? prioridad - 1 : prioridad);
 
             // Antes de cargar la vista, hacemos las configuraciones correspondientes en el formulario
             configurarFormulario();
@@ -149,12 +197,13 @@ public class MiembroManager {
             stageManager.openModal(rootNode, FXMLView.FormularioMiembro);
 
         } catch (Exception e) {
-            listaMiembrosControlador.getLog().error(e.getMessage());
+            abmMiembroControlador.getLog().error(e.getMessage());
         }
     }
 
     public void procesarMiembro(Miembro miembro, boolean nuevoValor) {
-        if (miembro != null) {
+        if (miembro != null && listaMiembrosControlador.getTblMiembros() != null) {
+
             // Si el miembro no está dentro de la lista, la agregamos
             if (nuevoValor) {
                 // Lo agregamos a la lista
@@ -220,17 +269,35 @@ public class MiembroManager {
         String direccion = abmMiembroControlador.getTxtDireccion().getText().trim();
         String correo = abmMiembroControlador.getTxtCorreo().getText().trim();
         String contrasena = abmMiembroControlador.getTxtContrasena().getText().trim();
-        Cargo cargoSeleccionado = abmMiembroControlador.getCmbCargo().getValue();
-        EstadoMiembro estadoMiembroSeleccionado = abmMiembroControlador.getCmbEstado().getValue();
+
+        // En cuanto al cargo y el estado, si no esta en sesion establecer por defecto como miembro y en espera
+        // Si es un miembro, no deberia tener acceso a estas propiedades, por lo que le establecemos el mismo cargo y estado
+        Cargo cargoSeleccionado;
+        EstadoMiembro estadoMiembroSeleccionado;
+        if (!sessionControlador.validarSesion()) {
+            cargoSeleccionado = abmMiembroControlador.getCargos().getFirst();
+            estadoMiembroSeleccionado =  abmMiembroControlador.getEstadosMiembros().getLast();
+        } else {
+            if (tieneCargoMiembro()) {
+                cargoSeleccionado = sessionControlador.getUsuario().getCargo();
+                estadoMiembroSeleccionado = sessionControlador.getUsuario().getEstadoMiembro();
+            } else {
+                cargoSeleccionado = abmMiembroControlador.getCmbCargo().getValue();
+                estadoMiembroSeleccionado = abmMiembroControlador.getCmbEstado().getValue();
+            }
+        }
+
+        // Creamos un nuevo miembro auxiliar basándonos en el contexto
+        Miembro miembro = new Miembro(nombre, apellido, fechaNacSeleccionada, telefono, direccion, correo,
+                cargoSeleccionado, estadoMiembroSeleccionado);
 
         // Creamos un nuevo miembro auxiliar basándonos en el contexto
         if (abmMiembroControlador.esNuevoMiembro()) {
-            return new Miembro(nombre, apellido, contrasena, fechaNacSeleccionada, telefono, direccion, correo,
-                    cargoSeleccionado, estadoMiembroSeleccionado);
-        } else {
-            return new Miembro(nombre, apellido, fechaNacSeleccionada, telefono, direccion, correo,
-                    cargoSeleccionado, estadoMiembroSeleccionado);
+            miembro.setClave(contrasena);
         }
+
+        // Devolvemos el miembro creado
+        return miembro;
     }
 
     public void guardarMiembro() {
@@ -251,12 +318,20 @@ public class MiembroManager {
                 // Establecemos la misma clave al miembro auxiliar
                 aux.setClave(abmMiembroControlador.getMiembro().getClave());
 
+                // Verificamos si el miembro que estamos moficando es el que se encuentra en sesion
+                boolean esMismoMiembro = sessionControlador.autenticarMiembro(abmMiembroControlador.getMiembro());
+
                 // Primero, modificamos el DNI del miembro
                 int filasActualizadas = miembroService.modificarDni(aux.getDni(), abmMiembroControlador.getMiembro().getDni());
 
                 // Modificamos el miembro
                 if (filasActualizadas > 0) {
                     modificarMiembro(aux);
+                }
+
+                // Modificamos la información del usuario en sesion, en caso de que sea el mismo
+                if (esMismoMiembro) {
+                    sessionControlador.modificarSesion(aux);
                 }
 
             } else {
@@ -267,8 +342,10 @@ public class MiembroManager {
                 agregarMiembro(aux);
             }
 
-            // Actuailizamos la tabla de miembros
-            listaMiembrosControlador.getTblMiembros().refresh();
+            if (listaMiembrosControlador.getTblMiembros() != null) {
+                // Actuailizamos la tabla de miembros
+                listaMiembrosControlador.getTblMiembros().refresh();
+            }
 
             // Salimos del modal
             stageManager.closeModal(FXMLView.FormularioMiembro.getKey());
@@ -291,7 +368,6 @@ public class MiembroManager {
             mostrarMensaje(true, "Error", "No se pudo agregar el miembro correctamente!");
         }
     }
-
 
     public void modificarMiembro(Miembro miembro) {
         try {
@@ -466,21 +542,35 @@ public class MiembroManager {
     public void configurarFormulario() {
 
         if (!abmMiembroControlador.esNuevoMiembro()) {
-
             // Desactivamos el TextField para ingresar una contranse
             abmMiembroControlador.getTxtContrasena().setDisable(true);
             abmMiembroControlador.getTxtContrasena().setVisible(false);
             abmMiembroControlador.getLblContrasena().setVisible(false);
-
         } else {
-
             // Desactivamos el boton para cambiar la contrasena
             abmMiembroControlador.getBtnCambiarContrasena().setDisable(true);
             abmMiembroControlador.getBtnCambiarContrasena().setVisible(false);
         }
+
+        // Si el usuario no está en sesion o es un miembro del consejo, desactivamos los cargos y estados
+        if (!sessionControlador.validarSesion() || tieneCargoMiembro()) {
+            abmMiembroControlador.getCmbCargo().setDisable(true);
+            abmMiembroControlador.getCmbCargo().setVisible(false);
+            abmMiembroControlador.getLblCargo().setVisible(false);
+
+            abmMiembroControlador.getCmbEstado().setDisable(true);
+            abmMiembroControlador.getCmbEstado().setVisible(false);
+            abmMiembroControlador.getLblEstado().setVisible(false);
+        }
     }
 
     // Metdodos para validar los campos del formulario
+
+    public boolean tieneCargoMiembro(){
+        System.out.println(sessionControlador.getUsuario().getCargo().getCargo());
+        return sessionControlador.validarSesion() &&
+                sessionControlador.getUsuario().getCargo().getCargo().equals("Miembro del Consejo");
+    }
 
     public boolean validarCamposFormulario(Object controlador) {
         ArrayList<String> errores = new ArrayList<>();
@@ -498,7 +588,7 @@ public class MiembroManager {
             } else {
                 boolean esDiferente = abmMiembroControlador.esNuevoMiembro() ||
                         abmMiembroControlador.getMiembro().getDni() != Integer.parseInt(dni);
-                if (abmMiembroControlador.esNuevoMiembro() || esDiferente)  {
+                if (abmMiembroControlador.esNuevoMiembro() || esDiferente) {
                     if (miembroService.findById(Integer.parseInt(dni)) != null) {
                         errores.add("El DNI ingresado ya está en uso. Por favor, ingrese otro DNI.");
                     }
@@ -578,7 +668,7 @@ public class MiembroManager {
         } else if (controlador instanceof CambiarContrasenaMiembroController) {
 
             // Obtenemos las contrasenas ingresadas
-            String contrasenaActuagit l = cambiarContrasenaMiembroControlador.getTxtContrasenaActual().getText().trim();
+            String contrasenaActual = cambiarContrasenaMiembroControlador.getTxtContrasenaActual().getText().trim();
             String contrasenaNueva = cambiarContrasenaMiembroControlador.getTxtContrasenaNueva().getText().trim();
             String repetirContrasenaNueva = cambiarContrasenaMiembroControlador.getTxtRepetirContrasenaNueva().getText().trim();
 
