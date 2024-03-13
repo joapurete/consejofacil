@@ -1,7 +1,11 @@
 package com.java.consejofacil.controller.ABMInvolucrado;
 
 import com.java.consejofacil.config.StageManager;
-import com.java.consejofacil.helpers.Helpers;
+import com.java.consejofacil.helper.Alertas.AlertHelper;
+import com.java.consejofacil.helper.Componentes.ComponentHelper;
+import com.java.consejofacil.controller.SelectorController;
+import com.java.consejofacil.helper.Componentes.TableCellFactoryHelper;
+import com.java.consejofacil.helper.Utilidades.ListHelper;
 import com.java.consejofacil.model.*;
 import com.java.consejofacil.service.Cargo.CargoServiceImpl;
 import com.java.consejofacil.service.EstadoMiembro.EstadoMiembroServiceImpl;
@@ -12,13 +16,11 @@ import com.java.consejofacil.view.FXMLView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +28,6 @@ import java.util.Optional;
 
 @Component
 public class InvolucradoManager {
-
-    // Ayudas necesarias
-    @Autowired
-    @Lazy
-    private Helpers helpers;
 
     // Servicios necesarios
     @Autowired
@@ -59,6 +56,9 @@ public class InvolucradoManager {
     @Autowired
     @Lazy
     private FormularioListaInvolucradoController abmListaInvolucradoControlador;
+    @Autowired
+    @Lazy
+    private SelectorController selectorControlador;
 
     // Stage Manager
     @Autowired
@@ -92,13 +92,13 @@ public class InvolucradoManager {
         listaInvolucradosControlador.getExpedientes().clear();
         listaInvolucradosControlador.getExpedientes().addAll(expedienteService.findAll());
         listaInvolucradosControlador.getCmbExpediente().setItems(listaInvolucradosControlador.getExpedientes());
-        helpers.configurarComboEditable(listaInvolucradosControlador.getCmbExpediente());
+        ComponentHelper.configurarComboEditable(listaInvolucradosControlador.getCmbExpediente());
 
         // Cargamos lista y combo de miembros
         listaInvolucradosControlador.getMiembros().clear();
         listaInvolucradosControlador.getMiembros().addAll(miembroService.encontrarMiembrosActivos());
         listaInvolucradosControlador.getCmbInvolucrado().setItems(listaInvolucradosControlador.getMiembros());
-        helpers.configurarComboEditable(listaInvolucradosControlador.getCmbInvolucrado());
+        ComponentHelper.configurarComboEditable(listaInvolucradosControlador.getCmbInvolucrado());
     }
 
     public void inicializarCombosFormulario(BaseFormularioInvolucrado controlador) {
@@ -106,14 +106,14 @@ public class InvolucradoManager {
         controlador.getExpedientes().clear();
         controlador.getExpedientes().addAll(expedienteService.findAll());
         controlador.getCmbExpediente().setItems(controlador.getExpedientes());
-        helpers.configurarComboEditable(controlador.getCmbExpediente());
+        ComponentHelper.configurarComboEditable(controlador.getCmbExpediente());
 
         if (controlador instanceof FormularioInvolucradoController) {
             // Cargamos lista y combo de miembros
             controlador.getMiembros().clear();
             controlador.getMiembros().addAll(miembroService.encontrarMiembrosActivos());
             controlador.getCmbInvolucrado().setItems(controlador.getMiembros());
-            helpers.configurarComboEditable(controlador.getCmbInvolucrado());
+            ComponentHelper.configurarComboEditable(controlador.getCmbInvolucrado());
         }
     }
 
@@ -187,22 +187,28 @@ public class InvolucradoManager {
 
     // Metodos para agregar, modificar y eliminar involucrados
 
-    public Involucrado obtenerDatosFormulario() {
+    public Involucrado obtenerDatosFormulario(BaseFormularioInvolucrado controlador) {
         // Obtenemos la información de los campos
-        Expediente expediente = abmInvolucradoControlador.getCmbExpediente().getValue();
-        Miembro miembro = abmInvolucradoControlador.getCmbInvolucrado().getValue();
-        abmInvolucradoControlador.getTxtDetallesInvolucrado().getText();
-        String detallesInvolucrado = !abmInvolucradoControlador.getTxtDetallesInvolucrado().getText().trim().isEmpty() ?
-                abmInvolucradoControlador.getTxtDetallesInvolucrado().getText().trim() : "No hay detalles para mostrar.";
+        Expediente expediente = controlador.getCmbExpediente().getValue();
 
-        // Creamos un nuevo involucrado auxiliar
-        return new Involucrado(expediente, miembro, detallesInvolucrado);
+        // Creamos un involucrado auxiliar
+        Involucrado involucrado = new Involucrado(expediente, null, null);
+
+        // Obtenemos los datos del formulario original
+        if (controlador instanceof FormularioInvolucradoController) {
+            involucrado.setMiembro(controlador.getCmbInvolucrado().getValue());
+            involucrado.setDetallesInvolucrado(!controlador.getTxtDetallesInvolucrado().getText().trim().isEmpty() ?
+                    controlador.getTxtDetallesInvolucrado().getText().trim() : "No hay detalles para mostrar.");
+        }
+
+        // Develmos el involucrado creado
+        return involucrado;
     }
 
     public void guardarInvolucrado() {
         if (validarCamposFormulario(abmInvolucradoControlador)) {
             // Creamos un nuevo involucrado auxiliar
-            Involucrado aux = obtenerDatosFormulario();
+            Involucrado aux = obtenerDatosFormulario(abmInvolucradoControlador);
 
             // Si el involucrado es diferente de nulo, queremos modificar
             if (abmInvolucradoControlador.getInvolucrado() != null) {
@@ -212,17 +218,17 @@ public class InvolucradoManager {
 
                 // Modificamos el involucrado
                 if (modificarInvolucrado(aux)) {
-                    mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha modificado el involucrado correctamente!");
+                    mostrarMensaje(false, "Info", "Se ha modificado el involucrado correctamente!");
                 } else {
-                    mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo modificar el involucrado correctamente!");
+                    mostrarMensaje(true, "Error", "No se pudo modificar el involucrado correctamente!");
                 }
 
             } else {
                 // Si el involucrado es nulo, queremos agregar
                 if (agregarInvolucrado(aux)) {
-                    mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha agregado el involucrado correctamente!");
+                    mostrarMensaje(false, "Info", "Se ha agregado el involucrado correctamente!");
                 } else {
-                    mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo agregar el involucrado correctamente!");
+                    mostrarMensaje(true, "Error", "No se pudo agregar el involucrado correctamente!");
                 }
             }
 
@@ -366,13 +372,16 @@ public class InvolucradoManager {
 
     private boolean validarCamposFormulario(BaseFormularioInvolucrado controlador) {
         ArrayList<String> errores = new ArrayList<>();
+
+        // Creamos un involucrado auxiliar y otro para obtener los datos del formulario
         Involucrado aux = new Involucrado();
+        Involucrado involucrado = obtenerDatosFormulario(controlador);
 
         // Verificamos que haya seleccionado un expediente
-        if (controlador.getCmbExpediente().getValue() == null) {
+        if (involucrado.getExpediente() == null) {
             errores.add("Por favor, seleccione un expediente.");
         } else {
-            Expediente expediente = expedienteService.findById(controlador.getCmbExpediente().getValue().getId());
+            Expediente expediente = expedienteService.findById(involucrado.getExpediente().getId());
             if (expediente == null) {
                 errores.add("El expediente seleccionado no se encuentra en la base de datos.");
             } else if (controlador instanceof FormularioInvolucradoController) {
@@ -385,24 +394,24 @@ public class InvolucradoManager {
 
         if (controlador instanceof FormularioInvolucradoController) {
 
-            // Verificamos que haya seleccionado un involucrado y que no esté inactivo en el sistema
-            if (controlador.getCmbInvolucrado().getValue() == null) {
+            // Verificamos que haya seleccionado un miembro y que no esté inactivo en el sistema
+            if (involucrado.getMiembro() == null) {
                 errores.add("Por favor, seleccione un involucrado.");
             } else {
-                Miembro involucrado = miembroService.findById(controlador.getCmbInvolucrado().getValue().getDni());
-                if (involucrado == null) {
+                Miembro miembro = miembroService.findById(involucrado.getMiembro().getDni());
+                if (miembro == null) {
                     errores.add("El involucrado seleccionado no se encuentra en la base de datos.");
                 } else {
-                    if (!involucrado.getEstadoMiembro().getEstadoMiembro().equals("Activo")) {
+                    if (!miembro.getEstadoMiembro().getEstadoMiembro().equals("Activo")) {
                         errores.add("Debe seleccionar un involucrado activo en el sistema.");
                     }
-                    // Establecemos involucrado al auxiliar
-                    aux.setMiembro(involucrado);
+                    // Establecemos miembro al auxiliar
+                    aux.setMiembro(miembro);
                 }
             }
 
             // Verificamos que los detalles no supere los 500 caracteres
-            if (controlador.getTxtDetallesInvolucrado().getLength() > 500) {
+            if (involucrado.getDetallesInvolucrado().length() > 500) {
                 errores.add("Los detalles del involucrado no pueden tener más de 500 caracteres.");
             }
 
@@ -431,7 +440,7 @@ public class InvolucradoManager {
 
         // Verificamos si hay errores
         if (!errores.isEmpty()) {
-            mostrarCadenaMensajes(errores, "Se ha producido uno o varios errores:", Alert.AlertType.ERROR, "Error");
+            mostrarCadenaMensajes(true, errores, "Se ha producido uno o varios errores:", "Error");
             return false;
         }
 
@@ -448,8 +457,8 @@ public class InvolucradoManager {
             errores.add("El involucrado " + inv.getMiembro().toString() + " no se encuentra en la base de datos.");
         } else {
             if (!involucrado.getEstadoMiembro().getEstadoMiembro().equals("Activo")) {
-                errores.add("El involucrado " + inv.getMiembro().toString() + " se encuentra inactivo o en espera.");
-                errores.add("Debe seleccionar un involucrado activo en el sistema.");
+                errores.add("El involucrado " + inv.getMiembro().toString() + " se encuentra inactivo o en espera.\n" +
+                        "Debe seleccionar un involucrado activo en el sistema.");
             }
         }
 
@@ -509,25 +518,25 @@ public class InvolucradoManager {
     // Metodos para interactuar con los selectores
 
     public void seleccionarExpediente(ComboBox<Expediente> combo) throws Exception {
-        helpers.seleccionarExpediente(combo);
+        selectorControlador.seleccionarExpediente(combo);
     }
 
     public void seleccionarMiembro(ComboBox<Miembro> combo) throws Exception {
-        helpers.seleccionarMiembro(combo);
+        selectorControlador.seleccionarMiembro(combo);
     }
 
     // Metodos para mostrar mensajes en pantalla
 
     public boolean mostrarConfirmacion(String titulo, String contenido) {
-        return helpers.mostrarConfirmacion(titulo, contenido);
+        return AlertHelper.mostrarConfirmacion(titulo, contenido);
     }
 
-    public void mostrarCadenaMensajes(ArrayList<String> mensajes, String titulo, Alert.AlertType tipoAlerta, String tituloAlerta) {
-        helpers.mostrarCadenaMensajes(mensajes, titulo, tipoAlerta, tituloAlerta);
+    public void mostrarCadenaMensajes(boolean error, ArrayList<String> mensajes, String titulo, String tituloAlerta) {
+        AlertHelper.mostrarCadenaMensajes(error, mensajes, titulo, tituloAlerta);
     }
 
-    public void mostrarMensaje(Alert.AlertType tipo, String titulo, String contenido) {
-        helpers.mostrarMensaje(tipo, titulo, contenido);
+    public void mostrarMensaje(boolean error, String titulo, String contenido) {
+        AlertHelper.mostrarMensaje(error, titulo, contenido);
     }
 
     // Metodos adicionales para el formulario con lista
@@ -538,15 +547,15 @@ public class InvolucradoManager {
         abmListaInvolucradoControlador.getColDetallesInvolucrado().setCellValueFactory(new PropertyValueFactory<>("detallesInvolucrado"));
 
         // Configuramos las columnas en relacion con el miembro
-        helpers.configurarDniMiembro(abmListaInvolucradoControlador.getColDni());
-        helpers.configurarCargoMiembro(abmListaInvolucradoControlador.getColCargo());
-        helpers.configurarEstadoMiembro(abmListaInvolucradoControlador.getColEstado());
+        TableCellFactoryHelper.configurarCeldaDniMiembro(abmListaInvolucradoControlador.getColDni());
+        TableCellFactoryHelper.configurarCeldaCargoMiembro(abmListaInvolucradoControlador.getColCargo());
+        TableCellFactoryHelper.configurarCeldaEstadoMiembro(abmListaInvolucradoControlador.getColEstado());
 
         // Configuramos el TextField para que pueda modificar en tiempo de ejecucion los detalles del involucrado
-        helpers.configurarTxtFieldTabla(abmListaInvolucradoControlador.getColDetallesInvolucrado());
+        TableCellFactoryHelper.configurarCeldaTextField(abmListaInvolucradoControlador.getColDetallesInvolucrado());
 
         // Configuramos el CheckBox para que pueda seleccionar nuevos involucrados a la lista
-        helpers.configurarCheckTableCell(abmListaInvolucradoControlador.getColSeleccionar(),
+        TableCellFactoryHelper.configurarCeldaCheck(abmListaInvolucradoControlador.getColSeleccionar(),
                 abmListaInvolucradoControlador.getMiembrosSeleccionados());
 
         // Cargamos la lista de involucrados
@@ -588,7 +597,7 @@ public class InvolucradoManager {
                 if (involucrado != null) {
 
                     // Si esta seleccionado, queremos agregar o modificar
-                    if (flag != helpers.FLAG_ELIMINAR) {
+                    if (flag != ListHelper.FLAG_ELIMINAR) {
                         // Validamos la información del involucrado
                         if (validarInvolucrado(involucrado)) {
 
@@ -598,7 +607,7 @@ public class InvolucradoManager {
                             }
 
                             // Si el ID es diferente de 0, quiere decir que ya existe
-                            if (involucrado.getId() != 0 || flag == helpers.FLAG_MODIFICAR) {
+                            if (involucrado.getId() != 0 || flag == ListHelper.FLAG_MODIFICAR) {
                                 // Modificamos el involucrado
                                 if (modificarInvolucrado(involucrado)) {
                                     abmListaInvolucradoControlador.getCadenaInfos().add("Se ha modificado el involucrado " + involucrado.getMiembro().toString() + " correctamente!");
@@ -628,8 +637,8 @@ public class InvolucradoManager {
             }
 
             // Mostramos cadenas de errores e infos en pantalla
-            mostrarCadenaMensajes(abmListaInvolucradoControlador.getCadenaErrores(), "Se ha producido uno o varios errores:", Alert.AlertType.ERROR, "Error");
-            mostrarCadenaMensajes(abmListaInvolucradoControlador.getCadenaInfos(), "Se ha producido una o varias modificaciones:", Alert.AlertType.INFORMATION, "Info");
+            mostrarCadenaMensajes(true, abmListaInvolucradoControlador.getCadenaErrores(), "Se ha producido uno o varios errores:", "Error");
+            mostrarCadenaMensajes(false, abmListaInvolucradoControlador.getCadenaInfos(), "Se ha producido una o varias modificaciones:", "Info");
 
             // Actualizamos la tabla de involucrados
             listaInvolucradosControlador.getTblInvolucrados().refresh();
@@ -683,7 +692,7 @@ public class InvolucradoManager {
             // Verificamos si el miembro seleccionado ya se encuentra en la lista
             if (buscarInvolucradoPorMiembro(miembro) == null) {
                 // Si no se encuentra presente, lo agregamos
-                abmListaInvolucradoControlador.getInvolucrados().add(new Involucrado(expediente, miembro, "--"));
+                abmListaInvolucradoControlador.getInvolucrados().add(new Involucrado(expediente, miembro, ""));
             }
         }
 
@@ -697,7 +706,7 @@ public class InvolucradoManager {
     public void cargarMiembrosSeleccionados() {
         // Cargamos la lista de miembros seleccionados
         for (Involucrado involucrado : abmListaInvolucradoControlador.getInvolucrados()) {
-            abmListaInvolucradoControlador.getMiembrosSeleccionados().put(involucrado.getMiembro(), helpers.FLAG_MODIFICAR);
+            abmListaInvolucradoControlador.getMiembrosSeleccionados().put(involucrado.getMiembro(), ListHelper.FLAG_MODIFICAR);
         }
     }
 
@@ -707,7 +716,7 @@ public class InvolucradoManager {
         // Verificamos si el CheckBox de mostrar seleccionados está presionado
         // En ese caso, mostrar solo aquellos que esten contenidos en la lista, y no los haya que eliminar
         return (abmListaInvolucradoControlador.getMiembrosSeleccionados().containsKey(inv.getMiembro())
-                && abmListaInvolucradoControlador.getMiembrosSeleccionados().get(inv.getMiembro()) != helpers.FLAG_ELIMINAR)
+                && abmListaInvolucradoControlador.getMiembrosSeleccionados().get(inv.getMiembro()) != ListHelper.FLAG_ELIMINAR)
                 || !abmListaInvolucradoControlador.getCheckMostrarSeleccionados().isSelected();
     }
 
@@ -776,7 +785,7 @@ public class InvolucradoManager {
 
         // Iteramos sobre la copia de la lista
         for (Involucrado involucrado : copiaInvolucrados) {
-            helpers.seleccionarItemCheckTableCell(involucrado.getMiembro(), abmListaInvolucradoControlador.getMiembrosSeleccionados(), valorActual);
+            ListHelper.seleccionarItem(involucrado.getMiembro(), abmListaInvolucradoControlador.getMiembrosSeleccionados(), valorActual);
         }
 
         // Actualizamos la tabla

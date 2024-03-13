@@ -1,6 +1,5 @@
 package com.java.consejofacil.controller.ABMAsistencia;
 
-
 import com.java.consejofacil.model.Asistencia;
 import com.java.consejofacil.model.EstadoAsistencia;
 import com.java.consejofacil.model.Miembro;
@@ -103,7 +102,7 @@ public class ListaAsistenciaController implements Initializable {
         if (asis == null) {
             // Manejamos el caso cuando no se selecciona ninguna asistencia
             String errorMessage = listaSeleccionada ? "Debes seleccionar una asistencia para obtener la lista a la que pertenece!" : "Debes seleccionar una asistencia!";
-            asistenciaManager.mostrarMensaje(Alert.AlertType.ERROR, "Error", errorMessage);
+            asistenciaManager.mostrarMensaje(true, "Error", errorMessage);
         } else {
             asistenciaManager.cargarFormulario(listaSeleccionada ? FXMLView.FormularioListaAsistencia : FXMLView.FormularioAsistencia, asis);
         }
@@ -116,15 +115,15 @@ public class ListaAsistenciaController implements Initializable {
 
         // Verificamos que no sea nulo
         if (asis == null) {
-            asistenciaManager.mostrarMensaje(Alert.AlertType.ERROR, "Error", "Debes seleccionar una asistencia!"); // para obtener la lista al cual pertenece
+            asistenciaManager.mostrarMensaje(true, "Error", "Debes seleccionar una asistencia!"); // para obtener la lista al cual pertenece
         } else {
 
             // Eliminamos la asistencia
             if (asistenciaManager.eliminarAsistencia(asis, false)){
                 // Mostramos un mensaje
-                asistenciaManager.mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha eliminado la asistencia correctamente!");
+                asistenciaManager.mostrarMensaje(false, "Info", "Se ha eliminado la asistencia correctamente!");
             } else {
-                asistenciaManager.mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo eliminar la asistencia correctamente!");
+                asistenciaManager.mostrarMensaje(true, "Error", "No se pudo eliminar la asistencia correctamente!");
             }
 
             // Actualizamos la tabla de asistencias

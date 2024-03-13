@@ -1,33 +1,25 @@
 package com.java.consejofacil.controller.ABMReunion;
 
 import com.java.consejofacil.config.StageManager;
-import com.java.consejofacil.helpers.Helpers;
+import com.java.consejofacil.helper.Alertas.AlertHelper;
+import com.java.consejofacil.helper.Componentes.TableCellFactoryHelper;
+import com.java.consejofacil.helper.Utilidades.DateFormatterHelper;
 import com.java.consejofacil.model.Reunion;
 import com.java.consejofacil.service.Reunion.ReunionServiceImpl;
 import com.java.consejofacil.view.FXMLView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 @Component
 public class ReunionManager {
-
-    // Ayudas necesarias
-    @Autowired
-    @Lazy
-    private Helpers helpers;
-
-    // Variables de control
-    DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     // Servicios necesarios
     @Autowired
@@ -60,7 +52,7 @@ public class ReunionManager {
             controlador.getColAsunto().setCellValueFactory(new PropertyValueFactory<>("asunto"));
 
             // Formateamos la fecha de ingreso
-            helpers.formatearColumnaFecha(controlador.getColFechaReunion());
+            TableCellFactoryHelper.configurarCeldaFecha(controlador.getColFechaReunion());
 
             // Cargamos listas
             controlador.getReuniones().clear();
@@ -137,14 +129,19 @@ public class ReunionManager {
 
     // Metodos para agregar, modificar y eliminar reuniones
 
+    public Reunion obtenerDatosFormulario(){
+        // Obtenemos la información en los campos
+        String asunto = abmReunionControlador.getTxtAsunto().getText().trim();
+        LocalDate fechaReunion = abmReunionControlador.getDtpFechaReunion().getValue();
+
+        // Creamos una reunion auxiliar
+        return new Reunion(asunto, fechaReunion);
+    }
+
     public void guardarReunion() {
         if (validarCamposFormulario()) {
-            // Obtenemos la información en los campos
-            LocalDate fechaReunion = abmReunionControlador.getDtpFechaReunion().getValue();
-            String asunto = abmReunionControlador.getTxtAsunto().getText().trim();
-
             // Creamos una nueva reunión auxiliar
-            Reunion aux = new Reunion(asunto, fechaReunion);
+            Reunion aux = obtenerDatosFormulario();
 
             // Si la reunión es diferente de nulo, queremos modificar
             if (abmReunionControlador.getReunion() != null) {
@@ -176,11 +173,11 @@ public class ReunionManager {
             procesarReunion(reunion, true);
 
             // Mostramos un mensaje
-            mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha agregado la reunión correctamente!");
+            mostrarMensaje(false, "Info", "Se ha agregado la reunión correctamente!");
 
         } catch (Exception e) {
             abmReunionControlador.getLog().error(e.getMessage());
-            mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo agregar la reunión correctamente!");
+            mostrarMensaje(true, "Error", "No se pudo agregar la reunión correctamente!");
         }
     }
 
@@ -194,11 +191,11 @@ public class ReunionManager {
             procesarReunion(reunion, false);
 
             // Mostramos un mensaje
-            mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha modificado la reunión correctamente!");
+            mostrarMensaje(false, "Info", "Se ha modificado la reunión correctamente!");
 
         } catch (Exception e) {
             abmReunionControlador.getLog().error(e.getMessage());
-            mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo modificar la reunión correctamente!");
+            mostrarMensaje(true, "Error", "No se pudo modificar la reunión correctamente!");
         }
     }
 
@@ -214,11 +211,11 @@ public class ReunionManager {
                 listaReunionesControlador.getFiltroReuniones().remove(reunion);
 
                 // Mostramos un mensaje
-                mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha eliminado la reunión correctamente!");
+                mostrarMensaje(false, "Info", "Se ha eliminado la reunión correctamente!");
 
             } catch (Exception e) {
                 listaReunionesControlador.getLog().error(e.getMessage());
-                mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "No se pudo eliminar la reunión correctamente!");
+                mostrarMensaje(true, "Info", "No se pudo eliminar la reunión correctamente!");
             }
         }
     }
@@ -276,24 +273,25 @@ public class ReunionManager {
 
     public boolean validarCamposFormulario() {
         ArrayList<String> errores = new ArrayList<>();
+        Reunion reunion = obtenerDatosFormulario();
 
         // Verificamos que el asunto no este vacio y que no supere los 150 caracteres
-        if (abmReunionControlador.getTxtAsunto().getText().trim().isEmpty()) {
+        if (reunion.getAsunto().isEmpty()) {
             errores.add("Por favor, ingrese un asunto.");
-        } else if (abmReunionControlador.getTxtAsunto().getLength() > 150) {
+        } else if (reunion.getAsunto().length() > 150) {
             errores.add("El asunto no puede tener más de 150 caracteres.");
         }
 
         // Verificamos que la fecha de reunión no este vacia y que no sea anterior al día de hoy
-        if (abmReunionControlador.getDtpFechaReunion().getValue() == null) {
+        if (reunion.getFechaReunion() == null) {
             errores.add("Por favor, ingrese una fecha de reunión.");
-        } else if (abmReunionControlador.getDtpFechaReunion().getValue().isBefore(LocalDate.now())) {
-            errores.add("Debe seleccionar una fecha de reunión que sea igual o posterior al dia de hoy " + LocalDate.now().format(formatoFecha) + ".");
+        } else if (reunion.getFechaReunion().isBefore(LocalDate.now())) {
+            errores.add("Debe seleccionar una fecha de reunión que sea igual o posterior al dia de hoy " + DateFormatterHelper.fechaHoy() + ".");
         }
 
         // Verificamos si hay errores
         if (!errores.isEmpty()) {
-            helpers.mostrarCadenaMensajes(errores, "Se ha producido uno o varios errores:", Alert.AlertType.ERROR, "Error");
+            AlertHelper.mostrarCadenaMensajes(true, errores, "Se ha producido uno o varios errores:", "Error");
             return false;
         }
 
@@ -329,11 +327,11 @@ public class ReunionManager {
     // Metodos para mostrar mensajes en pantalla
 
     public boolean mostrarConfirmacion(String titulo, String contenido) {
-        return helpers.mostrarConfirmacion(titulo, contenido);
+        return AlertHelper.mostrarConfirmacion(titulo, contenido);
     }
 
-    public void mostrarMensaje(Alert.AlertType tipo, String titulo, String contenido) {
-        helpers.mostrarMensaje(tipo, titulo, contenido);
+    public void mostrarMensaje(boolean error, String titulo, String contenido) {
+        AlertHelper.mostrarMensaje(error, titulo, contenido);
     }
 
     // Metodos adicionales para el selector
@@ -344,7 +342,7 @@ public class ReunionManager {
 
         // Verificamos que sea diferente de nulo
         if (selectorReunionControlador.getReunion() == null) {
-            mostrarMensaje(Alert.AlertType.ERROR, "Error", "Debes seleccionar una reunión!");
+            mostrarMensaje(true, "Error", "Debes seleccionar una reunión!");
         } else {
             // Salimos del modal
             stageManager.closeModal(FXMLView.SelectorReunion.getKey());

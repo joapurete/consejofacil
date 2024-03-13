@@ -1,10 +1,13 @@
 package com.java.consejofacil.config;
 
-import com.java.consejofacil.helpers.Helpers;
+import com.java.consejofacil.controller.SelectorController;
+import com.java.consejofacil.security.SecurityConfig;
+import com.java.consejofacil.security.SessionInfo;
 import javafx.stage.Stage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+
 import java.io.IOException;
 import java.util.ResourceBundle;
 
@@ -13,7 +16,7 @@ public class AppConfig {
     // Creamos un bean de tipo Resource Bundle
     // Este bean gestiona las propiedades de las vistas FXML
     @Bean
-    ResourceBundle resourceBundle() {
+    public ResourceBundle resourceBundle() {
         return ResourceBundle.getBundle("views");
     }
 
@@ -27,7 +30,17 @@ public class AppConfig {
 
     @Bean
     @Lazy
-    public Helpers helpers() {
-        return new Helpers();
+    public SecurityConfig securityConfig() {
+        return new SecurityConfig();
     }
+
+    @Bean
+    @Lazy
+    public SessionInfo sessionInfo() {
+        return new SessionInfo();
+    }
+
+    @Bean
+    @Lazy
+    public SelectorController selectorControlador() { return new SelectorController(); }
 }

@@ -35,7 +35,7 @@ public class ListaReunionesController extends BaseTablaReuniones implements Init
 
         // Verificamos que no sea nulo
         if (reunion == null) {
-            getReunionManager().mostrarMensaje(Alert.AlertType.ERROR, "Error", "Debes seleccionar una reunión!");
+            getReunionManager().mostrarMensaje(true, "Error", "Debes seleccionar una reunión!");
         } else {
             // Eliminamos la reunión
             getReunionManager().eliminarReunion(reunion, false);
@@ -52,7 +52,7 @@ public class ListaReunionesController extends BaseTablaReuniones implements Init
 
         // Verificamos que no sea nulo
         if (reunion == null) {
-            getReunionManager().mostrarMensaje(Alert.AlertType.ERROR, "Error", "Debes seleccionar una reunión!");
+            getReunionManager().mostrarMensaje(true, "Error", "Debes seleccionar una reunión!");
         } else {
             // Cargamos el formulario para modificar la reunión
             getReunionManager().cargarFormulario(reunion);

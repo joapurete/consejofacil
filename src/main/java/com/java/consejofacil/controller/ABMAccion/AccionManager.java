@@ -1,7 +1,11 @@
 package com.java.consejofacil.controller.ABMAccion;
 
 import com.java.consejofacil.config.StageManager;
-import com.java.consejofacil.helpers.Helpers;
+import com.java.consejofacil.helper.Alertas.AlertHelper;
+import com.java.consejofacil.helper.Componentes.ComponentHelper;
+import com.java.consejofacil.controller.SelectorController;
+import com.java.consejofacil.helper.Componentes.TableCellFactoryHelper;
+import com.java.consejofacil.helper.Utilidades.DateFormatterHelper;
 import com.java.consejofacil.model.Accion;
 import com.java.consejofacil.model.Expediente;
 import com.java.consejofacil.service.Accion.AccionServiceImpl;
@@ -10,26 +14,16 @@ import com.java.consejofacil.view.FXMLView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 @Component
 public class AccionManager {
-
-    // Ayudas necesarias
-    @Autowired
-    @Lazy
-    private Helpers helpers;
-
-    // Variables de control
-    DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     // Servicios utilizados
     @Autowired
@@ -46,6 +40,9 @@ public class AccionManager {
     @Autowired
     @Lazy
     private FormularioAccionController abmAccionControlador;
+    @Autowired
+    @Lazy
+    private SelectorController selectorControlador;
 
     // Stage Manager
     @Autowired
@@ -63,7 +60,7 @@ public class AccionManager {
             listaAccionesControlador.getColExpediente().setCellValueFactory(new PropertyValueFactory<>("expediente"));
 
             // Formateamos la fecha de accion
-            helpers.formatearColumnaFecha(listaAccionesControlador.getColFechaAccion());
+            TableCellFactoryHelper.configurarCeldaFecha(listaAccionesControlador.getColFechaAccion());
 
             // Cargamos listas
             listaAccionesControlador.getAcciones().clear();
@@ -203,11 +200,11 @@ public class AccionManager {
             procesarAccion(accion, true);
 
             // Mostramos un mensaje
-            mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha agregado la acción correctamente!");
+            mostrarMensaje(false, "Info", "Se ha agregado la acción correctamente!");
 
         } catch (Exception e) {
             abmAccionControlador.getLog().error(e.getMessage());
-            mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo agregar la acción correctamente!");
+            mostrarMensaje(true, "Error", "No se pudo agregar la acción correctamente!");
         }
     }
 
@@ -221,11 +218,11 @@ public class AccionManager {
             procesarAccion(accion, false);
 
             // Mostramos un mensaje
-            mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha modificado la acción correctamente!");
+            mostrarMensaje(false, "Info", "Se ha modificado la acción correctamente!");
 
         } catch (Exception e) {
             abmAccionControlador.getLog().error(e.getMessage());
-            mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo modificar la acción correctamente!");
+            mostrarMensaje(true, "Error", "No se pudo modificar la acción correctamente!");
         }
     }
 
@@ -241,11 +238,11 @@ public class AccionManager {
                 listaAccionesControlador.getFiltroAcciones().remove(accion);
 
                 // Mostramos un mensaje
-                mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha eliminado la acción correctamente!");
+                mostrarMensaje(false, "Info", "Se ha eliminado la acción correctamente!");
 
             } catch (Exception e) {
                 listaAccionesControlador.getLog().error(e.getMessage());
-                mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "No se pudo eliminar la acción correctamente!");
+                mostrarMensaje(true, "Info", "No se pudo eliminar la acción correctamente!");
             }
         }
     }
@@ -310,38 +307,39 @@ public class AccionManager {
 
     public boolean validarCamposFormulario() {
         ArrayList<String> errores = new ArrayList<>();
-        LocalDate fechaIngreso = null;
+        Accion accion = obtenerDatosFormulario();
 
         // Verificamos que los detalles no esten vacios y que no superen los 500 caracteres
-        if (abmAccionControlador.getTxtDetallesAccion().getText().trim().isEmpty()) {
+        if (accion.getDetallesAccion().isEmpty()) {
             errores.add("Por favor, ingrese unos detalles de la acción.");
-        } else if (abmAccionControlador.getTxtDetallesAccion().getLength() > 500) {
+        } else if (accion.getDetallesAccion().length() > 500) {
             errores.add("Los detalles de la acción no pueden tener más de 500 caracteres.");
         }
 
         // Verificamos que la fecha no este vacia
-        if (abmAccionControlador.getDtpFechaAccion().getValue() == null) {
+        if (accion.getFechaAccion() == null) {
             errores.add("Por favor, ingrese una fecha de acción.");
-        } else { fechaIngreso = abmAccionControlador.getDtpFechaAccion().getValue(); }
+        }
 
         // Verificamos que haya seleccionado un expediente
-        if (abmAccionControlador.getCmbExpediente().getValue() == null) {
+        if (accion.getExpediente() == null) {
             errores.add("Por favor, seleccione un expediente.");
         } else {
-            Expediente expediente = expedienteService.findById(abmAccionControlador.getCmbExpediente().getValue().getId());
+            Expediente expediente = expedienteService.findById(accion.getExpediente().getId());
             if (expediente == null) {
                 errores.add("El expediente seleccionado no se encuentra en la base de datos.");
             } else {
                 // Verificamos que la fecha de acción no sea anterior al día de ingreso del expediente en la facultad
-                if (fechaIngreso != null && fechaIngreso.isBefore(expediente.getFechaIngreso())) {
-                    errores.add("Debe seleccionar una fecha de acción que sea igual o posterior al dia de ingreso del expediente " + expediente.getFechaIngreso().format(formatoFecha) + ".");
+                if (accion.getFechaAccion() != null && accion.getFechaAccion().isBefore(expediente.getFechaIngreso())) {
+                    errores.add("Debe seleccionar una fecha de acción que sea igual o posterior al dia de ingreso del expediente " +
+                            DateFormatterHelper.formatearFechaSimple(expediente.getFechaIngreso()) + ".");
                 }
             }
         }
 
         // Verificamos si hay errores
         if (!errores.isEmpty()) {
-            helpers.mostrarCadenaMensajes(errores, "Se ha producido uno o varios errores:", Alert.AlertType.ERROR, "Error");
+            AlertHelper.mostrarCadenaMensajes(true, errores, "Se ha producido uno o varios errores:", "Error");
             return false;
         }
 
@@ -382,22 +380,22 @@ public class AccionManager {
     // Metodos para interactuar con los selectores
 
     public void seleccionarExpediente(ComboBox<Expediente> combo) throws Exception {
-        helpers.seleccionarExpediente(combo);
+        selectorControlador.seleccionarExpediente(combo);
     }
 
     // Metodo para configurar un combo editable
 
     public <T> void configurarComboEditable(ComboBox<T> combo) {
-        helpers.configurarComboEditable(combo);
+        ComponentHelper.configurarComboEditable(combo);
     }
 
     // Metodos para mostrar mensajes en pantalla
 
     public boolean mostrarConfirmacion(String titulo, String contenido) {
-        return helpers.mostrarConfirmacion(titulo, contenido);
+        return AlertHelper.mostrarConfirmacion(titulo, contenido);
     }
 
-    public void mostrarMensaje(Alert.AlertType tipo, String titulo, String contenido) {
-        helpers.mostrarMensaje(tipo, titulo, contenido);
+    public void mostrarMensaje(boolean error, String titulo, String contenido) {
+        AlertHelper.mostrarMensaje(error, titulo, contenido);
     }
 }

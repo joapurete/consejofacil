@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,6 +31,7 @@ public class StageManager {
     private SpringFXMLLoader springFXMLLoader;
 
     // Mapa de modales asociados a su titulo (clave)
+    @Getter
     private final Map<String, Stage> modalStages = new HashMap<>();
 
     public StageManager(Stage stage) {

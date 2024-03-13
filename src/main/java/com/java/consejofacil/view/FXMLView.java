@@ -45,6 +45,9 @@ public enum FXMLView {
     FormularioListaRevision("frm2Rev.key", "frmRev.title", "ABMRevision/FormularioListaRevision"),
 
 
+    ListaMiembros("lstMie.key", "lstMie.title", "ABMMiembro/ListaMiembros"),
+    FormularioMiembro("frmMie.key", "frmMie.title", "ABMMiembro/FormularioMiembro"),
+    CambiarContrasenaMiembro("cmbCntMie.key", "cmbCntMie.title", "ABMMiembro/CambiarContrasenaMiembro"),
     SelectorMiembro("slcMie.key", "slcMie.title", "ABMMiembro/SelectorMiembro");
 
     // Devolvemos la clave

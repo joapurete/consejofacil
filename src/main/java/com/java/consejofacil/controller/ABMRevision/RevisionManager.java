@@ -1,7 +1,12 @@
 package com.java.consejofacil.controller.ABMRevision;
 
 import com.java.consejofacil.config.StageManager;
-import com.java.consejofacil.helpers.Helpers;
+import com.java.consejofacil.helper.Alertas.AlertHelper;
+import com.java.consejofacil.helper.Componentes.ComponentHelper;
+import com.java.consejofacil.controller.SelectorController;
+import com.java.consejofacil.helper.Componentes.TableCellFactoryHelper;
+import com.java.consejofacil.helper.Utilidades.DateFormatterHelper;
+import com.java.consejofacil.helper.Utilidades.ListHelper;
 import com.java.consejofacil.model.*;
 import com.java.consejofacil.service.EstadoExpediente.EstadoExpedienteServiceImpl;
 import com.java.consejofacil.service.Expediente.ExpedienteServiceImpl;
@@ -11,15 +16,12 @@ import com.java.consejofacil.view.FXMLView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,14 +29,6 @@ import java.util.Optional;
 
 @Component
 public class RevisionManager {
-
-    // Variables de control
-    private final DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-    // Ayudas necesarias
-    @Autowired
-    @Lazy
-    private Helpers helpers;
 
     // Servicios necesarios
     @Autowired
@@ -60,6 +54,9 @@ public class RevisionManager {
     @Autowired
     @Lazy
     private FormularioListaRevisionController abmListaRevisionControlador;
+    @Autowired
+    @Lazy
+    private SelectorController selectorControlador;
 
     // Administradores necesarios
     @Autowired
@@ -187,21 +184,28 @@ public class RevisionManager {
 
     // Metodos para agregar, modificar y eliminar revisiones
 
-    public Revision obtenerDatosFormulario() {
+    public Revision obtenerDatosFormulario(BaseFormularioRevision controlador) {
         // Obtenemos la información en los campos
-        Reunion reunion = abmRevisionControlador.getCmbReunion().getValue();
-        Expediente expediente = abmRevisionControlador.getCmbExpediente().getValue();
-        String detallesRevision = !abmRevisionControlador.getTxtDetallesRevision().getText().trim().isEmpty() ?
-                abmRevisionControlador.getTxtDetallesRevision().getText().trim() : "No hay detalles para mostrar.";
+        Reunion reunion = controlador.getCmbReunion().getValue();
 
         // Creamos una nueva revisión auxiliar
-        return new Revision(reunion, expediente, detallesRevision);
+        Revision revision = new Revision(reunion, null, null);
+
+        // Obtenemos los datos del formulario original
+        if (controlador instanceof FormularioRevisionController) {
+            revision.setExpediente(controlador.getCmbExpediente().getValue());
+            revision.setDetallesRevision(!controlador.getTxtDetallesRevision().getText().trim().isEmpty() ?
+                    controlador.getTxtDetallesRevision().getText().trim() : "No hay detalles para mostrar.");
+        }
+
+        // Devolvemos la revisión creada
+        return revision;
     }
 
     public void guardarRevision() {
         if (validarCamposFormulario(abmRevisionControlador)) {
             // Creamos una nueva revisión auxiliar
-            Revision aux = obtenerDatosFormulario();
+            Revision aux = obtenerDatosFormulario(abmRevisionControlador);
 
             // Si la revisión es diferente de nulo, queremos modificar
             if (abmRevisionControlador.getRevision() != null) {
@@ -211,17 +215,17 @@ public class RevisionManager {
 
                 // Modificamos la revisión
                 if (modificarRevision(aux)) {
-                    mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha modificado la revisión correctamente!");
+                    mostrarMensaje(false, "Info", "Se ha modificado la revisión correctamente!");
                 } else {
-                    mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo modificar la revisión correctamente!");
+                    mostrarMensaje(true, "Error", "No se pudo modificar la revisión correctamente!");
                 }
 
             } else {
                 // Si la revisión es nulo, queremos agregar
                 if (agregarRevision(aux)) {
-                    mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha agregado la revisión correctamente!");
+                    mostrarMensaje(false, "Info", "Se ha agregado la revisión correctamente!");
                 } else {
-                    mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo agregar la revisión correctamente!");
+                    mostrarMensaje(true, "Error", "No se pudo agregar la revisión correctamente!");
                 }
             }
 
@@ -336,11 +340,11 @@ public class RevisionManager {
     // Metodos para interactuar con los selectores
 
     public void seleccionarExpediente(ComboBox<Expediente> combo) throws Exception {
-        helpers.seleccionarExpediente(combo);
+        selectorControlador.seleccionarExpediente(combo);
     }
 
     public void seleccionarReunion(ComboBox<Reunion> combo) throws Exception {
-        helpers.seleccionarReunion(combo);
+        selectorControlador.seleccionarReunion(combo);
     }
 
     // Metodos de autocarga del formulario
@@ -375,19 +379,23 @@ public class RevisionManager {
 
     public boolean validarCamposFormulario(BaseFormularioRevision controlador) {
         ArrayList<String> errores = new ArrayList<>();
+
+        // Creamos una revision auxiliar y otra para obtener los datos del formulario
         Revision aux = new Revision();
+        Revision revision = obtenerDatosFormulario(controlador);
+
 
         // Verificamos que haya seleccionado una reunión
-        if (controlador.getCmbReunion().getValue() == null) {
+        if (revision.getReunion() == null) {
             errores.add("Por favor, seleccione una reunión.");
         } else {
-            Reunion reunion = reunionService.findById(controlador.getCmbReunion().getValue().getId());
+            Reunion reunion = reunionService.findById(revision.getReunion().getId());
             if (reunion == null) {
                 errores.add("La reunión seleccionada no se encuentra en la base de datos.");
             } else {
                 // Verificamos que la reunion no sea posterior al día de hoy
                 if (reunion.getFechaReunion().isAfter(LocalDate.now())) {
-                    errores.add("Debe seleccionar una reunión previa o programada para el día de hoy " + LocalDate.now().format(formatoFecha) + ".");
+                    errores.add("Debe seleccionar una reunión previa o programada para el día de hoy " + DateFormatterHelper.fechaHoy() + ".");
                 }
                 if (controlador instanceof FormularioRevisionController) {
                     // Establecemos reunión al auxiliar
@@ -401,10 +409,10 @@ public class RevisionManager {
         if (controlador instanceof FormularioRevisionController) {
 
             // Verificamos que haya seleccionado un expediente
-            if (controlador.getCmbExpediente().getValue() == null) {
+            if (revision.getExpediente() == null) {
                 errores.add("Por favor, seleccione un expediente.");
             } else {
-                Expediente expediente = expedienteService.findById(controlador.getCmbExpediente().getValue().getId());
+                Expediente expediente = expedienteService.findById(revision.getExpediente().getId());
                 if (expediente == null) {
                     errores.add("El expediente seleccionado no se encuentra en la base de datos.");
                 } else {
@@ -415,9 +423,9 @@ public class RevisionManager {
                     if (aux.getReunion() != null) {
                         // Verificamos que la fecha de ingreso del expediente no sea posterior al día de la reunion
                         if (expediente.getFechaIngreso().isAfter(aux.getReunion().getFechaReunion())) {
-                            errores.add("La fecha de ingreso " + expediente.getFechaIngreso().format(formatoFecha) + " del expediente N°"
-                                    + expediente.getId() + " es posterior al día de la reunión " + aux.getReunion().getFechaReunion().format(formatoFecha) + ".");
-                            errores.add("Debe seleccionar un expediente cuya fecha de ingreso sea igual o anterior al día de la reunión.");
+                            errores.add("La fecha de ingreso " + DateFormatterHelper.formatearFechaSimple(expediente.getFechaIngreso()) + " del expediente N°"
+                                    + expediente.getId() + " es posterior al día de la reunión " + DateFormatterHelper.formatearFechaSimple(aux.getReunion().getFechaReunion()) + ".\n" +
+                                    "Debe seleccionar un expediente cuya fecha de ingreso sea igual o anterior al día de la reunión.");
                         }
                     }
                     // Establecemos expediente al auxiliar
@@ -426,7 +434,7 @@ public class RevisionManager {
             }
 
             // Verificamos que los detalles no supere los 500 caracteres
-            if (controlador.getTxtDetallesRevision().getLength() > 500) {
+            if (revision.getDetallesRevision().length() > 500) {
                 errores.add("Los detalles de la revisión no pueden tener más de 500 caracteres.");
             }
 
@@ -455,7 +463,7 @@ public class RevisionManager {
 
         // Verificamos si hay errores
         if (!errores.isEmpty()) {
-            helpers.mostrarCadenaMensajes(errores, "Se ha producido uno o varios errores:", Alert.AlertType.ERROR, "Error");
+            AlertHelper.mostrarCadenaMensajes(true, errores, "Se ha producido uno o varios errores:", "Error");
             return false;
         }
 
@@ -473,14 +481,14 @@ public class RevisionManager {
         } else {
             // Verificamos que el expediente no esté cerrado
             if (!expediente.getEstadoExpediente().getEstadoExpediente().equals("Abierto")) {
-                errores.add("El expediente N° " + expediente.getId() + " se encuentra cerrado.");
-                errores.add("Debe seleccionar un expediente que esté actualmente abierto.");
+                errores.add("El expediente N° " + expediente.getId() + " se encuentra cerrado.\n" +
+                        "Debe seleccionar un expediente que esté actualmente abierto.");
             }
             // Verificamos que el expediente no sea posterior al día de la reunion
             if (expediente.getFechaIngreso().isAfter(rev.getReunion().getFechaReunion())) {
-                errores.add("La fecha de ingreso " + expediente.getFechaIngreso().format(formatoFecha) + " del expediente N°"
-                        + expediente.getId() + " es posterior al día de la reunión " + rev.getReunion().getFechaReunion().format(formatoFecha) + ".");
-                errores.add("Debe seleccionar un expediente cuya fecha de ingreso sea igual o anterior al día de la reunión.");
+                errores.add("La fecha de ingreso " + DateFormatterHelper.formatearFechaSimple(expediente.getFechaIngreso()) + " del expediente N°"
+                        + expediente.getId() + " es posterior al día de la reunión " + DateFormatterHelper.formatearFechaSimple(rev.getReunion().getFechaReunion()) + ".\n" +
+                        "Debe seleccionar un expediente cuya fecha de ingreso sea igual o anterior al día de la reunión.");
             }
         }
 
@@ -540,21 +548,21 @@ public class RevisionManager {
     // Metodos para mostrar mensajes en pantalla
 
     public boolean mostrarConfirmacion(String titulo, String contenido) {
-        return helpers.mostrarConfirmacion(titulo, contenido);
+        return AlertHelper.mostrarConfirmacion(titulo, contenido);
     }
 
-    public void mostrarCadenaMensajes(ArrayList<String> mensajes, String titulo, Alert.AlertType tipoAlerta, String tituloAlerta) {
-        helpers.mostrarCadenaMensajes(mensajes, titulo, tipoAlerta, tituloAlerta);
+    public void mostrarCadenaMensajes(boolean error, ArrayList<String> mensajes, String titulo, String tituloAlerta) {
+        AlertHelper.mostrarCadenaMensajes(error, mensajes, titulo, tituloAlerta);
     }
 
-    public void mostrarMensaje(Alert.AlertType tipo, String titulo, String contenido) {
-        helpers.mostrarMensaje(tipo, titulo, contenido);
+    public void mostrarMensaje(boolean error, String titulo, String contenido) {
+        AlertHelper.mostrarMensaje(error, titulo, contenido);
     }
 
     // Metodo para configurar un combo editable
 
     public <T> void configurarComboEditable(ComboBox<T> combo) {
-        helpers.configurarComboEditable(combo);
+        ComponentHelper.configurarComboEditable(combo);
     }
 
     // Metodos adicionales para el formulario con lista
@@ -564,16 +572,16 @@ public class RevisionManager {
         abmListaRevisionControlador.getColDetallesRevision().setCellValueFactory(new PropertyValueFactory<>("detallesRevision"));
 
         // Configuramos las columnas en relacion con el expediente
-        helpers.configurarIdExpediente(abmListaRevisionControlador.getColId());
-        helpers.configurarNotaExpediente(abmListaRevisionControlador.getColTextoNota());
-        helpers.configurarFechaIngresoExpediente(abmListaRevisionControlador.getColFechaIngreso());
-        helpers.configurarEstadoExpediente(abmListaRevisionControlador.getColEstado());
+        TableCellFactoryHelper.configurarCeldaIdExpediente(abmListaRevisionControlador.getColId());
+        TableCellFactoryHelper.configurarCeldaNotaExpediente(abmListaRevisionControlador.getColTextoNota());
+        TableCellFactoryHelper.configurarCeldaFechaIngresoExpediente(abmListaRevisionControlador.getColFechaIngreso());
+        TableCellFactoryHelper.configurarCeldaEstadoExpediente(abmListaRevisionControlador.getColEstado());
 
         // Configuramos el TextField para que pueda modificar en tiempo de ejecucion los detalles de la revision
-        helpers.configurarTxtFieldTabla(abmListaRevisionControlador.getColDetallesRevision());
+        TableCellFactoryHelper.configurarCeldaTextField(abmListaRevisionControlador.getColDetallesRevision());
 
         // Configuramos el CheckBox para que pueda seleccionar nuevas revisiones a la lista
-        helpers.configurarCheckTableCell(abmListaRevisionControlador.getColSeleccionar(),
+        TableCellFactoryHelper.configurarCeldaCheck(abmListaRevisionControlador.getColSeleccionar(),
                 abmListaRevisionControlador.getExpedientesSeleccionados());
 
         // Cargamos la lista de revisiones
@@ -637,7 +645,7 @@ public class RevisionManager {
             // Verificamos si el expediente seleccionado ya se encuentra en la lista
             if (buscarRevisionPorExpediente(expediente) == null) {
                 // Si no se encuentra presente, lo agregamos
-                abmListaRevisionControlador.getRevisiones().add(new Revision(reunion, expediente, "--"));
+                abmListaRevisionControlador.getRevisiones().add(new Revision(reunion, expediente, ""));
             }
         }
 
@@ -651,7 +659,7 @@ public class RevisionManager {
     public void cargarExpedientesSeleccionados() {
         // Cargamos la lista de epedientes seleccionados
         for (Revision revision : abmListaRevisionControlador.getRevisiones()) {
-            abmListaRevisionControlador.getExpedientesSeleccionados().put(revision.getExpediente(), helpers.FLAG_MODIFICAR);
+            abmListaRevisionControlador.getExpedientesSeleccionados().put(revision.getExpediente(), ListHelper.FLAG_MODIFICAR);
         }
     }
 
@@ -661,7 +669,7 @@ public class RevisionManager {
         // Verificamos si el CheckBox de mostrar seleccionados está presionado
         // En ese caso, mostrar solo aquellos que esten contenidos en la lista, y no los haya que eliminar
         return (abmListaRevisionControlador.getExpedientesSeleccionados().containsKey(rev.getExpediente())
-                && abmListaRevisionControlador.getExpedientesSeleccionados().get(rev.getExpediente()) != helpers.FLAG_ELIMINAR)
+                && abmListaRevisionControlador.getExpedientesSeleccionados().get(rev.getExpediente()) != ListHelper.FLAG_ELIMINAR)
                 || !abmListaRevisionControlador.getCheckMostrarSeleccionados().isSelected();
     }
 
@@ -730,7 +738,7 @@ public class RevisionManager {
 
         // Iteramos sobre la copia de la lista
         for (Revision revision : copiaRevisiones) {
-            helpers.seleccionarItemCheckTableCell(revision.getExpediente(), abmListaRevisionControlador.getExpedientesSeleccionados(), valorActual);
+            ListHelper.seleccionarItem(revision.getExpediente(), abmListaRevisionControlador.getExpedientesSeleccionados(), valorActual);
         }
 
         // Actualizamos la tabla de revisiones
@@ -754,7 +762,7 @@ public class RevisionManager {
                 if (revision != null) {
 
                     // Si esta seleccionado, queremos agregar o modificar
-                    if (flag != helpers.FLAG_ELIMINAR) {
+                    if (flag != ListHelper.FLAG_ELIMINAR) {
 
                         // Validamos la información de la revision
                         if (validarRevision(revision)) {
@@ -765,7 +773,7 @@ public class RevisionManager {
                             }
 
                             // Si el ID es diferente de 0, quiere decir que ya existe
-                            if (revision.getId() != 0 || flag == helpers.FLAG_MODIFICAR) {
+                            if (revision.getId() != 0 || flag == ListHelper.FLAG_MODIFICAR) {
                                 // Modificamos la revisión
                                 if (modificarRevision(revision)) {
                                     abmListaRevisionControlador.getCadenaInfos().add("Se ha modificado la revisión del expediente N° " + revision.getExpediente().getId() + " correctamente!");
@@ -796,8 +804,8 @@ public class RevisionManager {
             }
 
             // Mostramos cadenas de errores e infos en pantalla
-            mostrarCadenaMensajes(abmListaRevisionControlador.getCadenaErrores(), "Se ha producido uno o varios errores:", Alert.AlertType.ERROR, "Error");
-            mostrarCadenaMensajes(abmListaRevisionControlador.getCadenaInfos(), "Se ha producido una o varias modificaciones:", Alert.AlertType.INFORMATION, "Info");
+            mostrarCadenaMensajes(true, abmListaRevisionControlador.getCadenaErrores(), "Se ha producido uno o varios errores:", "Error");
+            mostrarCadenaMensajes(false, abmListaRevisionControlador.getCadenaInfos(), "Se ha producido una o varias modificaciones:", "Info");
 
             // Actualizamos la tabla de revisiones
             listaRevisionesControlador.getTblRevisiones().refresh();

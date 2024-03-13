@@ -14,6 +14,9 @@
     -fx-padding: 5;
     -fx-transition: border-color 0.3s;
 }
+.password-field-personalizado{
+    -fx-skin: "com.java.consejofacil.helper.Componentes.PasswordSkinHelper";
+}
 .text-field-personalizado:hover, .text-field-personalizado:focused, .password-field-personalizado:hover, .password-field-personalizado:focused{
     -fx-border-color: -primary-light_x8;
 }

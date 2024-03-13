@@ -90,7 +90,7 @@ public class ListaMinutasController implements Initializable {
 
         // Verificamos que no sea nulo
         if (minuta == null) {
-            minutaManager.mostrarMensaje(Alert.AlertType.ERROR, "Error", "Debes seleccionar una minuta!");
+            minutaManager.mostrarMensaje(true, "Error", "Debes seleccionar una minuta!");
         } else {
             // Eliminamos la minuta
             minutaManager.eliminarMinuta(minuta, false);
@@ -107,7 +107,7 @@ public class ListaMinutasController implements Initializable {
 
         // Verificamos que no sea nulo
         if (minuta == null) {
-            minutaManager.mostrarMensaje(Alert.AlertType.ERROR, "Error", "Debes seleccionar una minuta!");
+            minutaManager.mostrarMensaje(true, "Error", "Debes seleccionar una minuta!");
         } else {
             minutaManager.cargarFormulario(minuta);
         }

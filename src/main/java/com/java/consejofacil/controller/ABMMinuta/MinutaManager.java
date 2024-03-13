@@ -1,7 +1,10 @@
 package com.java.consejofacil.controller.ABMMinuta;
 
 import com.java.consejofacil.config.StageManager;
-import com.java.consejofacil.helpers.Helpers;
+import com.java.consejofacil.helper.Alertas.AlertHelper;
+import com.java.consejofacil.helper.Componentes.ComponentHelper;
+import com.java.consejofacil.controller.SelectorController;
+import com.java.consejofacil.helper.Utilidades.DateFormatterHelper;
 import com.java.consejofacil.model.Minuta;
 import com.java.consejofacil.model.Reunion;
 import com.java.consejofacil.service.Minuta.MinutaServiceImpl;
@@ -10,27 +13,16 @@ import com.java.consejofacil.view.FXMLView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 @Component
 public class MinutaManager {
-
-    // Ayudas necesarias
-    @Autowired
-    @Lazy
-    private Helpers helpers;
-
-    // Variables de control
-    DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     // Servicios utilizados
     @Autowired
@@ -47,6 +39,9 @@ public class MinutaManager {
     @Autowired
     @Lazy
     private FormularioMinutaController abmMinutaControlador;
+    @Autowired
+    @Lazy
+    private SelectorController selectorControlador;
 
     // Stage Manager
     @Autowired
@@ -201,11 +196,11 @@ public class MinutaManager {
             procesarMinuta(minuta, true);
 
             // Mostramos un mensaje
-            mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha agregado la minuta correctamente!");
+            mostrarMensaje(false, "Info", "Se ha agregado la minuta correctamente!");
 
         } catch (Exception e) {
             abmMinutaControlador.getLog().error(e.getMessage());
-            mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo agregar la minuta correctamente!");
+            mostrarMensaje(true, "Error", "No se pudo agregar la minuta correctamente!");
         }
     }
 
@@ -219,11 +214,11 @@ public class MinutaManager {
             procesarMinuta(minuta, false);
 
             // Mostramos un mensaje
-            mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha modificado la minuta correctamente!");
+            mostrarMensaje(false, "Info", "Se ha modificado la minuta correctamente!");
 
         } catch (Exception e) {
             abmMinutaControlador.getLog().error(e.getMessage());
-            mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo modificar la minuta correctamente!");
+            mostrarMensaje(true, "Error", "No se pudo modificar la minuta correctamente!");
         }
     }
 
@@ -239,11 +234,11 @@ public class MinutaManager {
                 listaMinutasControlador.getFiltroMinutas().remove(minuta);
 
                 // Mostramos un mensaje
-                mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha eliminado la minuta correctamente!");
+                mostrarMensaje(false, "Info", "Se ha eliminado la minuta correctamente!");
 
             } catch (Exception e) {
                 listaMinutasControlador.getLog().error(e.getMessage());
-                mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "No se pudo eliminar la minuta correctamente!");
+                mostrarMensaje(true, "Info", "No se pudo eliminar la minuta correctamente!");
             }
         }
     }
@@ -305,38 +300,39 @@ public class MinutaManager {
 
     public boolean validarCamposFormulario() {
         ArrayList<String> errores = new ArrayList<>();
+        Minuta minuta = obtenerDatosFormulario();
 
         // Verificamos que el tema tratado no este vacio y que no supere los 150 caracteres
-        if (abmMinutaControlador.getTxtTemaTratado().getText().trim().isEmpty()) {
+        if (minuta.getTemaTratado().isEmpty()) {
             errores.add("Por favor, ingrese un tema a tratar.");
-        } else if (abmMinutaControlador.getTxtTemaTratado().getLength() > 150) {
+        } else if (minuta.getTemaTratado().length() > 150) {
             errores.add("El tema tratado no puede tener más de 150 caracteres.");
 
         }
 
         // Verificamos que los detalles no esten vacios y que no superen los 500 caracteres
-        if (abmMinutaControlador.getTxtDetallesMinuta().getText().trim().isEmpty()) {
+        if (minuta.getDetallesMinuta().isEmpty()) {
             errores.add("Por favor, ingrese unos detalles de la minuta.");
-        } else if (abmMinutaControlador.getTxtDetallesMinuta().getLength() > 500) {
+        } else if (minuta.getDetallesMinuta().length() > 500) {
             errores.add("Los detalles de la minuta no pueden tener más de 500 caracteres.");
         }
 
         // Verificamos que haya seleccionado una reunion
-        if (abmMinutaControlador.getCmbReunion().getValue() == null) {
+        if (minuta.getReunion() == null) {
             errores.add("Por favor, seleccione una reunión.");
         } else {
-            Reunion reunion = reunionService.findById(abmMinutaControlador.getCmbReunion().getValue().getId());
+            Reunion reunion = reunionService.findById(minuta.getReunion().getId());
             if (reunion == null) {
                 errores.add("La reunión seleccionada no se encuentra en la base de datos.");
             } else if (reunion.getFechaReunion().isAfter(LocalDate.now())) {
                 // Verificamos que la reunion no sea posterior al día de hoy
-                errores.add("Debe seleccionar una reunión previa o programada para el día de hoy " + LocalDate.now().format(formatoFecha) + ".");
+                errores.add("Debe seleccionar una reunión previa o programada para el día de hoy " + DateFormatterHelper.fechaHoy() + ".");
             }
         }
 
         // Verificamos si hay errores
         if (!errores.isEmpty()) {
-            helpers.mostrarCadenaMensajes(errores, "Se ha producido uno o varios errores:", Alert.AlertType.ERROR, "Error");
+            AlertHelper.mostrarCadenaMensajes(true, errores, "Se ha producido uno o varios errores:", "Error");
             return false;
         }
 
@@ -374,23 +370,23 @@ public class MinutaManager {
     // Metodos para interactuar con los selectores
 
     public void seleccionarReunion(ComboBox<Reunion> combo) throws Exception {
-        helpers.seleccionarReunion(combo);
+        selectorControlador.seleccionarReunion(combo);
     }
 
     // Metodo para configurar un combo editable
 
     public <T> void configurarComboEditable(ComboBox<T> combo) {
-        helpers.configurarComboEditable(combo);
+        ComponentHelper.configurarComboEditable(combo);
     }
 
     // Metodos para mostrar mensajes en pantalla
 
     public boolean mostrarConfirmacion(String titulo, String contenido) {
-        return helpers.mostrarConfirmacion(titulo, contenido);
+        return AlertHelper.mostrarConfirmacion(titulo, contenido);
     }
 
-    public void mostrarMensaje(Alert.AlertType tipo, String titulo, String contenido) {
-        helpers.mostrarMensaje(tipo, titulo, contenido);
+    public void mostrarMensaje(boolean error, String titulo, String contenido) {
+        AlertHelper.mostrarMensaje(error, titulo, contenido);
     }
 
 }

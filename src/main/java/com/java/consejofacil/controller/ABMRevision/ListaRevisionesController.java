@@ -88,7 +88,7 @@ public class ListaRevisionesController implements Initializable {
         if (rev == null) {
             // Manejamos el caso cuando no se selecciona ninguna revisión
             String errorMessage = listaSeleccionada ? "Debes seleccionar una revisión para obtener la lista a la que pertenece!" : "Debes seleccionar una revisión!";
-            revisionManager.mostrarMensaje(Alert.AlertType.ERROR, "Error", errorMessage);
+            revisionManager.mostrarMensaje(true, "Error", errorMessage);
         } else {
             revisionManager.cargarFormulario(checkLista.isSelected() ? FXMLView.FormularioListaRevision : FXMLView.FormularioRevision, rev);
         }
@@ -100,14 +100,14 @@ public class ListaRevisionesController implements Initializable {
         Revision rev = tblRevisiones.getSelectionModel().getSelectedItem();
         // Verificamos que no sea nulo
         if (rev == null) {
-            revisionManager.mostrarMensaje(Alert.AlertType.ERROR, "Error", "Debes seleccionar una revisión!");
+            revisionManager.mostrarMensaje(true, "Error", "Debes seleccionar una revisión!");
         } else {
             // Eliminamos la revisión
             if (revisionManager.eliminarRevision(rev, false)) {
                 // Mostramos un mensaje
-                revisionManager.mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha eliminado la revisión correctamente!");
+                revisionManager.mostrarMensaje(false, "Info", "Se ha eliminado la revisión correctamente!");
             } else {
-                revisionManager.mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo eliminar la revisión correctamente!");
+                revisionManager.mostrarMensaje(true, "Error", "No se pudo eliminar la revisión correctamente!");
             }
 
             // Actualizamos la tabla de revisiones

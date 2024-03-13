@@ -5,6 +5,7 @@ import com.java.consejofacil.repository.MiembroRepository;
 import com.java.consejofacil.service.CrudService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -51,4 +52,12 @@ public class MiembroServiceImpl implements MiembroService, CrudService<Miembro> 
     public List<Miembro> encontrarMiembrosActivos() {
         return repository.findByestadoMiembro_estadoMiembro("Activo");
     }
+
+    @Override
+    @Transactional
+    public int modificarDni(int dni_nuevo, int dni_actual) { return repository.modificarDni(dni_nuevo, dni_actual); }
+
+    @Override
+    @Transactional
+    public int cambiarContrasena(String clave, int dni_miembro){ return repository.cambiarContrasena(clave, dni_miembro); }
 }

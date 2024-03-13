@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDate;
 
 @Entity
@@ -33,10 +32,10 @@ public class Miembro {
     private String correo;
     @Column(name = "direccion", length = 100)
     private String direccion;
+    @Column(name = "foto")
+    private byte[] foto;
     @Column(name = "telefono", length = 50)
     private String telefono;
-    @Column(name = "foto", length = 150)
-    private String foto;
 
     @ManyToOne
     @JoinColumn(name = "id_cargo")
@@ -46,15 +45,29 @@ public class Miembro {
     @JoinColumn(name = "id_estado_miembro")
     EstadoMiembro estadoMiembro;
 
-    public Miembro(String nombre, String apellido, String clave, LocalDate fechaNac, String correo, String direccion, String telefono, String foto, Cargo cargo, EstadoMiembro estadoMiembro) {
+    // Constructor utilizado para insertar un nuevo miembro
+    public Miembro(String nombre, String apellido, String clave, LocalDate fechaNac, String telefono, String direccion,
+                   String correo, Cargo cargo, EstadoMiembro estadoMiembro) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.clave = clave;
         this.fechaNac = fechaNac;
-        this.correo = correo;
-        this.direccion = direccion;
         this.telefono = telefono;
-        this.foto = foto;
+        this.direccion = direccion;
+        this.correo = correo;
+        this.cargo = cargo;
+        this.estadoMiembro = estadoMiembro;
+    }
+
+    // Constructor utilizado para modificar un nuevo miembro (se quita la clave)
+    public Miembro(String nombre, String apellido, LocalDate fechaNac, String telefono, String direccion,
+                   String correo, Cargo cargo, EstadoMiembro estadoMiembro) {
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.fechaNac = fechaNac;
+        this.telefono = telefono;
+        this.direccion = direccion;
+        this.correo = correo;
         this.cargo = cargo;
         this.estadoMiembro = estadoMiembro;
     }

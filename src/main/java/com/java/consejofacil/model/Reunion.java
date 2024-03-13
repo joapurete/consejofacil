@@ -1,6 +1,6 @@
 package com.java.consejofacil.model;
 
-import com.java.consejofacil.helpers.Helpers;
+import com.java.consejofacil.helper.Utilidades.DateFormatterHelper;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,6 +35,6 @@ public class Reunion {
     @Override
     public String toString() {
         // Formateamos la fecha de la reunion
-        return "ID Reunión " + getId() + " | " + Helpers.formatearFecha(getFechaReunion());
+        return "ID Reunión " + getId() + " | " + DateFormatterHelper.formatearFecha(getFechaReunion());
     }
 }

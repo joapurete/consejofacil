@@ -1,7 +1,12 @@
 package com.java.consejofacil.controller.ABMAsistencia;
 
 import com.java.consejofacil.config.StageManager;
-import com.java.consejofacil.helpers.Helpers;
+import com.java.consejofacil.helper.Alertas.AlertHelper;
+import com.java.consejofacil.helper.Componentes.ComponentHelper;
+import com.java.consejofacil.controller.SelectorController;
+import com.java.consejofacil.helper.Componentes.TableCellFactoryHelper;
+import com.java.consejofacil.helper.Utilidades.DateFormatterHelper;
+import com.java.consejofacil.helper.Utilidades.ListHelper;
 import com.java.consejofacil.model.*;
 import com.java.consejofacil.service.Asistencia.AsistenciaServiceImpl;
 import com.java.consejofacil.service.Cargo.CargoServiceImpl;
@@ -13,7 +18,6 @@ import com.java.consejofacil.view.FXMLView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +25,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,14 +32,6 @@ import java.util.Optional;
 
 @Component
 public class AsistenciaManager {
-
-    // Ayudas necesarias
-    @Autowired
-    @Lazy
-    private Helpers helpers;
-
-    // Variables de control
-    DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     // Servicios necesarios
     @Autowired
@@ -68,6 +63,9 @@ public class AsistenciaManager {
     @Autowired
     @Lazy
     private FormularioListaAsistenciaController abmListaAsistenciaControlador;
+    @Autowired
+    @Lazy
+    private SelectorController selectorControlador;
 
     // Stage Manager
     @Autowired
@@ -101,13 +99,13 @@ public class AsistenciaManager {
         listaAsistenciasControlador.getReuniones().clear();
         listaAsistenciasControlador.getReuniones().addAll(reunionService.findAll());
         listaAsistenciasControlador.getCmbReunion().setItems(listaAsistenciasControlador.getReuniones());
-        helpers.configurarComboEditable(listaAsistenciasControlador.getCmbReunion());
+        ComponentHelper.configurarComboEditable(listaAsistenciasControlador.getCmbReunion());
 
         // Cargamos lista y combo de miembros
         listaAsistenciasControlador.getMiembros().clear();
         listaAsistenciasControlador.getMiembros().addAll(miembroService.encontrarMiembrosActivos());
         listaAsistenciasControlador.getCmbMiembro().setItems(listaAsistenciasControlador.getMiembros());
-        helpers.configurarComboEditable(listaAsistenciasControlador.getCmbMiembro());
+        ComponentHelper.configurarComboEditable(listaAsistenciasControlador.getCmbMiembro());
 
         // Cargamos lista y combo de estados de asistencias
         listaAsistenciasControlador.getEstadosAsistencias().clear();
@@ -120,14 +118,14 @@ public class AsistenciaManager {
         controlador.getReuniones().clear();
         controlador.getReuniones().addAll(reunionService.findAll());
         controlador.getCmbReunion().setItems(controlador.getReuniones());
-        helpers.configurarComboEditable(controlador.getCmbReunion());
+        ComponentHelper.configurarComboEditable(controlador.getCmbReunion());
 
         if (controlador instanceof FormularioAsistenciaController) {
             // Cargamos lista y combo de miembros
             controlador.getMiembros().clear();
             controlador.getMiembros().addAll(miembroService.encontrarMiembrosActivos());
             controlador.getCmbMiembro().setItems(controlador.getMiembros());
-            helpers.configurarComboEditable(controlador.getCmbMiembro());
+            ComponentHelper.configurarComboEditable(controlador.getCmbMiembro());
 
             // Cargamos lista y combos de estados de asistencias
             controlador.getEstadosAsistencias().clear();
@@ -206,20 +204,27 @@ public class AsistenciaManager {
 
     // Metodos para agregar, modificar y eliminar asistencias
 
-    public Asistencia obtenerDatosFormulario() {
+    public Asistencia obtenerDatosFormulario(BaseFormularioAsistencia controlador) {
         // Obtenemos la información de los campos
-        Reunion reunion = abmAsistenciaControlador.getCmbReunion().getValue();
-        Miembro miembro = abmAsistenciaControlador.getCmbMiembro().getValue();
-        EstadoAsistencia estadoAsistencia = abmAsistenciaControlador.getCmbEstado().getValue();
+        Reunion reunion = controlador.getCmbReunion().getValue();
 
         // Creamos una nueva asistencia auxiliar
-        return new Asistencia(reunion, miembro, estadoAsistencia);
+        Asistencia asistencia = new Asistencia(reunion, null, null);
+
+        // Completamos con los datos del formulario original
+        if (controlador instanceof FormularioAsistenciaController) {
+           asistencia.setMiembro(controlador.getCmbMiembro().getValue());
+           asistencia.setEstadoAsistencia(controlador.getCmbEstado().getValue());
+        }
+
+        // Devolvemos la asistencia creada
+        return asistencia;
     }
 
     public void guardarAsistencia() {
         if (validarCamposFormulario(abmAsistenciaControlador)) {
             // Creamos una nueva asistencia auxiliar
-            Asistencia aux = obtenerDatosFormulario();
+            Asistencia aux = obtenerDatosFormulario(abmAsistenciaControlador);
 
             // Si la asistencia es diferente de nulo, queremos modificar
             if (abmAsistenciaControlador.getAsistencia() != null) {
@@ -229,17 +234,17 @@ public class AsistenciaManager {
 
                 // Modificamos la asistencia
                 if (modificarAsistencia(aux)) {
-                    mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha modificado la asistencia correctamente!");
+                    mostrarMensaje(false, "Info", "Se ha modificado la asistencia correctamente!");
                 } else {
-                    mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo modificar la asistencia correctamente!");
+                    mostrarMensaje(true, "Error", "No se pudo modificar la asistencia correctamente!");
                 }
 
             } else {
                 // Si la asistencia es nulo, queremos agregar
                 if (agregarAsistencia(aux)) {
-                    mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha agregado la asistencia correctamente!");
+                    mostrarMensaje(false, "Info", "Se ha agregado la asistencia correctamente!");
                 } else {
-                    mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo agregar la asistencia correctamente!");
+                    mostrarMensaje(true, "Error", "No se pudo agregar la asistencia correctamente!");
                 }
             }
 
@@ -385,13 +390,16 @@ public class AsistenciaManager {
 
     private boolean validarCamposFormulario(BaseFormularioAsistencia controlador) {
         ArrayList<String> errores = new ArrayList<>();
+
+        // Creamos una asistencia auxiliar y otra para almacenar los datos del formulario
         Asistencia aux = new Asistencia();
+        Asistencia asistencia = obtenerDatosFormulario(controlador);
 
         // Verificamos que haya seleccionado una reunión
-        if (controlador.getCmbReunion().getValue() == null) {
+        if (asistencia.getReunion() == null) {
             errores.add("Por favor, seleccione un reunión.");
         } else {
-            Reunion reunion = reunionService.findById(controlador.getCmbReunion().getValue().getId());
+            Reunion reunion = reunionService.findById(asistencia.getReunion().getId());
             if (reunion == null) {
                 errores.add("La reunión seleccionada no se encuentra en la base de datos.");
             } else if (controlador instanceof FormularioAsistenciaController) {
@@ -405,10 +413,10 @@ public class AsistenciaManager {
         if (controlador instanceof FormularioAsistenciaController) {
 
             // Verificamos que haya seleccionado un miembro y que no esté inactivo en el sistema
-            if (controlador.getCmbMiembro().getValue() == null) {
+            if (asistencia.getMiembro() == null) {
                 errores.add("Por favor, seleccione un miembro del consejo.");
             } else {
-                Miembro miembro = miembroService.findById(controlador.getCmbMiembro().getValue().getDni());
+                Miembro miembro = miembroService.findById(asistencia.getMiembro().getDni());
                 if (miembro == null) {
                     errores.add("El miembro del consejo seleccionado no se encuentra en la base de datos.");
                 } else {
@@ -421,10 +429,10 @@ public class AsistenciaManager {
             }
 
             // Verificamos que haya seleccionado un estado de asistencia
-            if (controlador.getCmbEstado().getValue() == null) {
+            if (asistencia.getEstadoAsistencia() == null) {
                 errores.add("Por favor, seleccione un estado de asistencia.");
             } else {
-                EstadoAsistencia estadoAsistencia = estadoAsistenciaService.findById(controlador.getCmbEstado().getValue().getId());
+                EstadoAsistencia estadoAsistencia = estadoAsistenciaService.findById(asistencia.getEstadoAsistencia().getId());
                 if (estadoAsistencia == null) {
                     errores.add("El estado de asistencia seleccionado no se encuentra en la base de datos.");
                 } else {
@@ -433,7 +441,7 @@ public class AsistenciaManager {
                         if (aux.getReunion().getFechaReunion().isAfter(LocalDate.now()) &&
                                 estadoAsistencia.getEstadoAsistencia().equals("Presente")) {
                             errores.add("La asistencia no puede ser marcada como presente en reuniones " +
-                                    "futuras al día de hoy " + LocalDate.now().format(formatoFecha) + ".");
+                                        "futuras al día de hoy " + DateFormatterHelper.fechaHoy() + ".");
                         }
                     }
                 }
@@ -464,7 +472,7 @@ public class AsistenciaManager {
 
         // Verificamos si hay errores
         if (!errores.isEmpty()) {
-            mostrarCadenaMensajes(errores, "Se ha producido uno o varios errores:", Alert.AlertType.ERROR, "Error");
+            mostrarCadenaMensajes(true, errores, "Se ha producido uno o varios errores:", "Error");
             return false;
         }
 
@@ -481,8 +489,8 @@ public class AsistenciaManager {
             errores.add("El miembro del consejo " + asis.getMiembro().toString() + " no se encuentra en la base de datos.");
         } else {
             if (!miembro.getEstadoMiembro().getEstadoMiembro().equals("Activo")) {
-                errores.add("El miembro del consejo " + asis.getMiembro().toString() + " se encuentra inactivo o en espera.");
-                errores.add("Debe seleccionar un miembro del consejo activo en el sistema.");
+                errores.add("El miembro del consejo " + asis.getMiembro().toString() + " se encuentra inactivo o en espera.\n" +
+                        "Debe seleccionar un miembro del consejo activo en el sistema.");
             }
         }
 
@@ -550,25 +558,25 @@ public class AsistenciaManager {
     // Metodos para interactuar con los selectores
 
     public void seleccionarReunion(ComboBox<Reunion> combo) throws Exception {
-        helpers.seleccionarReunion(combo);
+        selectorControlador.seleccionarReunion(combo);
     }
 
     public void seleccionarMiembro(ComboBox<Miembro> combo) throws Exception {
-        helpers.seleccionarMiembro(combo);
+        selectorControlador.seleccionarMiembro(combo);
     }
 
     // Metodos para mostrar mensajes en pantalla
 
     public boolean mostrarConfirmacion(String titulo, String contenido) {
-        return helpers.mostrarConfirmacion(titulo, contenido);
+        return AlertHelper.mostrarConfirmacion(titulo, contenido);
     }
 
-    public void mostrarCadenaMensajes(ArrayList<String> mensajes, String titulo, Alert.AlertType tipoAlerta, String tituloAlerta) {
-        helpers.mostrarCadenaMensajes(mensajes, titulo, tipoAlerta, tituloAlerta);
+    public void mostrarCadenaMensajes(boolean error, ArrayList<String> mensajes, String titulo, String tituloAlerta) {
+        AlertHelper.mostrarCadenaMensajes(error, mensajes, titulo, tituloAlerta);
     }
 
-    public void mostrarMensaje(Alert.AlertType tipo, String titulo, String contenido) {
-        helpers.mostrarMensaje(tipo, titulo, contenido);
+    public void mostrarMensaje(boolean error, String titulo, String contenido) {
+        AlertHelper.mostrarMensaje(error, titulo, contenido);
     }
 
     // Metodos adicionales para el formulario con lista
@@ -579,17 +587,17 @@ public class AsistenciaManager {
         abmListaAsistenciaControlador.getColEstadoAsistencia().setCellValueFactory(new PropertyValueFactory<>("estadoAsistencia"));
 
         // Configuramos las columnas en relacion con el miembro
-        helpers.configurarDniMiembro(abmListaAsistenciaControlador.getColDni());
-        helpers.configurarCargoMiembro(abmListaAsistenciaControlador.getColCargo());
-        helpers.configurarEstadoMiembro(abmListaAsistenciaControlador.getColEstadoMiembro());
+        TableCellFactoryHelper.configurarCeldaDniMiembro(abmListaAsistenciaControlador.getColDni());
+        TableCellFactoryHelper.configurarCeldaCargoMiembro(abmListaAsistenciaControlador.getColCargo());
+        TableCellFactoryHelper.configurarCeldaEstadoMiembro(abmListaAsistenciaControlador.getColEstadoMiembro());
 
         // Configuramos el ComboBox para que pueda modificar en tiempo de ejecucion el estado de asistencia
         cargarListaEstadosAsistencias();
-        helpers.configurarCmbTablaEstadoAsistencia(abmListaAsistenciaControlador.getColEstadoAsistencia(),
+        TableCellFactoryHelper.configurarCeldaComboEstadoAsistencia(abmListaAsistenciaControlador.getColEstadoAsistencia(),
                 abmListaAsistenciaControlador.getEstadosAsistencias());
 
         // Configuramos el CheckBox para que pueda seleccionar nuevas asistencias a la lista
-        helpers.configurarCheckTableCell(abmListaAsistenciaControlador.getColSeleccionar(),
+        TableCellFactoryHelper.configurarCeldaCheck(abmListaAsistenciaControlador.getColSeleccionar(),
                 abmListaAsistenciaControlador.getMiembrosSeleccionados());
 
         // Cargamos la lista de asistencias
@@ -639,19 +647,19 @@ public class AsistenciaManager {
                 if (asistencia != null) {
 
                     // Si esta seleccionado, queremos agregar o modificar
-                    if (flag != helpers.FLAG_ELIMINAR) {
+                    if (flag != ListHelper.FLAG_ELIMINAR) {
                         // Validamos la información de la asistencia
                         if (validarAsistencia(asistencia)) {
 
                             // Verificamos que la asistencia no se marcada como presente en reuniones que aun no han ocurrido
                             if (asistencia.getReunion().getFechaReunion().isAfter(LocalDate.now()) && asistencia.getEstadoAsistencia().getEstadoAsistencia().equals("Presente")) {
                                 abmListaAsistenciaControlador.getCadenaErrores().add("La asistencia del miembro del consejo " + asistencia.getMiembro().toString()
-                                        + " no puede ser marcada como presente en reuniones futuras al día de hoy " + LocalDate.now().format(formatoFecha) + ".");
+                                        + " no puede ser marcada como presente en reuniones futuras al día de hoy " + DateFormatterHelper.fechaHoy() + ".");
                                 asistencia.setEstadoAsistencia(abmListaAsistenciaControlador.getEstadosAsistencias().getLast());
                             }
 
                             // Si el ID es diferente de 0, quiere decir que ya existe
-                            if (asistencia.getId() != 0 || flag == helpers.FLAG_MODIFICAR) {
+                                if (asistencia.getId() != 0 || flag == ListHelper.FLAG_MODIFICAR) {
                                 // Modificamos la asistencia
                                 if (modificarAsistencia(asistencia)) {
                                     abmListaAsistenciaControlador.getCadenaInfos().add("Se ha modificado la asistencia del miembro del consejo " + asistencia.getMiembro().toString() + " correctamente!");
@@ -681,8 +689,8 @@ public class AsistenciaManager {
             }
 
             // Mostramos cadenas de errores e infos en pantalla
-            mostrarCadenaMensajes(abmListaAsistenciaControlador.getCadenaErrores(), "Se ha producido uno o varios errores:", Alert.AlertType.ERROR, "Error");
-            mostrarCadenaMensajes(abmListaAsistenciaControlador.getCadenaInfos(), "Se ha producido una o varias modificaciones:", Alert.AlertType.INFORMATION, "Info");
+            mostrarCadenaMensajes(true, abmListaAsistenciaControlador.getCadenaErrores(), "Se ha producido uno o varios errores:", "Error");
+            mostrarCadenaMensajes(false, abmListaAsistenciaControlador.getCadenaInfos(), "Se ha producido una o varias modificaciones:", "Info");
 
             // Actualizamos la tabla de involucrados
             listaAsistenciasControlador.getTblAsistencias().refresh();
@@ -750,7 +758,7 @@ public class AsistenciaManager {
     public void cargarMiembrosSeleccionados() {
         // Cargamos la lista de miembros seleccionados
         for (Asistencia asistencia : abmListaAsistenciaControlador.getAsistencias()) {
-            abmListaAsistenciaControlador.getMiembrosSeleccionados().put(asistencia.getMiembro(), helpers.FLAG_MODIFICAR);
+            abmListaAsistenciaControlador.getMiembrosSeleccionados().put(asistencia.getMiembro(), ListHelper.FLAG_MODIFICAR);
         }
     }
 
@@ -760,7 +768,7 @@ public class AsistenciaManager {
         // Verificamos si el CheckBox de mostrar seleccionados está presionado
         // En ese caso, mostrar solo aquellos que esten contenidos en la lista, y no los haya que eliminar
         return (abmListaAsistenciaControlador.getMiembrosSeleccionados().containsKey(asis.getMiembro())
-                && abmListaAsistenciaControlador.getMiembrosSeleccionados().get(asis.getMiembro()) != helpers.FLAG_ELIMINAR);
+                && abmListaAsistenciaControlador.getMiembrosSeleccionados().get(asis.getMiembro()) != ListHelper.FLAG_ELIMINAR);
     }
 
     public void filtrarListaAsistencias() {
@@ -831,7 +839,7 @@ public class AsistenciaManager {
 
         // Iteramos sobre la copia de la lista
         for (Asistencia asistencia : copiaAsistencias) {
-            helpers.seleccionarItemCheckTableCell(asistencia.getMiembro(), abmListaAsistenciaControlador.getMiembrosSeleccionados(), valorActual);
+            ListHelper.seleccionarItem(asistencia.getMiembro(), abmListaAsistenciaControlador.getMiembrosSeleccionados(), valorActual);
         }
 
         // Actualizamos la tabla

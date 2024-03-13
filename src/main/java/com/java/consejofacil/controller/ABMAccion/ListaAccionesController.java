@@ -91,7 +91,7 @@ public class ListaAccionesController implements Initializable {
 
         // Verificamos que no sea nulo
         if (accion == null) {
-            accionManager.mostrarMensaje(Alert.AlertType.ERROR, "Error", "Debes seleccionar una acción!");
+            accionManager.mostrarMensaje(true, "Error", "Debes seleccionar una acción!");
         } else {
             accionManager.eliminarAccion(accion, false);
 
@@ -107,7 +107,7 @@ public class ListaAccionesController implements Initializable {
 
         // Verificamos que no sea nulo
         if (accion == null) {
-            accionManager.mostrarMensaje(Alert.AlertType.ERROR, "Error", "Debes seleccionar una acción!");
+            accionManager.mostrarMensaje(true, "Error", "Debes seleccionar una acción!");
         } else {
             accionManager.cargarFormulario(accion);
         }

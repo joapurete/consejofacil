@@ -1,6 +1,7 @@
 package com.java.consejofacil.controller;
 
-import com.java.consejofacil.helpers.Helpers;
+import com.java.consejofacil.helper.Utilidades.ImageHelper;
+import com.java.consejofacil.security.SessionInfo;
 import com.java.consejofacil.view.FXMLView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,6 +20,11 @@ import java.util.ResourceBundle;
 @Controller
 public class MenuController implements Initializable {
 
+    // Informacion de inicio de sesion
+    @Autowired
+    @Lazy
+    private SessionInfo sesion;
+
     // Botones del menu lateral
     @FXML
     private Button btnInicio, btnExpedientes, btnReuniones, btnInvolucrados, btnAcciones, btnMinutas, btnMiembros, btnAsistencias, btnRevisiones, btnHistorialCambios, btnLogout;
@@ -34,18 +40,13 @@ public class MenuController implements Initializable {
     @Lazy
     private MainLayoutController mainLayoutController;
 
-    // Ayudas necesarias
-    @Autowired
-    @Lazy
-    private Helpers helpers;
-
     // Lista de items (botones) del menu
     private List<Button> items;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Redondeamos la foto de perfil
-        helpers.redondearImagen(fotoPerfil);
+        ImageHelper.redondearImagen(fotoPerfil);
 
         // Agregamos los listeners a los botones
         addListeners();
@@ -53,6 +54,8 @@ public class MenuController implements Initializable {
         // Inicializamos la lista de items con los botones correspondientes
         items = Arrays.asList(btnInicio, btnExpedientes, btnReuniones, btnInvolucrados, btnAcciones, btnMinutas,
                 btnMiembros, btnAsistencias, btnRevisiones, btnHistorialCambios);
+
+        System.out.println(sesion.getUsuario().toString());
     }
 
     private void addListeners() {
@@ -60,6 +63,7 @@ public class MenuController implements Initializable {
         btnInicio.setOnAction(event -> onMenuItemSelected(FXMLView.Inicio, event));
         btnExpedientes.setOnAction(event -> onMenuItemSelected(FXMLView.ListaExpedientes, event));
         btnReuniones.setOnAction(event -> onMenuItemSelected(FXMLView.ListaReuniones, event));
+        btnMiembros.setOnAction(event -> onMenuItemSelected(FXMLView.ListaMiembros, event));
         btnAcciones.setOnAction(event -> onMenuItemSelected(FXMLView.ListaAcciones, event));
         btnMinutas.setOnAction(event -> onMenuItemSelected(FXMLView.ListaMinutas, event));
         btnInvolucrados.setOnAction(event -> onMenuItemSelected(FXMLView.ListaInvolucrados, event));

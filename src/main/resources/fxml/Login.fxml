@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
+<?import java.lang.*?>
 <?import java.net.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
@@ -7,74 +9,74 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="login-container" xmlns="http://javafx.com/javafx/8"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.java.consejofacil.controller.LoginController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="login-container" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.java.consejofacil.controller.LoginController">
     <stylesheets>
-        <URL value="@../styles/_config.css"/>
-        <URL value="@../styles/view/_login.css"/>
-        <URL value="@../styles/_styles.css"/>
-        <URL value="@../styles/_formulario.css"/>
+        <URL value="@../styles/_config.css" />
+        <URL value="@../styles/view/_login.css" />
+        <URL value="@../styles/_styles.css" />
+        <URL value="@../styles/_formulario.css" />
     </stylesheets>
-    <VBox prefHeight="400.0" prefWidth="200.0" styleClass="login-logo-container"
-          stylesheets="@../styles/view/_login.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-          AnchorPane.topAnchor="0.0">
-        <ImageView fitHeight="100.0" fitWidth="90.0" styleClass="logo">
-            <VBox.margin>
-                <Insets bottom="20.0"/>
-            </VBox.margin>
-            <Image url="@../images/logo.png"/>
-        </ImageView>
-        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Consejo Fácil"/>
-    </VBox>
-    <VBox layoutX="200.0" prefHeight="410.0" prefWidth="400.0" styleClass="vbox-container"
-          stylesheets="@../styles/_container.css">
-        <AnchorPane layoutX="230.0" layoutY="30.0" maxHeight="-Infinity" maxWidth="-Infinity"
-                    styleClass="view-container">
-            <VBox alignment="CENTER" spacing="50.0" styleClass="login-formulario-container"
-                  AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0"
-                  AnchorPane.topAnchor="20.0">
-                <VBox alignment="CENTER" styleClass="titulo-principal-container">
-                    <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titulo-principal"
-                          text="Iniciar Sesión">
-                        <font>
-                            <Font name="Arial Black" size="15.0"/>
-                        </font>
-                    </Text>
-                </VBox>
-                <GridPane hgap="10.0" maxWidth="-Infinity" prefWidth="320.0"
-                          styleClass="login-formulario-grid" vgap="10.0">
-                    <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0"/>
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="234.0" minWidth="10.0"
-                                           prefWidth="184.0"/>
-                    </columnConstraints>
-                    <rowConstraints>
-                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES"/>
-                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES"/>
-                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0"
-                                        vgrow="SOMETIMES"/>
-                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0"
-                                        vgrow="SOMETIMES"/>
-                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES"/>
-                    </rowConstraints>
-                    <Label styleClass="label-formulario" text="Contraseña:" GridPane.rowIndex="1"/>
-                    <Label styleClass="label-formulario" text="DNI:"/>
-                    <TextField promptText="..." styleClass="text-field-personalizado"
-                               stylesheets="@../styles/_styles.css" GridPane.columnIndex="1"/>
-                    <Button mnemonicParsing="false" onAction="#login"
-                            styleClass="btn-personalizado" stylesheets="@../styles/_styles.css"
-                            text="Entrar" GridPane.rowIndex="4"/>
-                    <PasswordField styleClass="password-field-personalizado" GridPane.columnIndex="1"
-                                   GridPane.rowIndex="1"/>
-                    <Button mnemonicParsing="false" onAction="#registrar"
-                            styleClass="btn-personalizado" stylesheets="@../styles/_styles.css"
-                            text="Crear cuenta" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="¿Te olvidaste la contraseña?"
-                          GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2"/>
-                    <CheckBox mnemonicParsing="false" styleClass="check-box-personalizado" text="Recordar"
-                              GridPane.rowIndex="2"/>
-                </GridPane>
-            </VBox>
-        </AnchorPane>
-    </VBox>
+    <children>
+        <VBox prefHeight="400.0" prefWidth="200.0" styleClass="login-logo-container" stylesheets="@../styles/view/_login.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <ImageView fitHeight="100.0" fitWidth="90.0" styleClass="logo">
+                    <VBox.margin>
+                        <Insets bottom="20.0" />
+                    </VBox.margin>
+                    <image>
+                        <Image url="@../images/logo.png" />
+                    </image>
+                </ImageView>
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Consejo Fácil" />
+            </children>
+        </VBox>
+        <VBox layoutX="200.0" prefHeight="410.0" prefWidth="400.0" styleClass="vbox-container" stylesheets="@../styles/_container.css">
+            <children>
+                <AnchorPane layoutX="230.0" layoutY="30.0" maxHeight="-Infinity" maxWidth="-Infinity" styleClass="view-container">
+                    <children>
+                        <VBox alignment="CENTER" spacing="50.0" styleClass="login-formulario-container" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+                            <children>
+                                <VBox alignment="CENTER" styleClass="titulo-principal-container">
+                                    <children>
+                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titulo-principal" text="Iniciar Sesión">
+                                            <font>
+                                                <Font name="Arial Black" size="15.0" />
+                                            </font>
+                                        </Text>
+                                    </children>
+                                </VBox>
+                                <GridPane hgap="10.0" maxWidth="-Infinity" prefWidth="320.0" styleClass="login-formulario-grid" vgap="10.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="234.0" minWidth="10.0" prefWidth="184.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
+                                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
+                                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <Label styleClass="label-formulario" text="Contraseña:" GridPane.rowIndex="1" />
+                                        <Label styleClass="label-formulario" text="DNI:" />
+                                        <Button mnemonicParsing="false" onAction="#iniciarSesion" styleClass="btn-personalizado" stylesheets="@../styles/_styles.css" text="Entrar" GridPane.rowIndex="4" />
+                                        <PasswordField fx:id="txtContrasena" styleClass="password-field-personalizado" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                        <Button mnemonicParsing="false" onAction="#crearCuenta" styleClass="btn-personalizado" stylesheets="@../styles/_styles.css" text="Crear cuenta" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                        <Text onMouseClicked="#olvidasteContrasena" strokeType="OUTSIDE" strokeWidth="0.0" text="¿Te olvidaste la contraseña?" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+                                            <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                            </cursor>
+                                        </Text>
+                                        <CheckBox mnemonicParsing="false" styleClass="check-box-personalizado" text="Recordar" GridPane.rowIndex="2" />
+                                        <TextField fx:id="txtDni" styleClass="text-field-personalizado" GridPane.columnIndex="1" />
+                                    </children>
+                                </GridPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </AnchorPane>
+            </children>
+        </VBox>
+    </children>
 </AnchorPane>

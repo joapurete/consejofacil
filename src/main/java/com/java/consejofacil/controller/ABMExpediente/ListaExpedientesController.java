@@ -40,7 +40,7 @@ public class ListaExpedientesController extends BaseTablaExpedientes implements 
 
         // Verificamos que no sea nulo
         if (exp == null) {
-            getExpedienteManager().mostrarMensaje(Alert.AlertType.ERROR, "Error", "Debes seleccionar un expediente!");
+            getExpedienteManager().mostrarMensaje(true, "Error", "Debes seleccionar un expediente!");
         } else {
             // Eliminamos el expediente
             getExpedienteManager().eliminarExpediente(exp, false);
@@ -57,7 +57,7 @@ public class ListaExpedientesController extends BaseTablaExpedientes implements 
 
         // Verificamos que no sea nulo
         if (exp == null) {
-            getExpedienteManager().mostrarMensaje(Alert.AlertType.ERROR, "Error", "Debes seleccionar un expediente!");
+            getExpedienteManager().mostrarMensaje(true, "Error", "Debes seleccionar un expediente!");
         } else {
             getExpedienteManager().cargarFormulario(exp);
         }

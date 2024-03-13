@@ -1,7 +1,11 @@
 package com.java.consejofacil.controller.ABMExpediente;
 
 import com.java.consejofacil.config.StageManager;
-import com.java.consejofacil.helpers.Helpers;
+import com.java.consejofacil.helper.Alertas.AlertHelper;
+import com.java.consejofacil.helper.Componentes.ComponentHelper;
+import com.java.consejofacil.controller.SelectorController;
+import com.java.consejofacil.helper.Componentes.TableCellFactoryHelper;
+import com.java.consejofacil.helper.Utilidades.DateFormatterHelper;
 import com.java.consejofacil.model.EstadoExpediente;
 import com.java.consejofacil.model.Expediente;
 import com.java.consejofacil.model.Miembro;
@@ -12,7 +16,6 @@ import com.java.consejofacil.view.FXMLView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -20,19 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 @Component
 public class ExpedienteManager {
-
-    // Ayudas necesarias
-    @Autowired
-    @Lazy
-    private Helpers helpers;
-
-    // Variables de control
-    DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     // Servicios utilizados
     @Autowired
@@ -55,6 +49,9 @@ public class ExpedienteManager {
     @Autowired
     @Lazy
     private SelectorExpedienteController selectorExpedienteControlador;
+    @Autowired
+    @Lazy
+    private SelectorController selectorControlador;
 
     // Stage Manager
     @Autowired
@@ -73,7 +70,7 @@ public class ExpedienteManager {
             controlador.getColEstado().setCellValueFactory(new PropertyValueFactory<>("estadoExpediente"));
 
             // Formateamos la fecha de ingreso
-            helpers.formatearColumnaFecha(controlador.getColFechaIngreso());
+            TableCellFactoryHelper.configurarCeldaFecha(controlador.getColFechaIngreso());
 
             // Cargamos listas
             controlador.getExpedientes().clear();
@@ -228,11 +225,11 @@ public class ExpedienteManager {
             procesarExpediente(expediente, true);
 
             // Mostramos un mensaje
-            mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha agregado el expediente correctamente!");
+            mostrarMensaje(false, "Info", "Se ha agregado el expediente correctamente!");
             
         } catch (Exception e) {
             abmExpedienteControlador.getLog().error(e.getMessage());
-            mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo agregar el expediente correctamente!");
+            mostrarMensaje(true, "Error", "No se pudo agregar el expediente correctamente!");
         }
     }
 
@@ -246,11 +243,11 @@ public class ExpedienteManager {
             procesarExpediente(expediente, false);
 
             // Mostramos un mensaje
-            mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha modificado el expediente correctamente!");
+            mostrarMensaje(false, "Info", "Se ha modificado el expediente correctamente!");
             
         } catch (Exception e) {
             abmExpedienteControlador.getLog().error(e.getMessage());
-            mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo modificar el expediente correctamente!");
+            mostrarMensaje(true, "Error", "No se pudo modificar el expediente correctamente!");
         }
     }
 
@@ -266,11 +263,11 @@ public class ExpedienteManager {
                 listaExpedientesControlador.getFiltroExpedientes().remove(expediente);
 
                 // Mostramos un mensaje
-                mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha eliminado el expediente correctamente!");
+                mostrarMensaje(false, "Info", "Se ha eliminado el expediente correctamente!");
                 
             } catch (Exception e) {
                 listaExpedientesControlador.getLog().error(e.getMessage());
-                mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "No se pudo eliminar el expediente correctamente!");
+                mostrarMensaje(true, "Info", "No se pudo eliminar el expediente correctamente!");
             }
         }
     }
@@ -346,26 +343,27 @@ public class ExpedienteManager {
 
     public boolean validarCamposFormulario() {
         ArrayList<String> errores = new ArrayList<>();
+        Expediente expediente = obtenerDatosFormulario();
 
         // Verificamos que la nota no este vacia y que no supere los 500 caracteres
-        if (abmExpedienteControlador.getTxtTextoNota().getText().trim().isEmpty()) {
+        if (expediente.getTextoNota().isEmpty()) {
             errores.add("Por favor, ingrese una nota.");
-        } else if (abmExpedienteControlador.getTxtTextoNota().getLength() > 500) {
+        } else if (expediente.getTextoNota().length() > 500) {
             errores.add("La nota no puede tener más de 500 caracteres.");
         }
 
         // Verificamos que la fecha de ingreso no este vacia y que no sea posterior al día de hoy
-        if (abmExpedienteControlador.getDtpFechaIngreso().getValue() == null) {
+        if (expediente.getFechaIngreso() == null) {
             errores.add("Por favor, ingrese una fecha de ingreso.");
-        } else if (abmExpedienteControlador.getDtpFechaIngreso().getValue().isAfter(LocalDate.now())) {
-            errores.add("Debe seleccionar una fecha de ingreso que sea igual o anterior al dia de hoy " + LocalDate.now().format(formatoFecha) + ".");
+        } else if (expediente.getFechaIngreso().isAfter(LocalDate.now())) {
+            errores.add("Debe seleccionar una fecha de ingreso que sea igual o anterior al dia de hoy " + DateFormatterHelper.fechaHoy() + ".");
         }
 
         // Verificamos que haya seleccionado un iniciante
-        if (abmExpedienteControlador.getCmbIniciante().getValue() == null) {
+        if (expediente.getIniciante() == null) {
             errores.add("Por favor, seleccione un iniciante.");
         } else {
-            Miembro iniciante = miembroService.findById(abmExpedienteControlador.getCmbIniciante().getValue().getDni());
+            Miembro iniciante = miembroService.findById(expediente.getIniciante().getDni());
             if (iniciante == null) {
                 errores.add("El iniciante seleccionado no se encuentra en la base de datos.");
             } else if (!iniciante.getEstadoMiembro().getEstadoMiembro().equals("Activo")) {
@@ -374,10 +372,10 @@ public class ExpedienteManager {
         }
 
         // Verificamos que haya seleccionado un estado de expediente
-        if (abmExpedienteControlador.getCmbEstadoExpediente().getValue() == null) {
+        if (expediente.getEstadoExpediente() == null) {
             errores.add("Por favor, seleccione un estado de expediente.");
         } else {
-            EstadoExpediente estado = estadoExpedienteService.findById(abmExpedienteControlador.getCmbEstadoExpediente().getValue().getId());
+            EstadoExpediente estado = estadoExpedienteService.findById(expediente.getEstadoExpediente().getId());
             if (estado == null) {
                 errores.add("El estado de expediente seleccionado no se encuentra en la base de datos.");
             }
@@ -385,7 +383,7 @@ public class ExpedienteManager {
 
         // Verificamos si hay errores
         if (!errores.isEmpty()) {
-            helpers.mostrarCadenaMensajes(errores, "Se ha producido uno o varios errores:", Alert.AlertType.ERROR, "Error");
+            AlertHelper.mostrarCadenaMensajes(true, errores, "Se ha producido uno o varios errores:", "Error");
             return false;
         }
 
@@ -431,23 +429,23 @@ public class ExpedienteManager {
     // Metodos para interactuar con los selectores
 
     public void seleccionarMiembro(ComboBox<Miembro> combo) throws Exception {
-        helpers.seleccionarMiembro(combo);
+        selectorControlador.seleccionarMiembro(combo);
     }
 
     // Metodo para configurar un combo editable
 
     public <T> void configurarComboEditable(ComboBox<T> combo) {
-        helpers.configurarComboEditable(combo);
+        ComponentHelper.configurarComboEditable(combo);
     }
 
     // Metodos para mostrar mensajes en pantalla
 
     public boolean mostrarConfirmacion(String titulo, String contenido) {
-        return helpers.mostrarConfirmacion(titulo, contenido);
+        return AlertHelper.mostrarConfirmacion(titulo, contenido);
     }
 
-    public void mostrarMensaje(Alert.AlertType tipo, String titulo, String contenido) {
-        helpers.mostrarMensaje(tipo, titulo, contenido);
+    public void mostrarMensaje(boolean error, String titulo, String contenido) {
+        AlertHelper.mostrarMensaje(error, titulo, contenido);
     }
 
     // Metodos adicionales para el selector
@@ -458,7 +456,7 @@ public class ExpedienteManager {
 
         // Verificamos que sea diferente de nulo
         if (selectorExpedienteControlador.getExpediente() == null) {
-            mostrarMensaje(Alert.AlertType.ERROR, "Error", "Debes seleccionar un expediente!");
+            mostrarMensaje(true, "Error", "Debes seleccionar un expediente!");
         } else {
             // Salimos del modal
             stageManager.closeModal(FXMLView.SelectorExpediente.getKey());

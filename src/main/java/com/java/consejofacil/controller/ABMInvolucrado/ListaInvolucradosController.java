@@ -100,7 +100,7 @@ public class ListaInvolucradosController implements Initializable {
         if (inv == null) {
             // Manejamos el caso cuando no se selecciona ningún involucrado
             String errorMessage = listaSeleccionada ? "Debes seleccionar un involucrado para obtener la lista a la que pertenece!" : "Debes seleccionar un involucrado!";
-            involucradoManager.mostrarMensaje(Alert.AlertType.ERROR, "Error", errorMessage);
+            involucradoManager.mostrarMensaje(true, "Error", errorMessage);
         } else {
             involucradoManager.cargarFormulario(listaSeleccionada ? FXMLView.FormularioListaInvolucrado : FXMLView.FormularioInvolucrado, inv);
         }
@@ -113,15 +113,15 @@ public class ListaInvolucradosController implements Initializable {
 
         // Verificamos que no sea nulo
         if (inv == null) {
-            involucradoManager.mostrarMensaje(Alert.AlertType.ERROR, "Error", "Debes seleccionar un involucrado!"); // para obtener la lista al cual pertenece
+            involucradoManager.mostrarMensaje(true, "Error", "Debes seleccionar un involucrado!"); // para obtener la lista al cual pertenece
         } else {
 
             // Eliminamos el involucrado
             if (involucradoManager.eliminarInvolucrado(inv, false)){
                 // Mostramos un mensaje
-                involucradoManager.mostrarMensaje(Alert.AlertType.INFORMATION, "Info", "Se ha eliminado el involucrado correctamente!");
+                involucradoManager.mostrarMensaje(false, "Info", "Se ha eliminado el involucrado correctamente!");
             } else {
-                involucradoManager.mostrarMensaje(Alert.AlertType.ERROR, "Error", "No se pudo eliminar el involucrado correctamente!");
+                involucradoManager.mostrarMensaje(true, "Error", "No se pudo eliminar el involucrado correctamente!");
             }
 
             // Actualizamos la tabla de involucrados
