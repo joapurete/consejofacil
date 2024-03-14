@@ -68,7 +68,7 @@
                                                 <Cursor fx:constant="HAND" />
                                             </cursor>
                                         </Text>
-                                        <CheckBox mnemonicParsing="false" styleClass="check-box-personalizado" text="Recordar" GridPane.rowIndex="2" />
+                                        <CheckBox fx:id="checkRecordar" mnemonicParsing="false" styleClass="check-box-personalizado" text="Recordar" GridPane.rowIndex="2" />
                                         <TextField fx:id="txtDni" styleClass="text-field-personalizado" GridPane.columnIndex="1" />
                                     </children>
                                 </GridPane>

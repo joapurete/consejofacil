@@ -79,6 +79,8 @@ public class ListaAsistenciaController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        asistenciaManager.validarAccesoMiembro();
         // Inicializamos tabla de asistencias
         asistenciaManager.inicializarTablaAsistencias();
         // Inicializamos los filtros

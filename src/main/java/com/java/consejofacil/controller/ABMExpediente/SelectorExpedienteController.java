@@ -19,6 +19,8 @@ public class SelectorExpedienteController extends BaseTablaExpedientes implement
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        getExpedienteManager().validarAccesoMiembro();
         // Inicializamos la tabla de expedientes
         getExpedienteManager().inicializarTablaExpedientes(this);
         // Inicializamos los filtros

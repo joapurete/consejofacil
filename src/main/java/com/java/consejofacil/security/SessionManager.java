@@ -1,14 +1,15 @@
-package com.java.consejofacil.controller;
+package com.java.consejofacil.security;
 
 import com.java.consejofacil.config.StageManager;
+import com.java.consejofacil.controller.MainLayoutController;
+import com.java.consejofacil.controller.MenuController;
 import com.java.consejofacil.helper.Alertas.AlertHelper;
 import com.java.consejofacil.model.Miembro;
-import com.java.consejofacil.security.SessionInfo;
 import com.java.consejofacil.view.FXMLView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
-public class SessionController {
+public class SessionManager {
 
     // Componente que contiene la información de sesion
     @Autowired
@@ -28,7 +29,7 @@ public class SessionController {
     @Lazy
     private StageManager stageManager;
 
-    public SessionController() {
+    public SessionManager() {
     }
 
     // Metodos para abrir, cerrar y modifidcar una sesion activa

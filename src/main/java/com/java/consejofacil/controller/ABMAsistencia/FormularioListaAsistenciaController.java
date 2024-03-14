@@ -85,73 +85,71 @@ public class FormularioListaAsistenciaController extends BaseFormularioAsistenci
     @Getter
     private final ArrayList<String> cadenaInfos = new ArrayList<>();
 
-    @Autowired
-    @Lazy
-    private AsistenciaManager asistenciaManager;
-
     // Logger para gestionar informacion
     @Getter
     private final Logger log = LoggerFactory.getLogger(FormularioListaAsistenciaController.class);
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        getAsistenciaManager().validarAccesoMiembro();
         // Inicializamos tabla de involucrados
-        asistenciaManager.inicializarListaAsistencias();
+        getAsistenciaManager().inicializarListaAsistencias();
         // Inicializamos combos
-        asistenciaManager.inicializarCombosFormulario(this);
+        getAsistenciaManager().inicializarCombosFormulario(this);
         // Inicializamos filtros de la tabla
-        asistenciaManager.inicializarFiltrosListaAsistencias();
+        getAsistenciaManager().inicializarFiltrosListaAsistencias();
         // Inicializamos cadenas de strings
-        asistenciaManager.inicializarCadenasTexto();
+        getAsistenciaManager().inicializarCadenasTexto();
     }
 
     // Metodo para guardar las asistencias seleccionadas
 
     @FXML
-    private void guardarAsistencias() { asistenciaManager.guardarListaAsistencias(); }
+    private void guardarAsistencias() { getAsistenciaManager().guardarListaAsistencias(); }
 
     // Buscamos involucrados por expediente
 
     @FXML
-    private void buscarAsistenciasPorReunion() { asistenciaManager.buscarAsistenciasPorReunion(); }
+    private void buscarAsistenciasPorReunion() { getAsistenciaManager().buscarAsistenciasPorReunion(); }
 
     // Filtramos por la información seleccionada
 
     @FXML
-    private void filtrarPorNombre() { asistenciaManager.filtrarListaAsistencias(); }
+    private void filtrarPorNombre() { getAsistenciaManager().filtrarListaAsistencias(); }
 
     @FXML
-    private void filtrarPorCargo() { asistenciaManager.filtrarListaAsistencias(); }
+    private void filtrarPorCargo() { getAsistenciaManager().filtrarListaAsistencias(); }
 
     @FXML
-    private void filtrarPorEstadoMiembro() { asistenciaManager.filtrarListaAsistencias(); }
+    private void filtrarPorEstadoMiembro() { getAsistenciaManager().filtrarListaAsistencias(); }
 
     @FXML
-    private void filtrarPorEstadoAsistencia() { asistenciaManager.filtrarListaAsistencias(); }
+    private void filtrarPorEstadoAsistencia() { getAsistenciaManager().filtrarListaAsistencias(); }
 
     // Metodos de los CheckBox
 
     @FXML
-    private void seleccionarTodos() { asistenciaManager.seleccionarTodosLosMiembros(); }
+    private void seleccionarTodos() { getAsistenciaManager().seleccionarTodosLosMiembros(); }
 
     @FXML
-    private void mostrarInvolucradosSeleccionados() { asistenciaManager.filtrarListaAsistencias(); }
+    private void mostrarInvolucradosSeleccionados() { getAsistenciaManager().filtrarListaAsistencias(); }
 
     @FXML
-    private void marcarPresentePorDefecto() { asistenciaManager.marcarPresentePorDefecto(); }
+    private void marcarPresentePorDefecto() { getAsistenciaManager().marcarPresentePorDefecto(); }
 
     // Metodos de busqueda avanzada de los combos
 
     @FXML
-    private void seleccionarReunion() throws Exception { asistenciaManager.seleccionarReunion(getCmbReunion()); }
+    private void seleccionarReunion() throws Exception { getAsistenciaManager().seleccionarReunion(getCmbReunion()); }
 
     // Metodos para limpiar campos
 
     @FXML
-    private void nuevaReunion() { asistenciaManager.limpiarFormulario(this); }
+    private void nuevaReunion() { getAsistenciaManager().limpiarFormulario(this); }
 
     @FXML
     private void limpiarFiltro() {
-        asistenciaManager.limpiarFiltrosListaAsistencias();
+        getAsistenciaManager().limpiarFiltrosListaAsistencias();
     }
 }

@@ -50,6 +50,9 @@ public class FormularioMinutaController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        minutaManager.validarAccesoMiembro();
+
         // Inicializamos los combos del formulario
         minutaManager.inicializarCombosFormulario();
 

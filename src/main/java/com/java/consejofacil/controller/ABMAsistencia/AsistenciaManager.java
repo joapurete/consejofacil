@@ -1,6 +1,7 @@
 package com.java.consejofacil.controller.ABMAsistencia;
 
 import com.java.consejofacil.config.StageManager;
+import com.java.consejofacil.security.SessionManager;
 import com.java.consejofacil.helper.Alertas.AlertHelper;
 import com.java.consejofacil.helper.Componentes.ComponentHelper;
 import com.java.consejofacil.controller.SelectorController;
@@ -71,6 +72,17 @@ public class AsistenciaManager {
     @Autowired
     @Lazy
     private StageManager stageManager;
+
+    // Componente para obtener información de sesion
+    @Autowired
+    @Lazy
+    private SessionManager sessionManager;
+
+    // Metodo para validar el acceso del miembro
+
+    public void validarAccesoMiembro() {
+        sessionManager.validarAccesoMiembro();
+    }
 
     // Metodos de inicialización de componentes
 

@@ -82,72 +82,68 @@ public class FormularioListaInvolucradoController extends BaseFormularioInvolucr
     @Getter
     private final ArrayList<String> cadenaInfos = new ArrayList<>();
 
-    @Autowired
-    @Lazy
-    private InvolucradoManager involucradoManager;
-
     // Logger para gestionar informacion
     @Getter
     private final Logger log = LoggerFactory.getLogger(FormularioListaInvolucradoController.class);
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        getInvolucradoManager().validarAccesoMiembro();
         // Inicializamos tabla de involucrados
-        involucradoManager.inicializarListaInvolucrados();
+        getInvolucradoManager().inicializarListaInvolucrados();
         // Inicializamos combos
-        involucradoManager.inicializarCombosFormulario(this);
+        getInvolucradoManager().inicializarCombosFormulario(this);
         // Inicializamos filtros de la tabla
-        involucradoManager.inicializarFiltrosListaInvolucrados();
+        getInvolucradoManager().inicializarFiltrosListaInvolucrados();
         // Inicializamos cadenas de strings
-        involucradoManager.inicializarCadenasTexto();
+        getInvolucradoManager().inicializarCadenasTexto();
     }
 
     // Metodo para guardar los involucrados seleccionados
 
     @FXML
-    private void guardarInvolucrados() { involucradoManager.guardarListaInvolucrados(); }
+    private void guardarInvolucrados() { getInvolucradoManager().guardarListaInvolucrados(); }
 
     // Buscamos involucrados por expediente
 
     @FXML
-    private void buscarInvolucradosPorExpediente() { involucradoManager.buscarInvolucradosPorExpediente(); }
+    private void buscarInvolucradosPorExpediente() { getInvolucradoManager().buscarInvolucradosPorExpediente(); }
 
     // Filtramos por la información seleccionada
 
     @FXML
-    private void filtrarPorNombre() { involucradoManager.filtrarListaInvolucrados(); }
+    private void filtrarPorNombre() { getInvolucradoManager().filtrarListaInvolucrados(); }
 
     @FXML
-    private void filtrarPorCargo() { involucradoManager.filtrarListaInvolucrados(); }
+    private void filtrarPorCargo() { getInvolucradoManager().filtrarListaInvolucrados(); }
 
     @FXML
-    private void filtrarPorEstado() { involucradoManager.filtrarListaInvolucrados(); }
+    private void filtrarPorEstado() { getInvolucradoManager().filtrarListaInvolucrados(); }
 
     @FXML
-    private void filtrarPorDetalles() { involucradoManager.filtrarListaInvolucrados(); }
+    private void filtrarPorDetalles() { getInvolucradoManager().filtrarListaInvolucrados(); }
 
     // Metodos de los CheckBox
 
     @FXML
-    private void seleccionarTodos() { involucradoManager.seleccionarTodosLosMiembros(); }
+    private void seleccionarTodos() { getInvolucradoManager().seleccionarTodosLosMiembros(); }
 
     @FXML
-    void mostrarInvolucradosSeleccionados() { involucradoManager.filtrarListaInvolucrados(); }
+    void mostrarInvolucradosSeleccionados() { getInvolucradoManager().filtrarListaInvolucrados(); }
 
     // Metodos de busqueda avanzada de los combos
 
     @FXML
-    private void seleccionarExpediente() throws Exception {
-        involucradoManager.seleccionarExpediente(getCmbExpediente());
-    }
+    private void seleccionarExpediente() throws Exception { getInvolucradoManager().seleccionarExpediente(getCmbExpediente()); }
 
     // Metodos para limpiar campos
 
     @FXML
-    private void nuevoExpediente() { involucradoManager.limpiarFormulario(this); }
+    private void nuevoExpediente() { getInvolucradoManager().limpiarFormulario(this); }
 
     @FXML
     private void limpiarFiltros() {
-        involucradoManager.limpiarFiltrosListaInvolucrados();
+        getInvolucradoManager().limpiarFiltrosListaInvolucrados();
     }
 }

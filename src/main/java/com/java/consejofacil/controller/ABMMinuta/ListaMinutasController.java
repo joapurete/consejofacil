@@ -74,6 +74,8 @@ public class ListaMinutasController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        minutaManager.validarAccesoMiembro();
         // Inicializamos la tabla de minutas
         minutaManager.inicializarTablaMinutas();
         // Inicializamos los filtros

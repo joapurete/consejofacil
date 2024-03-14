@@ -18,6 +18,9 @@ public class FormularioAsistenciaController extends BaseFormularioAsistencia imp
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        getAsistenciaManager().validarAccesoMiembro();
+
         // Inicializamos combos del formulario
         getAsistenciaManager().inicializarCombosFormulario(this);
 

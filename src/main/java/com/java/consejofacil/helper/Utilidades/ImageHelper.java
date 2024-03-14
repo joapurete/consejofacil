@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.URI;
+import java.net.URL;
 
 public class ImageHelper {
 
@@ -81,5 +82,13 @@ public class ImageHelper {
 
         // Establecemos la imagen redondeada
         imagen.setImage(imageRedondeada);
+    }
+
+    // Metodo para colocar una imagen por defecto
+
+    public static void colocarImagenPorDefecto(ImageView imageView){
+        // Colocamos la foto de perfil por defecto
+        URL urlDefault = ImageHelper.class.getResource("/images/default.png");
+        imageView.setImage(urlDefault != null ? new Image(urlDefault.toString()) : null);
     }
 }

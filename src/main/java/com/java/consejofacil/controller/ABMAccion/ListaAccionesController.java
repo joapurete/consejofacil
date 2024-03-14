@@ -75,6 +75,8 @@ public class ListaAccionesController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        accionManager.validarAccesoMiembro();
         // Inicializamos la tabla de acciones
         accionManager.inicializarTablaAcciones();
         // Inicializamos los filtros

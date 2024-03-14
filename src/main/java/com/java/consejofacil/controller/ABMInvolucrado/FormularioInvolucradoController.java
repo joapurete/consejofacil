@@ -18,6 +18,8 @@ public class FormularioInvolucradoController extends BaseFormularioInvolucrado i
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        getInvolucradoManager().validarAccesoMiembro();
         // Inicializamos combos del formulario
         getInvolucradoManager().inicializarCombosFormulario(this);
 

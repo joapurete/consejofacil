@@ -1,7 +1,7 @@
 package com.java.consejofacil.controller.ABMMiembro;
 
 import com.java.consejofacil.config.StageManager;
-import com.java.consejofacil.controller.SessionController;
+import com.java.consejofacil.security.SessionManager;
 import com.java.consejofacil.helper.Alertas.AlertHelper;
 import com.java.consejofacil.helper.Componentes.TableCellFactoryHelper;
 import com.java.consejofacil.helper.Utilidades.DateFormatterHelper;
@@ -35,16 +35,6 @@ import java.util.List;
 @Component
 public class MiembroManager {
 
-    // Componente para codificar y validar contrasenas
-    @Autowired
-    @Lazy
-    private SecurityConfig securityConfig;
-
-    // Componente para obtener información de sesion
-    @Autowired
-    @Lazy
-    private SessionController sessionControlador;
-
     // Servicios utilizados
     @Autowired
     @Lazy
@@ -75,10 +65,20 @@ public class MiembroManager {
     @Lazy
     private StageManager stageManager;
 
+    // Componente para codificar y validar contrasenas
+    @Autowired
+    @Lazy
+    private SecurityConfig securityConfig;
+
+    // Componente para obtener información de sesion
+    @Autowired
+    @Lazy
+    private SessionManager sessionManager;
+
     // Metodo para validar el acceso del miembro
 
     public void validarAccesoMiembro() {
-        sessionControlador.validarAccesoMiembro();
+        sessionManager.validarAccesoMiembro();
     }
 
     // Metodos de inicialización de componentes
@@ -108,11 +108,11 @@ public class MiembroManager {
             // Cargamos las listas basandonos en el controlador
             if (controlador instanceof SelectorMiembroController) {
                 controlador.getMiembros().addAll(miembros);
-            } else if (controlador instanceof ListaMiembrosController){
+            } else if (controlador instanceof ListaMiembrosController) {
 
                 // Obtenemos la prioridad del miembro
-                int prioridad = sessionControlador.getUsuario() != null ?
-                        sessionControlador.getUsuario().getCargo().getPrioridad() : 0;
+                int prioridad = sessionManager.getUsuario() != null ?
+                        sessionManager.getUsuario().getCargo().getPrioridad() : 0;
 
                 // Iteramos los miembros y agregamos aquellos que tengan menor prioridad
                 for (Miembro miembro : miembros) {
@@ -187,8 +187,8 @@ public class MiembroManager {
             }
 
             // Inicializamos el combo de cargos basandonos en la prioridad del usuario
-            int prioridad = sessionControlador.getUsuario().getCargo().getPrioridad();
-            inicializarComboCargoFormulario(miembro != null ? prioridad - 1 : prioridad);
+            int prioridad = sessionManager.validarSesion() ? sessionManager.getUsuario().getCargo().getPrioridad() : 1;
+            inicializarComboCargoFormulario(prioridad);
 
             // Antes de cargar la vista, hacemos las configuraciones correspondientes en el formulario
             configurarFormulario();
@@ -248,16 +248,24 @@ public class MiembroManager {
     // Metodos para agregar, modificar y eliminar miembros
 
     public byte[] obtenerBytesFotoPerfil() {
-        // Convertimos la imagen en bytes
-        Image foto = abmMiembroControlador.getNuevaFotoPerfil();
-        byte[] bytesFoto = ImageHelper.convertirImagenABytes(foto);
+        if (abmMiembroControlador.getNuevaFotoPerfil() != null) {
+            // Convertimos la imagen en bytes
+            Image foto = abmMiembroControlador.getNuevaFotoPerfil();
+            byte[] bytesFoto = ImageHelper.convertirImagenABytes(foto);
 
-        // Verificamos si la foto de perfil esta vacia, y en caso de que ya tenga una foto de perfil antigua, se la guardamos
-        if (bytesFoto == null && abmMiembroControlador.getMiembro() != null) {
-            bytesFoto = abmMiembroControlador.getMiembro().getFoto();
+            // Verificamos si la foto de perfil esta vacia, y en caso de que ya tenga una foto de perfil antigua, se la guardamos
+            if (bytesFoto == null && abmMiembroControlador.getMiembro() != null) {
+                bytesFoto = abmMiembroControlador.getMiembro().getFoto();
+            }
+
+            return bytesFoto;
+        } else if (abmMiembroControlador.getSeEliminoFotoPerfil()) {
+            // En caso de que se haya eliminado la foto de perfil
+            return null;
         }
 
-        return bytesFoto;
+        // Si no cambio la foto, ni la quiso eliminar, lo dejamos como esta
+        return abmMiembroControlador.getMiembro().getFoto();
     }
 
     public Miembro obtenerDatosFormulario() {
@@ -270,17 +278,17 @@ public class MiembroManager {
         String correo = abmMiembroControlador.getTxtCorreo().getText().trim();
         String contrasena = abmMiembroControlador.getTxtContrasena().getText().trim();
 
-        // En cuanto al cargo y el estado, si no esta en sesion establecer por defecto como miembro y en espera
+        // En cuanto al cargo y el estado, si no está en sesion establecer por defecto como miembro y en espera
         // Si es un miembro, no deberia tener acceso a estas propiedades, por lo que le establecemos el mismo cargo y estado
         Cargo cargoSeleccionado;
         EstadoMiembro estadoMiembroSeleccionado;
-        if (!sessionControlador.validarSesion()) {
+        if (!sessionManager.validarSesion()) {
             cargoSeleccionado = abmMiembroControlador.getCargos().getFirst();
-            estadoMiembroSeleccionado =  abmMiembroControlador.getEstadosMiembros().getLast();
+            estadoMiembroSeleccionado = abmMiembroControlador.getEstadosMiembros().getLast();
         } else {
             if (tieneCargoMiembro()) {
-                cargoSeleccionado = sessionControlador.getUsuario().getCargo();
-                estadoMiembroSeleccionado = sessionControlador.getUsuario().getEstadoMiembro();
+                cargoSeleccionado = sessionManager.getUsuario().getCargo();
+                estadoMiembroSeleccionado = sessionManager.getUsuario().getEstadoMiembro();
             } else {
                 cargoSeleccionado = abmMiembroControlador.getCmbCargo().getValue();
                 estadoMiembroSeleccionado = abmMiembroControlador.getCmbEstado().getValue();
@@ -319,7 +327,7 @@ public class MiembroManager {
                 aux.setClave(abmMiembroControlador.getMiembro().getClave());
 
                 // Verificamos si el miembro que estamos moficando es el que se encuentra en sesion
-                boolean esMismoMiembro = sessionControlador.autenticarMiembro(abmMiembroControlador.getMiembro());
+                boolean esMismoMiembro = sessionManager.autenticarMiembro(abmMiembroControlador.getMiembro());
 
                 // Primero, modificamos el DNI del miembro
                 int filasActualizadas = miembroService.modificarDni(aux.getDni(), abmMiembroControlador.getMiembro().getDni());
@@ -331,7 +339,7 @@ public class MiembroManager {
 
                 // Modificamos la información del usuario en sesion, en caso de que sea el mismo
                 if (esMismoMiembro) {
-                    sessionControlador.modificarSesion(aux);
+                    sessionManager.modificarSesion(aux);
                 }
 
             } else {
@@ -399,6 +407,11 @@ public class MiembroManager {
 
                 // Mostramos un mensaje
                 mostrarMensaje(false, "Info", "Se ha eliminado el miembro correctamente!");
+
+                // Cerramos sesion, en caso de que sea el que haya iniciado sesion
+                if (sessionManager.autenticarMiembro(miembro)) {
+                    sessionManager.cerrarSesion();
+                }
 
             } catch (Exception e) {
                 listaMiembrosControlador.getLog().error(e.getMessage());
@@ -553,7 +566,7 @@ public class MiembroManager {
         }
 
         // Si el usuario no está en sesion o es un miembro del consejo, desactivamos los cargos y estados
-        if (!sessionControlador.validarSesion() || tieneCargoMiembro()) {
+        if (!sessionManager.validarSesion() || tieneCargoMiembro()) {
             abmMiembroControlador.getCmbCargo().setDisable(true);
             abmMiembroControlador.getCmbCargo().setVisible(false);
             abmMiembroControlador.getLblCargo().setVisible(false);
@@ -566,10 +579,9 @@ public class MiembroManager {
 
     // Metdodos para validar los campos del formulario
 
-    public boolean tieneCargoMiembro(){
-        System.out.println(sessionControlador.getUsuario().getCargo().getCargo());
-        return sessionControlador.validarSesion() &&
-                sessionControlador.getUsuario().getCargo().getCargo().equals("Miembro del Consejo");
+    public boolean tieneCargoMiembro() {
+        return sessionManager.validarSesion() &&
+                sessionManager.getUsuario().getCargo().getCargo().equals("Miembro del Consejo");
     }
 
     public boolean validarCamposFormulario(Object controlador) {
@@ -756,12 +768,6 @@ public class MiembroManager {
             abmMiembroControlador.getTxtContrasena().clear();
             abmMiembroControlador.getCmbCargo().setValue(null);
             abmMiembroControlador.getCmbEstado().setValue(null);
-
-            // Colocamos la foto de perfil por defecto
-            URL urlDefault = getClass().getResource("/images/default.png");
-            abmMiembroControlador.getImgFotoPerfil().setImage(urlDefault != null ? new Image(urlDefault.toString()) : null);
-            abmMiembroControlador.setNuevaFotoPerfil(null);
-
         } else if (controlador instanceof CambiarContrasenaMiembroController) {
             // Limpiamos el formulario para cambiar contrasena
             cambiarContrasenaMiembroControlador.getTxtContrasenaActual().clear();
@@ -825,5 +831,12 @@ public class MiembroManager {
             // Guardamos la nueva foto de perfil
             abmMiembroControlador.setNuevaFotoPerfil(image);
         }
+    }
+
+    public void eliminarFotoPerfil() {
+        // Colocamos la foto de perfil por defecto
+        ImageHelper.colocarImagenPorDefecto(abmMiembroControlador.getImgFotoPerfil());
+        abmMiembroControlador.setNuevaFotoPerfil(null);
+        abmMiembroControlador.setSeEliminoFotoPerfil(true);
     }
 }

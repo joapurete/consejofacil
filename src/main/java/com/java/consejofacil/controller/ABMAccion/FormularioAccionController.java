@@ -51,6 +51,9 @@ public class FormularioAccionController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        accionManager.validarAccesoMiembro();
+
         // Inicializamos los combos del formulario
         accionManager.inicializarCombosFormulario();
 

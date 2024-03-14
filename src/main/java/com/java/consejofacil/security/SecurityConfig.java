@@ -1,6 +1,5 @@
 package com.java.consejofacil.security;
 
-import com.java.consejofacil.controller.SessionController;
 import com.java.consejofacil.helper.Alertas.AlertHelper;
 import com.java.consejofacil.model.Miembro;
 import com.java.consejofacil.service.Miembro.MiembroServiceImpl;
@@ -17,7 +16,7 @@ public class SecurityConfig {
 
     @Autowired
     @Lazy
-    private SessionController sessionControlador;
+    private SessionManager sessionManager;
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -42,7 +41,7 @@ public class SecurityConfig {
                 if (validarContrasena(clave, miembro.getClave())) {
 
                     // Abrimos la sesion del usuario
-                    sessionControlador.abrirSesion(miembro);
+                    sessionManager.abrirSesion(miembro);
 
                     // Indicamos que el incio de sesion fue exitosa
                     return true;

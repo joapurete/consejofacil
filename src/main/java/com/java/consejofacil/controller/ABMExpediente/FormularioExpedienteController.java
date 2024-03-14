@@ -56,6 +56,9 @@ public class FormularioExpedienteController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        expedienteManager.validarAccesoMiembro();
+
         // Inicializamos los combos del formulario
         expedienteManager.inicializarCombosFormulario();
 

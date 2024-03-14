@@ -32,6 +32,8 @@ public class MainLayoutController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         // Establecemos la vista central inicial
         viewCentro = FXMLView.ListaExpedientes;
+        Node centroInicial = stageManager.loadView(viewCentro.getFxmlFile());
+        bpMainLayout.setCenter(centroInicial);
     }
 
     public void cambiarCentro(FXMLView view)  {

@@ -77,6 +77,8 @@ public class ListaInvolucradosController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        involucradoManager.validarAccesoMiembro();
         // Inicializamos tabla de involucrados
         involucradoManager.inicializarTablaInvolucrados();
         // Inicializamos los filtros

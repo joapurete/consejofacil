@@ -23,7 +23,13 @@ public class ListaReunionesController extends BaseTablaReuniones implements Init
     private final Logger log = LoggerFactory.getLogger(ListaReunionesController.class);
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) { getReunionManager().inicializarTablaReuniones(this); }
+    public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        getReunionManager().validarAccesoMiembro();
+
+        // Inicializamos la tabla de reuniones
+        getReunionManager().inicializarTablaReuniones(this);
+    }
 
     @FXML
     private void agregarReunion() { getReunionManager().cargarFormulario(null); }

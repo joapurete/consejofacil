@@ -73,10 +73,13 @@ public class FormularioMiembroController implements Initializable {
     @Getter
     private Label lblEstado;
 
-    // Foto de perfil
+    // Variables relacionadas con la foto de perfil
     @Getter
     @Setter
     private Image nuevaFotoPerfil;
+    @Getter
+    @Setter
+    private Boolean seEliminoFotoPerfil;
 
     // Listas utilizadas
     @Getter
@@ -101,8 +104,10 @@ public class FormularioMiembroController implements Initializable {
         // Inicializamos los combos del formulario
         miembroManager.inicializarCombosFormulario();
 
-        // Limpiamos la foto de perfil
+        // Limpiamos las variables relacionadas con la foto de perfil
+        // Inicialmente, no queremos eliminar la foto de perfil
         nuevaFotoPerfil = null;
+        seEliminoFotoPerfil = false;
 
         // Estblecemos en nulo al miembro
         miembro = null;
@@ -122,6 +127,9 @@ public class FormularioMiembroController implements Initializable {
     private void seleccionarFotoPerfil() {
         miembroManager.seleccionarFotoPerfil();
     }
+
+    @FXML
+    private void eliminarFotoPerfil() { miembroManager.eliminarFotoPerfil(); }
 
     @FXML
     private void cambiarContrasena() {

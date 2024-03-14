@@ -45,6 +45,9 @@ public class FormularioReunionController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        reunionManager.validarAccesoMiembro();
+
         // Estblecemos en nulo a la reunión
         reunion = null;
 

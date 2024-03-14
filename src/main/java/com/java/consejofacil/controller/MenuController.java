@@ -5,6 +5,7 @@ import com.java.consejofacil.helper.Alertas.AlertHelper;
 import com.java.consejofacil.helper.Utilidades.ImageHelper;
 import com.java.consejofacil.model.Cargo;
 import com.java.consejofacil.model.Miembro;
+import com.java.consejofacil.security.SessionManager;
 import com.java.consejofacil.view.FXMLView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -15,7 +16,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
+
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +38,7 @@ public class MenuController implements Initializable {
     // Botones del menu lateral
     @FXML
     private Button btnInicio, btnExpedientes, btnReuniones, btnInvolucrados, btnAcciones, btnMinutas, btnMiembros,
-    btnAsistencias, btnRevisiones, btnHistorialCambios;
+            btnAsistencias, btnRevisiones, btnHistorialCambios;
 
     // Controladores de los fxml
     @Autowired
@@ -48,7 +51,7 @@ public class MenuController implements Initializable {
     // Información de inicio de sesion
     @Autowired
     @Lazy
-    private SessionController sessionControlador;
+    private SessionManager sessionManager;
 
     // Lista de items (botones) del menu
     private List<Button> items;
@@ -108,7 +111,7 @@ public class MenuController implements Initializable {
     private void cerrarSesion() {
         if (AlertHelper.mostrarConfirmacion("Info", "¿Está seguro que desea cerrar sesión?")) {
             // Cerramos la sesion
-            sessionControlador.cerrarSesion();
+            sessionManager.cerrarSesion();
         }
     }
 
@@ -116,17 +119,17 @@ public class MenuController implements Initializable {
 
     @FXML
     private void modificarPerfil() {
-        if (sessionControlador.validarSesion()) {
-            miembroManager.cargarFormulario(sessionControlador.getUsuario(), this);
+        if (sessionManager.validarSesion()) {
+            miembroManager.cargarFormulario(sessionManager.getUsuario(), this);
         }
     }
 
     // Metodo para establecer la información del usuario en el menu
 
     public void actualizarMenu() {
-        if (sessionControlador.validarSesion()) {
+        if (sessionManager.validarSesion()) {
 
-            Miembro miembro = sessionControlador.getUsuario();
+            Miembro miembro = sessionManager.getUsuario();
 
             // Obtenemos la información del usuario en sesion
             byte[] imagenBytes = miembro.getFoto();
@@ -142,12 +145,21 @@ public class MenuController implements Initializable {
                 // Si la conversion fue exitosa, establecemos la foto de perfil
                 if (imagen != null) {
                     fotoPerfil.setImage(imagen);
+                } else {
+                    // Colocamos la foto de perfil por defecto
+                    ImageHelper.colocarImagenPorDefecto(fotoPerfil);
                 }
+            } else {
+                // Colocamos la foto de perfil por defecto
+                ImageHelper.colocarImagenPorDefecto(fotoPerfil);
             }
+
+            // Redondeamos la imagen
+            ImageHelper.redondearImagen(fotoPerfil);
 
             // Establecemos el nombre y cargo del miembro
             if (nombre != null) {
-               lblNombre.setText(nombre);
+                lblNombre.setText(nombre);
             }
             if (cargo != null) {
                 lblCargo.setText(cargo.toString());
@@ -160,7 +172,7 @@ public class MenuController implements Initializable {
 
     // Metodo para ocultar / mostrar btn de miembros segun la prioridad del miembro
 
-    public void habilitarBtnMiembros(boolean tieneAcceso){
+    public void habilitarBtnMiembros(boolean tieneAcceso) {
         btnMiembros.setDisable(!tieneAcceso);
         btnMiembros.setVisible(tieneAcceso);
     }

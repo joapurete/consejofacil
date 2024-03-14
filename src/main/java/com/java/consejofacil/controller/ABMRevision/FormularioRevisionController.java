@@ -18,6 +18,9 @@ public class FormularioRevisionController extends BaseFormularioRevision impleme
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        getRevisionManager().validarAccesoMiembro();
+
         // Inicializamos combos
         getRevisionManager().inicializarCombosFormulario(this);
 

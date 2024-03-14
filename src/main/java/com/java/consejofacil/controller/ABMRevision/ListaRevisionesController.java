@@ -65,6 +65,8 @@ public class ListaRevisionesController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        revisionManager.validarAccesoMiembro();
         // Inicializamos la tabla de revisiones
         revisionManager.inicializarTablaRevisiones();
         // Inicializamos los filtros

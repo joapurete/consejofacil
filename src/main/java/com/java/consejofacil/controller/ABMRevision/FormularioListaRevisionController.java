@@ -71,6 +71,8 @@ public class FormularioListaRevisionController extends BaseFormularioRevision im
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Validamos el acceso del miembro
+        getRevisionManager().validarAccesoMiembro();
         // Inicializamos lista de expedientes
         getRevisionManager().inicializarListaRevisiones();
         // Inicializamos combos
