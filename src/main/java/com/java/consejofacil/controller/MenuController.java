@@ -16,9 +16,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
-
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -85,6 +83,7 @@ public class MenuController implements Initializable {
         btnInvolucrados.setOnAction(event -> onMenuItemSelected(FXMLView.ListaInvolucrados, event));
         btnAsistencias.setOnAction(event -> onMenuItemSelected(FXMLView.ListaAsistencias, event));
         btnRevisiones.setOnAction(event -> onMenuItemSelected(FXMLView.ListaRevisiones, event));
+        btnHistorialCambios.setOnAction(event -> onMenuItemSelected(FXMLView.ListaHistorialCambios, event));
     }
 
     // Meotodo para cambiar el contenido central del main

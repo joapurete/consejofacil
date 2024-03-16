@@ -11,7 +11,7 @@
 
 <VBox fillWidth="false" prefHeight="750.0" prefWidth="950.0" styleClass="vbox-container"
       xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.java.consejofacil.controller.ABMMiembro.ListaMiembrosController">
+      fx:controller="com.java.consejofacil.controller.ABMHistorialCambio.ListaHistorialCambiosController">
     <stylesheets>
         <URL value="@../../styles/_config.css"/>
         <URL value="@../../styles/_styles.css"/>
@@ -29,7 +29,7 @@
 
                 <Line endX="100.0" startX="-100.0"/>
                 <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titulo-principal"
-                      text="Lista de Miembros"/>
+                      text="Historial de Cambios"/>
                 <Line endX="100.0" startX="-100.0"/>
             </HBox>
             <GridPane hgap="10.0" layoutX="10.0" layoutY="76.0" vgap="30.0" AnchorPane.leftAnchor="20.0"
@@ -45,24 +45,37 @@
                     <RowConstraints maxHeight="34.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                     <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
-                <Label prefHeight="27.0" styleClass="label-formulario" text="Buscar nombre:"
+                <Label prefHeight="27.0" styleClass="label-formulario" GridPane.halignment="CENTER"/>
+                <Label styleClass="label-formulario" text="Responsable:" GridPane.columnIndex="2"
                        GridPane.halignment="CENTER"/>
-                <Label styleClass="label-formulario" text="Cargo:" GridPane.columnIndex="2"
-                       GridPane.halignment="CENTER"/>
-                <ComboBox fx:id="cmbCargo" maxWidth="1.7976931348623157E308" onAction="#filtrarPorCargo"
-                          prefHeight="154.0" styleClass="combo-personalizado" GridPane.columnIndex="3"/>
-                <Label styleClass="label-formulario" text="Fecha Nac:" GridPane.halignment="CENTER"
+                <ComboBox fx:id="cmbResponsable" editable="true" maxWidth="1.7976931348623157E308"
+                          onAction="#filtrarPorResponsable" prefHeight="154.0"
+                          styleClass="combo-personalizado" GridPane.columnIndex="3"/>
+                <Button mnemonicParsing="false" onAction="#seleccionarResponsable" GridPane.columnIndex="4">
+                    <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <Image url="@../../images/icons/buscar.png"/>
+                        </ImageView>
+                    </graphic>
+                    <styleClass>
+                        <String fx:value="btn-personalizado"/>
+                        <String fx:value="buscar"/>
+                    </styleClass>
+                </Button>
+                <Label styleClass="label-formulario" text="Tipo:" GridPane.halignment="CENTER"
                        GridPane.rowIndex="1"/>
-                <DatePicker fx:id="dtpFechaNac" editable="false" maxWidth="1.7976931348623157E308"
-                            onAction="#filtrarPorFechaNac" styleClass="datepicker-personalizado"
-                            GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                <Label styleClass="label-formulario" text="Estado:" GridPane.columnIndex="2"
+                <DatePicker fx:id="dtpFechaCambio" editable="false" maxWidth="1.7976931348623157E308"
+                            onAction="#filtrarPorFechaCambio" styleClass="datepicker-personalizado"
+                            GridPane.columnIndex="1"/>
+                <Label styleClass="label-formulario" text="Buscar detalles:" GridPane.columnIndex="2"
                        GridPane.halignment="CENTER" GridPane.rowIndex="1"/>
-                <ComboBox fx:id="cmbEstado" maxWidth="1.7976931348623157E308" onAction="#filtrarPorEstado"
-                          prefHeight="31.0" styleClass="combo-personalizado" GridPane.columnIndex="3"
+                <ComboBox fx:id="cmbTipo" maxWidth="1.7976931348623157E308" onAction="#filtrarPorTipo"
+                          prefHeight="31.0" styleClass="combo-personalizado" GridPane.columnIndex="1"
                           GridPane.rowIndex="1"/>
-                <TextField fx:id="txtNombre" onKeyReleased="#filtrarPorNombre" promptText="..."
-                           styleClass="text-field-personalizado" GridPane.columnIndex="1"/>
+                <TextField fx:id="txtDetalles" onKeyReleased="#filtrarPorDetalles" promptText="..."
+                           styleClass="text-field-personalizado" GridPane.columnIndex="3"
+                           GridPane.rowIndex="1"/>
                 <Button mnemonicParsing="false" onAction="#limpiarFiltro" text="Limpiar"
                         GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                     <graphic>
@@ -76,27 +89,28 @@
                         <String fx:value="limpiar"/>
                     </styleClass>
                 </Button>
+                <Label styleClass="label-formulario" text="Fecha cambio:"/>
             </GridPane>
-            <TableView fx:id="tblMiembros" editable="true" layoutX="10.0" layoutY="160.0" prefHeight="428.0"
+            <TableView fx:id="tblCambios" editable="true" layoutX="10.0" layoutY="160.0" prefHeight="428.0"
                        styleClass="tabla-personalizada" stylesheets="@../../styles/_styles.css"
                        tableMenuButtonVisible="true" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="20.0"
                        AnchorPane.rightAnchor="20.0">
                 <columns>
-                    <TableColumn fx:id="colDni" prefWidth="107.0" text="DNI"/>
-                    <TableColumn fx:id="colNombre" prefWidth="240.0" text="Nombre"/>
-                    <TableColumn fx:id="colFechaNac" prefWidth="180.0" text="Fecha Nac."/>
-                    <TableColumn fx:id="colCargo" prefWidth="200.0" text="Cargo"/>
-                    <TableColumn fx:id="colEstado" prefWidth="182.0" text="Estado"/>
+                    <TableColumn fx:id="colId" prefWidth="107.0" text="ID"/>
+                    <TableColumn fx:id="colFechaCambio" prefWidth="180.0" text="Fecha"/>
+                    <TableColumn fx:id="colResponsable" prefWidth="200.0" text="Responsable"/>
+                    <TableColumn fx:id="colTipo" prefWidth="182.0" text="Tipo"/>
+                    <TableColumn fx:id="colDetalles" prefWidth="240.0" text="Detalles"/>
                 </columns>
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                 </columnResizePolicy>
             </TableView>
             <VBox layoutX="20.0" layoutY="667.0" spacing="10.0">
-                <HBox spacing="10.0" styleClass="center-acciones-container" AnchorPane.bottomAnchor="20.0"
-                      AnchorPane.leftAnchor="20.0">
+                <HBox spacing="10.0" styleClass="center-acciones-container"
+                      AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0">
                     <Button layoutX="43.0" layoutY="673.0" mnemonicParsing="false"
-                            onAction="#agregarMiembro" stylesheets="@../../styles/_styles.css"
+                            onAction="#agregarCambio" stylesheets="@../../styles/_styles.css"
                             text="Agregar">
                         <graphic>
                             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
@@ -113,7 +127,7 @@
                         </styleClass>
                     </Button>
                     <Button layoutX="279.0" layoutY="682.0" mnemonicParsing="false"
-                            onAction="#modificarMiembro" stylesheets="@../../styles/_styles.css"
+                            onAction="#modificarCambio" stylesheets="@../../styles/_styles.css"
                             text="Modificar">
                         <styleClass>
                             <String fx:value="btn-personalizado"/>
@@ -127,7 +141,7 @@
                         </graphic>
                     </Button>
                     <Button layoutX="400.0" layoutY="682.0" mnemonicParsing="false"
-                            onAction="#eliminarMiembro" stylesheets="@../../styles/_styles.css"
+                            onAction="#eliminarCambio" stylesheets="@../../styles/_styles.css"
                             text="Eliminar">
                         <styleClass>
                             <String fx:value="btn-personalizado"/>

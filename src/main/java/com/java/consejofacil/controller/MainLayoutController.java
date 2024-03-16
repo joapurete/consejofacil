@@ -12,6 +12,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
+
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -31,19 +32,24 @@ public class MainLayoutController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Establecemos la vista central inicial
-        viewCentro = FXMLView.ListaExpedientes;
-        Node centroInicial = stageManager.loadView(viewCentro.getFxmlFile());
-        bpMainLayout.setCenter(centroInicial);
+        if (bpMainLayout.getCenter() == null) {
+            viewCentro = FXMLView.ListaExpedientes;
+            Node centroInicial = stageManager.loadView(viewCentro.getFxmlFile());
+            bpMainLayout.setCenter(centroInicial);
+        }
     }
 
-    public void cambiarCentro(FXMLView view)  {
+    public void cambiarCentro(FXMLView view) {
+        // Guardamos la vista del nuevo centro
+        viewCentro = view;
+
         // Obtenemos el nodo raiz del centro actual del contenedor
         Node centroActual = bpMainLayout.getCenter();
         // Obtenemos el nodo raiz del nuevo centro a colocar en el contenedor
         Node nuevoCentro = stageManager.loadView(view.getFxmlFile());
 
-        // Guardamos la vista del nuevo centro
-        viewCentro = view;
+
+        System.out.println(viewCentro.getTitle());
 
         // Cambiamos el título de la ventana principal
         stageManager.setTitle(view.getTitle());

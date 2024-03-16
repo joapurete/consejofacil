@@ -1,6 +1,7 @@
 package com.java.consejofacil.controller.ABMReunion;
 
 import com.java.consejofacil.config.StageManager;
+import com.java.consejofacil.controller.ABMHistorialCambio.HistorialCambioManager;
 import com.java.consejofacil.security.SessionManager;
 import com.java.consejofacil.helper.Alertas.AlertHelper;
 import com.java.consejofacil.helper.Componentes.TableCellFactoryHelper;
@@ -47,6 +48,11 @@ public class ReunionManager {
     @Autowired
     @Lazy
     private SessionManager sessionManager;
+
+    // Componente para registrar los cambios realizados
+    @Autowired
+    @Lazy
+    private HistorialCambioManager historialCambioManager;
 
     // Metodo para validar el acceso del miembro
 
@@ -184,6 +190,10 @@ public class ReunionManager {
             // Agregamos reunión a la tabla
             procesarReunion(reunion, true);
 
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoIns().getKey(),
+                    obtenerDetallesCambioReunion(reunion, historialCambioManager.getTipoIns().getValue()));
+
             // Mostramos un mensaje
             mostrarMensaje(false, "Info", "Se ha agregado la reunión correctamente!");
 
@@ -201,6 +211,10 @@ public class ReunionManager {
 
             // Agregamos reunión modificada a la tabla
             procesarReunion(reunion, false);
+
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoMod().getKey(),
+                    obtenerDetallesCambioReunion(reunion, historialCambioManager.getTipoMod().getValue()));
 
             // Mostramos un mensaje
             mostrarMensaje(false, "Info", "Se ha modificado la reunión correctamente!");
@@ -222,14 +236,27 @@ public class ReunionManager {
                 listaReunionesControlador.getReuniones().remove(reunion);
                 listaReunionesControlador.getFiltroReuniones().remove(reunion);
 
+                // Agregamos cambio a la base de datos
+                historialCambioManager.registrarCambio(historialCambioManager.getTipoEli().getKey(),
+                        obtenerDetallesCambioReunion(reunion, historialCambioManager.getTipoEli().getValue()));
+
                 // Mostramos un mensaje
                 mostrarMensaje(false, "Info", "Se ha eliminado la reunión correctamente!");
 
             } catch (Exception e) {
                 listaReunionesControlador.getLog().error(e.getMessage());
-                mostrarMensaje(true, "Info", "No se pudo eliminar la reunión correctamente!");
+                mostrarMensaje(true, "Info", "No se pudo eliminar la reunión correctamente!\n" +
+                        "Es posible que esté vinculado a otros registros en el sistema.");
             }
         }
+    }
+
+    // Metodo para construir texto para los detalles del cambio realizado
+
+    public String obtenerDetallesCambioReunion(Reunion reunion, String tipoCambio){
+        return "Se ha registrado la " + tipoCambio.toLowerCase() + " de la reunión ID " + reunion.getId() + ". " +
+                "Asunto de la reunión: [" + reunion.getAsunto() + "]. " +
+                "Fecha de la reunión: " + DateFormatterHelper.formatearFechaSimple(reunion.getFechaReunion()) + ".";
     }
 
     // Metodos para filtrar las reuniones

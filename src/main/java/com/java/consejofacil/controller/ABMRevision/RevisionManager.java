@@ -1,6 +1,7 @@
 package com.java.consejofacil.controller.ABMRevision;
 
 import com.java.consejofacil.config.StageManager;
+import com.java.consejofacil.controller.ABMHistorialCambio.HistorialCambioManager;
 import com.java.consejofacil.security.SessionManager;
 import com.java.consejofacil.helper.Alertas.AlertHelper;
 import com.java.consejofacil.helper.Componentes.ComponentHelper;
@@ -68,6 +69,11 @@ public class RevisionManager {
     @Autowired
     @Lazy
     private SessionManager sessionManager;
+
+    // Componente para registrar los cambios realizados
+    @Autowired
+    @Lazy
+    private HistorialCambioManager historialCambioManager;
 
     // Metodo para validar el acceso del miembro
 
@@ -257,6 +263,10 @@ public class RevisionManager {
             // Agregamos revisión a la tabla
             procesarRevision(revision, true);
 
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoIns().getKey(),
+                    obtenerDetallesCambioRevision(revision, historialCambioManager.getTipoIns().getValue()));
+
             // Indicamos que la operacion fue exitosa
             return true;
 
@@ -275,6 +285,10 @@ public class RevisionManager {
 
             // Agregamos revisión modificada a la tabla
             procesarRevision(revision, false);
+
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoMod().getKey(),
+                    obtenerDetallesCambioRevision(revision, historialCambioManager.getTipoMod().getValue()));
 
             // Indicamos que la operacion fue exitosa
             return true;
@@ -297,6 +311,10 @@ public class RevisionManager {
                 listaRevisionesControlador.getRevisiones().remove(revision);
                 listaRevisionesControlador.getFiltroRevisiones().remove(revision);
 
+                // Agregamos cambio a la base de datos
+                historialCambioManager.registrarCambio(historialCambioManager.getTipoEli().getKey(),
+                        obtenerDetallesCambioRevision(revision, historialCambioManager.getTipoEli().getValue()));
+
                 // Indicamos que la operacion fue exitosa
                 return true;
 
@@ -306,6 +324,15 @@ public class RevisionManager {
         }
         // Indicamos que hubo un error
         return false;
+    }
+
+    // Metodo para construir texto para los detalles del cambio realizado
+
+    public String obtenerDetallesCambioRevision(Revision revision, String tipoCambio){
+        return "Se ha registrado la " + tipoCambio.toLowerCase() + " de la revisión N° " + revision.getId() + ". " +
+                "Detalles de la revisión: [" + revision.getDetallesRevision() + "]. " +
+                "Relacionada con la " + revision.getReunion().toString() + ", " +
+                "y perteneciente al " + revision.getExpediente().toString() + ".";
     }
 
     // Metodos para filtrar las revisiones

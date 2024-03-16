@@ -9,7 +9,7 @@ public class DataValidatorHelper {
     private static final String regexTelefono = "^\\+?\\d{0,3}[-.\\s]?\\d?[-.\\s]?\\(?\\d{2,4}\\)?[-.\\s]?\\d{2,4}[-\\s]?\\d{4}$";
     private static final String regexCorreo = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}(\\.[A-Za-z]{2,})?$";
     private static final String regexContrasena = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])\\S{6,}$";
-    private static final String regexDireccion = "^\\d+\\s+([a-zA-ZÁáÉéÍíÓóÚúÜü]+|[a-zA-ZÁáÉéÍíÓóÚúÜü]+\\s[a-zA-ZÁáÉéÍíÓóÚúÜü]+)$";
+    private static final String regexDireccion = "^\\d+\\s+[a-zA-ZÁáÉéÍíÓóÚúÜü]+(?:\\s+[a-zA-ZÁáÉéÍíÓóÚúÜü]+)*$";
     private static final String regexNombreApellido = "^[A-Za-zÁáÉéÍíÓóÚúÜü]+(?:\\s+[A-Za-zÁáÉéÍíÓóÚúÜü]+)*$";
 
     // Metodo para validar un DNI

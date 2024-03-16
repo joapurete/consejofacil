@@ -48,7 +48,11 @@ public enum FXMLView {
     ListaMiembros("lstMie.key", "lstMie.title", "ABMMiembro/ListaMiembros"),
     FormularioMiembro("frmMie.key", "frmMie.title", "ABMMiembro/FormularioMiembro"),
     CambiarContrasenaMiembro("cmbCntMie.key", "cmbCntMie.title", "ABMMiembro/CambiarContrasenaMiembro"),
-    SelectorMiembro("slcMie.key", "slcMie.title", "ABMMiembro/SelectorMiembro");
+    SelectorMiembro("slcMie.key", "slcMie.title", "ABMMiembro/SelectorMiembro"),
+
+
+    ListaHistorialCambios("lstHstCmb.key", "lstHstCmb.title", "ABMHistorialCambio/ListaHistorialCambios"),
+    FormularioCambio("frmCmb.key", "frmCmb.title", "ABMHistorialCambio/FormularioCambio");
 
     // Devolvemos la clave
     private final String key;

@@ -1,6 +1,7 @@
 package com.java.consejofacil.controller.ABMAsistencia;
 
 import com.java.consejofacil.config.StageManager;
+import com.java.consejofacil.controller.ABMHistorialCambio.HistorialCambioManager;
 import com.java.consejofacil.security.SessionManager;
 import com.java.consejofacil.helper.Alertas.AlertHelper;
 import com.java.consejofacil.helper.Componentes.ComponentHelper;
@@ -77,6 +78,11 @@ public class AsistenciaManager {
     @Autowired
     @Lazy
     private SessionManager sessionManager;
+
+    // Componente para registrar los cambios realizados
+    @Autowired
+    @Lazy
+    private HistorialCambioManager historialCambioManager;
 
     // Metodo para validar el acceso del miembro
 
@@ -276,6 +282,10 @@ public class AsistenciaManager {
             // Agregamos asistencia a la tabla
             procesarAsistencia(asistencia, true);
 
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoIns().getKey(),
+                    obtenerDetallesCambioAsistencia(asistencia, historialCambioManager.getTipoIns().getValue()));
+
             // Indicamos que la operacion fue exitosa
             return true;
 
@@ -294,6 +304,10 @@ public class AsistenciaManager {
 
             // Agregamos asistencia modificada a la tabla
             procesarAsistencia(asistencia, false);
+
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoMod().getKey(),
+                    obtenerDetallesCambioAsistencia(asistencia, historialCambioManager.getTipoMod().getValue()));
 
             // Indicamos que la operacion fue exitosa
             return true;
@@ -316,6 +330,10 @@ public class AsistenciaManager {
                 listaAsistenciasControlador.getAsistencias().remove(asistencia);
                 listaAsistenciasControlador.getFiltroAsistencias().remove(asistencia);
 
+                // Agregamos cambio a la base de datos
+                historialCambioManager.registrarCambio(historialCambioManager.getTipoEli().getKey(),
+                        obtenerDetallesCambioAsistencia(asistencia, historialCambioManager.getTipoEli().getValue()));
+
                 // Indicamos que la operacion fue exitosa
                 return true;
 
@@ -325,6 +343,15 @@ public class AsistenciaManager {
         }
         // Indicamos que hubo un error
         return false;
+    }
+
+    // Metodo para construir texto para los detalles del cambio realizado
+
+    public String obtenerDetallesCambioAsistencia(Asistencia asistencia, String tipoCambio){
+        return "Se ha registrado la " + tipoCambio.toLowerCase() + " de la asistencia N° " + asistencia.getId() + ". " +
+                "Estado de la asistencia: " + asistencia.getEstadoAsistencia().toString() + ". " +
+                "Relacionada con la " + asistencia.getReunion().toString() + ", " +
+                "y perteneciente al miembro del consejo " + asistencia.getMiembro().toString() + ".";
     }
 
     // Metodos para filtrar los involucrados

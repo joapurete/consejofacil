@@ -1,6 +1,7 @@
 package com.java.consejofacil.controller.ABMExpediente;
 
 import com.java.consejofacil.config.StageManager;
+import com.java.consejofacil.controller.ABMHistorialCambio.HistorialCambioManager;
 import com.java.consejofacil.security.SessionManager;
 import com.java.consejofacil.helper.Alertas.AlertHelper;
 import com.java.consejofacil.helper.Componentes.ComponentHelper;
@@ -63,6 +64,11 @@ public class ExpedienteManager {
     @Autowired
     @Lazy
     private SessionManager sessionManager;
+
+    // Componente para registrar los cambios realizados
+    @Autowired
+    @Lazy
+    private HistorialCambioManager historialCambioManager;
 
     // Metodo para validar el acceso del miembro
 
@@ -236,6 +242,10 @@ public class ExpedienteManager {
             // Agregamos expediente a la tabla
             procesarExpediente(expediente, true);
 
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoIns().getKey(),
+                    obtenerDetallesCambioExpediente(expediente, historialCambioManager.getTipoIns().getValue()));
+
             // Mostramos un mensaje
             mostrarMensaje(false, "Info", "Se ha agregado el expediente correctamente!");
             
@@ -253,6 +263,10 @@ public class ExpedienteManager {
 
             // Agregamos expediente modificado a la tabla
             procesarExpediente(expediente, false);
+
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoMod().getKey(),
+                    obtenerDetallesCambioExpediente(expediente, historialCambioManager.getTipoMod().getValue()));
 
             // Mostramos un mensaje
             mostrarMensaje(false, "Info", "Se ha modificado el expediente correctamente!");
@@ -274,14 +288,29 @@ public class ExpedienteManager {
                 listaExpedientesControlador.getExpedientes().remove(expediente);
                 listaExpedientesControlador.getFiltroExpedientes().remove(expediente);
 
+                // Agregamos cambio a la base de datos
+                historialCambioManager.registrarCambio(historialCambioManager.getTipoEli().getKey(),
+                        obtenerDetallesCambioExpediente(expediente, historialCambioManager.getTipoEli().getValue()));
+
                 // Mostramos un mensaje
                 mostrarMensaje(false, "Info", "Se ha eliminado el expediente correctamente!");
                 
             } catch (Exception e) {
                 listaExpedientesControlador.getLog().error(e.getMessage());
-                mostrarMensaje(true, "Info", "No se pudo eliminar el expediente correctamente!");
+                mostrarMensaje(true, "Info", "No se pudo eliminar el expediente correctamente!\n" +
+                        "Es posible que esté vinculado a otros registros en el sistema.");
             }
         }
+    }
+
+    // Metodo para construir texto para los detalles del cambio realizado
+
+    public String obtenerDetallesCambioExpediente(Expediente expediente, String tipoCambio){
+        return "Se ha registrado la " + tipoCambio.toLowerCase() + " del expediente N° " + expediente.getId() + ". " +
+                "Texto de la nota: [" + expediente.getTextoNota() + "]. " +
+                "Fecha de ingreso: " + DateFormatterHelper.formatearFechaSimple(expediente.getFechaIngreso()) + ". " +
+                "Estado del expediente: " + expediente.getEstadoExpediente().toString() + ". " +
+                "Iniciante del expediente: " + expediente.getIniciante().toString() + ".";
     }
 
     // Metodos para filtrar los expedientes

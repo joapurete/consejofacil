@@ -91,19 +91,20 @@ public class SessionManager {
 
                 // Verificamos si se encuentra dentro de una de las vistas para gestionar los miembros y si tiene la prioridad necesaria
                 if (mainLayoutControlador.getViewCentro().getTitle().contains("Miembro") &&
-                        getUsuario().getCargo().getPrioridad() < 2) {
+                        getUsuario().getCargo().getPrioridad() <= 1) {
 
                     // Cambiamos de centro
                     mainLayoutControlador.cambiarCentro(FXMLView.ListaExpedientes);
-
-                    return;
                 }
 
-                return;
+            } else {
+                // Cerramos la sesión
+                cerrarSesion();
             }
+        } else {
+            // Cerramos la sesión
+            cerrarSesion();
         }
-        // Cerramos la sesión
-        cerrarSesion();
     }
 
     private void mostrarMensaje(String contenido) {

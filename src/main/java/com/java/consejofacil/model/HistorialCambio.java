@@ -25,8 +25,18 @@ public class HistorialCambio {
     @Column(name = "detalles_cambio", length = 500, nullable = false)
     private String detallesCambio;
 
-    public HistorialCambio(LocalDate fechaCambio, String detallesCambio) {
+    @ManyToOne
+    @JoinColumn(name = "id_miembro")
+    Miembro responsable;
+
+    @ManyToOne
+    @JoinColumn(name = "id_tipo_cambio")
+    TipoCambio tipoCambio;
+
+    public HistorialCambio(LocalDate fechaCambio, Miembro responsable, TipoCambio tipoCambio, String detallesCambio) {
         this.fechaCambio = fechaCambio;
+        this.responsable = responsable;
+        this.tipoCambio = tipoCambio;
         this.detallesCambio = detallesCambio;
     }
 }

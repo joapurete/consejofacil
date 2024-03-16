@@ -43,5 +43,4 @@ public class AppConfig {
     @Bean
     @Lazy
     public SessionManager sessionController() { return new SessionManager(); }
-    //public SelectorController selectorControlador() { return new SelectorController(); }
 }

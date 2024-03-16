@@ -1,6 +1,7 @@
 package com.java.consejofacil.controller.ABMMiembro;
 
 import com.java.consejofacil.config.StageManager;
+import com.java.consejofacil.controller.ABMHistorialCambio.HistorialCambioManager;
 import com.java.consejofacil.security.SessionManager;
 import com.java.consejofacil.helper.Alertas.AlertHelper;
 import com.java.consejofacil.helper.Componentes.TableCellFactoryHelper;
@@ -25,9 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import javafx.scene.image.Image;
-
 import java.io.File;
-import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +73,11 @@ public class MiembroManager {
     @Autowired
     @Lazy
     private SessionManager sessionManager;
+
+    // Componente para registrar los cambios realizados
+    @Autowired
+    @Lazy
+    private HistorialCambioManager historialCambioManager;
 
     // Metodo para validar el acceso del miembro
 
@@ -259,13 +263,13 @@ public class MiembroManager {
             }
 
             return bytesFoto;
-        } else if (abmMiembroControlador.getSeEliminoFotoPerfil()) {
-            // En caso de que se haya eliminado la foto de perfil
-            return null;
+        } else if (abmMiembroControlador.getMiembro() != null && !abmMiembroControlador.getSeEliminoFotoPerfil()) {
+            // Si no cambio la foto, ni la quiso eliminar, lo dejamos como esta
+            return abmMiembroControlador.getMiembro().getFoto();
         }
 
-        // Si no cambio la foto, ni la quiso eliminar, lo dejamos como esta
-        return abmMiembroControlador.getMiembro().getFoto();
+        // En caso de que se haya eliminado la foto de perfil
+        return null;
     }
 
     public Miembro obtenerDatosFormulario() {
@@ -368,6 +372,10 @@ public class MiembroManager {
             // Agregamos miembro a la tabla
             procesarMiembro(miembro, true);
 
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoIns().getKey(),
+                    obtenerDetallesCambioMiembro(miembro, historialCambioManager.getTipoIns().getValue()));
+
             // Mostramos un mensaje
             mostrarMensaje(false, "Info", "Se ha agregado el miembro correctamente!");
 
@@ -384,6 +392,10 @@ public class MiembroManager {
 
             // Agregamos miembro modificado a la tabla
             procesarMiembro(miembro, false);
+
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoMod().getKey(),
+                    obtenerDetallesCambioMiembro(miembro, historialCambioManager.getTipoMod().getValue()));
 
             // Mostramos un mensaje
             mostrarMensaje(false, "Info", "Se ha modificado el miembro correctamente!");
@@ -405,6 +417,10 @@ public class MiembroManager {
                 listaMiembrosControlador.getMiembros().remove(miembro);
                 listaMiembrosControlador.getFiltroMiembros().remove(miembro);
 
+                // Agregamos cambio a la base de datos
+                historialCambioManager.registrarCambio(historialCambioManager.getTipoEli().getKey(),
+                        obtenerDetallesCambioMiembro(miembro, historialCambioManager.getTipoEli().getValue()));
+
                 // Mostramos un mensaje
                 mostrarMensaje(false, "Info", "Se ha eliminado el miembro correctamente!");
 
@@ -415,9 +431,23 @@ public class MiembroManager {
 
             } catch (Exception e) {
                 listaMiembrosControlador.getLog().error(e.getMessage());
-                mostrarMensaje(true, "Info", "No se pudo eliminar el miembro correctamente!");
+                mostrarMensaje(true, "Info", "No se pudo eliminar el miembro correctamente!\n" +
+                        "Es posible que esté vinculado a otros registros en el sistema.");
             }
         }
+    }
+
+    // Metodo para construir texto para los detalles del cambio realizado
+
+    public String obtenerDetallesCambioMiembro(Miembro miembro, String tipoCambio){
+        return "Se ha registrado la " + tipoCambio.toLowerCase() + " del miembro del consejo " + miembro.toString() + ". " +
+                "DNI del miembro: " + miembro.getDni() + ". " +
+                "Fecha de nacimiento: " + (miembro.getFechaNac() != null ? DateFormatterHelper.formatearFechaSimple(miembro.getFechaNac()) : "Vacío") + ". " +
+                "Teléfono: " + (!miembro.getTelefono().isEmpty() ? miembro.getTelefono() : "Vacío")  + ". " +
+                "Correo electrónico: " + (!miembro.getCorreo().isEmpty() ? miembro.getCorreo() : "Vacío") + ". " +
+                "Dirección: " + (!miembro.getDireccion().isEmpty() ? miembro.getDireccion() : "Vacío") + ". " +
+                "Cargo del miembro: " + miembro.getCargo().toString() + ". " +
+                "Estado del miembro: " + miembro.getEstadoMiembro().toString() + ".";
     }
 
     // Metodos para cambiar la contrasena
@@ -559,6 +589,9 @@ public class MiembroManager {
             abmMiembroControlador.getTxtContrasena().setDisable(true);
             abmMiembroControlador.getTxtContrasena().setVisible(false);
             abmMiembroControlador.getLblContrasena().setVisible(false);
+
+            // Desactivamos el TextField para ingresar un nuevo DNI
+            abmMiembroControlador.getTxtDni().setDisable(true);
         } else {
             // Desactivamos el boton para cambiar la contrasena
             abmMiembroControlador.getBtnCambiarContrasena().setDisable(true);

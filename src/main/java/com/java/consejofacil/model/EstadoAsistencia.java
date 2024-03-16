@@ -22,9 +22,7 @@ public class EstadoAsistencia {
     @Column(name = "estado_asistencia", length = 25, nullable = false)
     private String estadoAsistencia;
 
-    public EstadoAsistencia(String estadoAsistencia) {
-        this.estadoAsistencia = estadoAsistencia;
-    }
+    public EstadoAsistencia(String estadoAsistencia) { this.estadoAsistencia = estadoAsistencia; }
 
     @Override
     public String toString(){

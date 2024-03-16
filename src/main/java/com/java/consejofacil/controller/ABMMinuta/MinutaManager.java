@@ -1,6 +1,7 @@
 package com.java.consejofacil.controller.ABMMinuta;
 
 import com.java.consejofacil.config.StageManager;
+import com.java.consejofacil.controller.ABMHistorialCambio.HistorialCambioManager;
 import com.java.consejofacil.security.SessionManager;
 import com.java.consejofacil.helper.Alertas.AlertHelper;
 import com.java.consejofacil.helper.Componentes.ComponentHelper;
@@ -53,6 +54,11 @@ public class MinutaManager {
     @Autowired
     @Lazy
     private SessionManager sessionManager;
+
+    // Componente para registrar los cambios realizados
+    @Autowired
+    @Lazy
+    private HistorialCambioManager historialCambioManager;
 
     // Metodo para validar el acceso del miembro
 
@@ -207,6 +213,10 @@ public class MinutaManager {
             // Agregamos acción a la tabla
             procesarMinuta(minuta, true);
 
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoIns().getKey(),
+                    obtenerDetallesCambioMinuta(minuta, historialCambioManager.getTipoIns().getValue()));
+
             // Mostramos un mensaje
             mostrarMensaje(false, "Info", "Se ha agregado la minuta correctamente!");
 
@@ -224,6 +234,10 @@ public class MinutaManager {
 
             // Agregamos minuta modificada a la tabla
             procesarMinuta(minuta, false);
+
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoMod().getKey(),
+                    obtenerDetallesCambioMinuta(minuta, historialCambioManager.getTipoMod().getValue()));
 
             // Mostramos un mensaje
             mostrarMensaje(false, "Info", "Se ha modificado la minuta correctamente!");
@@ -245,6 +259,10 @@ public class MinutaManager {
                 listaMinutasControlador.getMinutas().remove(minuta);
                 listaMinutasControlador.getFiltroMinutas().remove(minuta);
 
+                // Agregamos cambio a la base de datos
+                historialCambioManager.registrarCambio(historialCambioManager.getTipoEli().getKey(),
+                        obtenerDetallesCambioMinuta(minuta, historialCambioManager.getTipoEli().getValue()));
+
                 // Mostramos un mensaje
                 mostrarMensaje(false, "Info", "Se ha eliminado la minuta correctamente!");
 
@@ -253,6 +271,15 @@ public class MinutaManager {
                 mostrarMensaje(true, "Info", "No se pudo eliminar la minuta correctamente!");
             }
         }
+    }
+
+    // Metodo para construir texto para los detalles del cambio realizado
+
+    public String obtenerDetallesCambioMinuta(Minuta minuta, String tipoCambio){
+        return "Se ha registrado la " + tipoCambio.toLowerCase() + " de la minuta N° " + minuta.getId() + ". " +
+                "Tema tratado de la minuta: [" + minuta.getTemaTratado() + "]. " +
+                "Detalles de la minuta: [" + minuta.getDetallesMinuta() + "]. " +
+                "Relacionada con la " + minuta.getReunion().toString() + ".";
     }
 
     // Metodos para filtrar las minutas

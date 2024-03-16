@@ -1,6 +1,7 @@
 package com.java.consejofacil.controller.ABMAccion;
 
 import com.java.consejofacil.config.StageManager;
+import com.java.consejofacil.controller.ABMHistorialCambio.HistorialCambioManager;
 import com.java.consejofacil.security.SessionManager;
 import com.java.consejofacil.helper.Alertas.AlertHelper;
 import com.java.consejofacil.helper.Componentes.ComponentHelper;
@@ -54,6 +55,11 @@ public class AccionManager {
     @Autowired
     @Lazy
     private SessionManager sessionManager;
+
+    // Componente para registrar los cambios realizados
+    @Autowired
+    @Lazy
+    private HistorialCambioManager historialCambioManager;
 
     // Metodo para validar el acceso del miembro
 
@@ -211,6 +217,10 @@ public class AccionManager {
             // Agregamos acción a la tabla
             procesarAccion(accion, true);
 
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoIns().getKey(),
+                    obtenerDetallesCambioAccion(accion, historialCambioManager.getTipoIns().getValue()));
+
             // Mostramos un mensaje
             mostrarMensaje(false, "Info", "Se ha agregado la acción correctamente!");
 
@@ -228,6 +238,10 @@ public class AccionManager {
 
             // Agregamos acción modificada a la tabla
             procesarAccion(accion, false);
+
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoMod().getKey(),
+                    obtenerDetallesCambioAccion(accion, historialCambioManager.getTipoMod().getValue()));
 
             // Mostramos un mensaje
             mostrarMensaje(false, "Info", "Se ha modificado la acción correctamente!");
@@ -249,14 +263,28 @@ public class AccionManager {
                 listaAccionesControlador.getAcciones().remove(accion);
                 listaAccionesControlador.getFiltroAcciones().remove(accion);
 
+                // Agregamos cambio a la base de datos
+                historialCambioManager.registrarCambio(historialCambioManager.getTipoEli().getKey(),
+                        obtenerDetallesCambioAccion(accion, historialCambioManager.getTipoEli().getValue()));
+
                 // Mostramos un mensaje
                 mostrarMensaje(false, "Info", "Se ha eliminado la acción correctamente!");
 
             } catch (Exception e) {
                 listaAccionesControlador.getLog().error(e.getMessage());
                 mostrarMensaje(true, "Info", "No se pudo eliminar la acción correctamente!");
+
             }
         }
+    }
+
+    // Metodo para construir texto para los detalles del cambio realizado
+
+    public String obtenerDetallesCambioAccion(Accion accion, String tipoCambio){
+        return "Se ha registrado la " + tipoCambio.toLowerCase() + " de la acción N° " + accion.getId() + ". " +
+                "Detalles de la acción: [" + accion.getDetallesAccion() + "]. " +
+                "Fecha de la acción: " + DateFormatterHelper.formatearFechaSimple(accion.getFechaAccion()) + ". " +
+                "Relacionada con el " + accion.getExpediente().toString() + ".";
     }
 
     // Metodos para filtrar las acciones

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import java.util.prefs.Preferences;
+import javafx.scene.control.TextField;
 
 public class SecurityConfig {
 
@@ -17,6 +19,9 @@ public class SecurityConfig {
     @Autowired
     @Lazy
     private SessionManager sessionManager;
+
+    // Credenciales guardadas del miembro
+    private final Preferences credenciales = Preferences.userNodeForPackage(SecurityConfig.class);
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -74,4 +79,18 @@ public class SecurityConfig {
     }
 
     public boolean validarContrasena(String rawPassword, String encodedPassword) { return passwordEncoder.matches(rawPassword, encodedPassword); }
+
+    // Metodos para autocargar y guardar credenciales
+
+    public void autocargarCredenciales(TextField txtDni, TextField txtContrasena) {
+        // Cargar las credenciales si existen
+        txtDni.setText(credenciales.get("dni", ""));
+        txtContrasena.setText(credenciales.get("contrasena", ""));
+    }
+
+    public void guardarCredenciales(String dni, String contrasena) {
+        // Guardar las credenciales en las preferencias
+        credenciales.put("dni", dni);
+        credenciales.put("contrasena", contrasena);
+    }
 }

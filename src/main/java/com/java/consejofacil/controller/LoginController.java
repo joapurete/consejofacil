@@ -17,15 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
-import java.io.*;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.DoubleSummaryStatistics;
-import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
 
 @Controller
 public class LoginController implements Initializable {
@@ -39,9 +33,6 @@ public class LoginController implements Initializable {
     // CheckBox para recordar los credenciales
     @FXML
     private CheckBox checkRecordar;
-
-    // Credenciales guardadas del miembro
-    private final Preferences credenciales = Preferences.userNodeForPackage(LoginController.class);
 
     // Controladores de los fxml
     @Autowired
@@ -66,7 +57,7 @@ public class LoginController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         // Cargar las credenciales si existen
-        cargarCredenciales();
+        securityConfig.autocargarCredenciales(txtDni, txtContrasena);
     }
 
     @FXML
@@ -82,7 +73,7 @@ public class LoginController implements Initializable {
 
                 if (checkRecordar.isSelected()) {
                     // Guardar las credenciales en el archivo properties
-                    guardarCredenciales(String.valueOf(dni), contrasena);
+                    securityConfig.guardarCredenciales(String.valueOf(dni), contrasena);
                 }
 
                 // Si el inicio de sesion fue exitoso, cambiamos al inicio
@@ -126,17 +117,5 @@ public class LoginController implements Initializable {
     @FXML
     private void olvidasteContrasena() {
         AlertHelper.mostrarMensaje(false, "Info", "Por favor, comunícate con el personal administrativo para obtener ayuda y recuperar el acceso a tu cuenta.");
-    }
-
-    private void cargarCredenciales() {
-        // Cargar las credenciales si existen
-        txtDni.setText(credenciales.get("dni", ""));
-        txtContrasena.setText(credenciales.get("contrasena", ""));
-    }
-
-    private void guardarCredenciales(String dni, String contrasena) {
-        // Guardar las credenciales del miembro
-        credenciales.put("dni", dni);
-        credenciales.put("contrasena", contrasena);
     }
 }

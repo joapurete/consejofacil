@@ -1,6 +1,7 @@
 package com.java.consejofacil.controller.ABMInvolucrado;
 
 import com.java.consejofacil.config.StageManager;
+import com.java.consejofacil.controller.ABMHistorialCambio.HistorialCambioManager;
 import com.java.consejofacil.security.SessionManager;
 import com.java.consejofacil.helper.Alertas.AlertHelper;
 import com.java.consejofacil.helper.Componentes.ComponentHelper;
@@ -70,6 +71,11 @@ public class InvolucradoManager {
     @Autowired
     @Lazy
     private SessionManager sessionManager;
+
+    // Componente para registrar los cambios realizados
+    @Autowired
+    @Lazy
+    private HistorialCambioManager historialCambioManager;
 
     // Metodo para validar el acceso del miembro
 
@@ -260,6 +266,10 @@ public class InvolucradoManager {
             // Agregamos involucrado a la tabla
             procesarInvolucrado(involucrado, true);
 
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoIns().getKey(),
+                    obtenerDetallesCambioInvolucrado(involucrado, historialCambioManager.getTipoIns().getValue()));
+
             // Indicamos que la operacion fue exitosa
             return true;
 
@@ -278,6 +288,10 @@ public class InvolucradoManager {
 
             // Agregamos involucrado modificado a la tabla
             procesarInvolucrado(involucrado, false);
+
+            // Agregamos cambio a la base de datos
+            historialCambioManager.registrarCambio(historialCambioManager.getTipoMod().getKey(),
+                    obtenerDetallesCambioInvolucrado(involucrado, historialCambioManager.getTipoMod().getValue()));
 
             // Indicamos que la operacion fue exitosa
             return true;
@@ -300,6 +314,10 @@ public class InvolucradoManager {
                 listaInvolucradosControlador.getInvolucrados().remove(involucrado);
                 listaInvolucradosControlador.getFiltroInvolucrados().remove(involucrado);
 
+                // Agregamos cambio a la base de datos
+                historialCambioManager.registrarCambio(historialCambioManager.getTipoEli().getKey(),
+                        obtenerDetallesCambioInvolucrado(involucrado, historialCambioManager.getTipoEli().getValue()));
+
                 // Indicamos que la operacion fue exitosa
                 return true;
 
@@ -309,6 +327,15 @@ public class InvolucradoManager {
         }
         // Indicamos que hubo un error
         return false;
+    }
+
+    // Metodo para construir texto para los detalles del cambio realizado
+
+    public String obtenerDetallesCambioInvolucrado(Involucrado involucrado, String tipoCambio){
+        return "Se ha registrado la " + tipoCambio.toLowerCase() + " del involucrado N° " + involucrado.getId() + ". " +
+                "Detalles del involucrado: [" + involucrado.getDetallesInvolucrado() + "]. " +
+                "Relacionada con el " + involucrado.getExpediente().toString() + ", " +
+                "y perteneciente al miembro del consejo " + involucrado.getMiembro().toString() + ".";
     }
 
     // Metodos para filtrar los involucrados
