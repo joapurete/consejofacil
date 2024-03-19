@@ -6,6 +6,9 @@
     -fx-border-color: -borde-claro;
     -fx-border-width: 1;
 }
+.tabla-personalizada.tabla-chica{
+    -fx-font-size: 1.1em;
+}
 
 /* Columnas */
 .tabla-personalizada .table-column{

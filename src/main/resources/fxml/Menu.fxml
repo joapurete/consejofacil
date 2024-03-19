@@ -36,7 +36,8 @@
             <VBox prefWidth="300.0" styleClass="menu-items-container" AnchorPane.leftAnchor="0.0"
                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0">
                 <Line endX="250.0"/>
-                <HBox maxWidth="260.0" onMouseClicked="#modificarPerfil" prefWidth="260.0" spacing="10.0"
+                <HBox fx:id="hboxPerfil" focusTraversable="true" maxWidth="260.0"
+                      onMouseClicked="#modificarPerfil" prefWidth="260.0" spacing="10.0"
                       styleClass="menu-perfil-container">
                     <cursor>
                         <Cursor fx:constant="HAND"/>

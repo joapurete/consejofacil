@@ -30,13 +30,12 @@
                 <rowConstraints>
                     <RowConstraints maxHeight="34.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
-                <Label prefHeight="27.0" styleClass="label-formulario" text="Buscar asunto:"
-                       GridPane.halignment="CENTER"/>
+                <TextField fx:id="txtAsunto" onKeyReleased="#filtrarPorTexto" prefWidth="280.0"
+                           styleClass="text-field-personalizado" GridPane.columnIndex="1"/>
                 <DatePicker fx:id="dtpFechaReunion" editable="false" onAction="#filtrarPorFechaReunion"
-                            prefWidth="280.0" styleClass="datepicker-personalizado"
-                            GridPane.columnIndex="3"/>
-                <Button mnemonicParsing="false" onAction="#limpiarFiltros"
-                        text="Limpiar" GridPane.columnIndex="4" GridPane.halignment="CENTER">
+                            prefWidth="280.0" styleClass="datepicker-personalizado" GridPane.columnIndex="3"/>
+                <Button mnemonicParsing="false" onAction="#limpiarFiltros" text="Limpiar"
+                        GridPane.columnIndex="4" GridPane.halignment="CENTER">
                     <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                    preserveRatio="true">
@@ -48,10 +47,10 @@
                         <String fx:value="limpiar"/>
                     </styleClass>
                 </Button>
+                <Label prefHeight="27.0" styleClass="label-formulario"
+                       text="Buscar asunto:" GridPane.halignment="CENTER"/>
                 <Label prefHeight="27.0" styleClass="label-formulario" text="Fecha:"
                        GridPane.columnIndex="2"/>
-                <TextField fx:id="txtAsunto" onKeyReleased="#filtrarPorTexto" prefWidth="280.0"
-                           styleClass="text-field-personalizado" GridPane.columnIndex="1"/>
             </GridPane>
             <TableView fx:id="tblReuniones" editable="true" layoutX="26.0" layoutY="92.0" prefHeight="450.0"
                        prefWidth="903.0" styleClass="tabla-personalizada" tableMenuButtonVisible="true">
@@ -64,8 +63,8 @@
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                 </columnResizePolicy>
             </TableView>
-            <Button layoutX="23.0" layoutY="584.0" mnemonicParsing="false"
-                    onAction="#agregarReunion" styleClass="btn-personalizado" text="Agregar"/>
+            <Button layoutX="23.0" layoutY="584.0" mnemonicParsing="false" onAction="#agregarReunion"
+                    styleClass="btn-personalizado" text="Agregar"/>
         </VBox>
     </AnchorPane>
 </VBox>

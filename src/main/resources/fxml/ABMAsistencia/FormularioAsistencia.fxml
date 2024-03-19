@@ -40,24 +40,6 @@
                         <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="44.0"
                                         vgrow="SOMETIMES"/>
                     </rowConstraints>
-                    <Button mnemonicParsing="false" onAction="#seleccionarMiembro" GridPane.columnIndex="2"
-                            GridPane.rowIndex="1">
-                        <styleClass>
-                            <String fx:value="btn-personalizado"/>
-                            <String fx:value="buscar"/>
-                        </styleClass>
-                        <graphic>
-                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
-                                       preserveRatio="true">
-                                <Image url="@../../images/icons/buscar.png"/>
-                            </ImageView>
-                        </graphic>
-                    </Button>
-                    <ComboBox fx:id="cmbMiembro" editable="true" maxWidth="1.7976931348623157E308"
-                              prefHeight="31.0" styleClass="combo-personalizado" GridPane.columnIndex="1"
-                              GridPane.rowIndex="1"/>
-                    <Label styleClass="label-formulario" text="Reunión:"/>
-                    <Label styleClass="label-formulario" text="Miembro:" GridPane.rowIndex="1"/>
                     <ComboBox fx:id="cmbReunion" editable="true" maxWidth="1.7976931348623157E308"
                               prefHeight="31.0" styleClass="combo-personalizado" GridPane.columnIndex="1"/>
                     <Button mnemonicParsing="false" onAction="#seleccionarReunion" GridPane.columnIndex="2">
@@ -72,10 +54,30 @@
                             <String fx:value="buscar"/>
                         </styleClass>
                     </Button>
-                    <Label styleClass="label-formulario" text="Estado:" GridPane.rowIndex="2"/>
+                    <ComboBox fx:id="cmbMiembro" editable="true" maxWidth="1.7976931348623157E308"
+                              prefHeight="31.0" styleClass="combo-personalizado" GridPane.columnIndex="1"
+                              GridPane.rowIndex="1"/>
+                    <Button mnemonicParsing="false" onAction="#seleccionarMiembro" GridPane.columnIndex="2"
+                            GridPane.rowIndex="1">
+                        <styleClass>
+                            <String fx:value="btn-personalizado"/>
+                            <String fx:value="buscar"/>
+                        </styleClass>
+                        <graphic>
+                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                       preserveRatio="true">
+                                <Image url="@../../images/icons/buscar.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
                     <ComboBox fx:id="cmbEstado" maxWidth="1.7976931348623157E308" prefHeight="31.0"
                               styleClass="combo-personalizado" GridPane.columnIndex="1"
                               GridPane.rowIndex="2"/>
+                    <Label styleClass="label-formulario" text="Reunión:"/>
+                    <Label styleClass="label-formulario" text="Miembro:"
+                           GridPane.rowIndex="1"/>
+                    <Label styleClass="label-formulario" text="Estado:"
+                           GridPane.rowIndex="2"/>
                 </GridPane>
                 <GridPane>
                     <columnConstraints>

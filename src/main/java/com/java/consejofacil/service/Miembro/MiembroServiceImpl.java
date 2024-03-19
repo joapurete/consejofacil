@@ -60,4 +60,7 @@ public class MiembroServiceImpl implements MiembroService, CrudService<Miembro> 
     @Override
     @Transactional
     public int cambiarContrasena(String clave, int dni_miembro){ return repository.cambiarContrasena(clave, dni_miembro); }
+
+    @Override
+    public List<Object[]> contarCantidadMiembrosPorEstado() { return repository.contarCantidadMiembrosPorEstado(); }
 }

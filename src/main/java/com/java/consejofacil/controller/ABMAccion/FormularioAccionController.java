@@ -73,7 +73,7 @@ public class FormularioAccionController implements Initializable {
     }
 
     @FXML
-    private void seleccionarExpediente() throws Exception { accionManager.seleccionarExpediente(cmbExpediente); }
+    private void seleccionarExpediente() { accionManager.seleccionarExpediente(cmbExpediente); }
 
     public void establecerAccion(Accion a) {
         // Establecemos accion

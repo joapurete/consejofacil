@@ -38,7 +38,8 @@
                 <rowConstraints>
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
-                <Label prefHeight="27.0" styleClass="label-formulario" text="Expediente:"/>
+                <Label prefHeight="27.0" styleClass="label-formulario"
+                       text="Expediente:"/>
                 <ComboBox fx:id="cmbExpediente" editable="true" maxWidth="1.7976931348623157E308"
                           onAction="#buscarInvolucradosPorExpediente" prefHeight="154.0"
                           styleClass="combo-personalizado" GridPane.columnIndex="1"/>
@@ -81,19 +82,16 @@
                     <RowConstraints maxHeight="34.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                     <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
-                <Label prefHeight="27.0" styleClass="label-formulario" text="Buscar nombre:"
-                       GridPane.halignment="CENTER"/>
-                <Label styleClass="label-formulario" text="Cargo:" GridPane.columnIndex="2"
-                       GridPane.halignment="CENTER"/>
+                <TextField fx:id="txtNombre" onKeyReleased="#filtrarPorNombre" promptText="..."
+                           styleClass="text-field-personalizado" GridPane.columnIndex="1"/>
                 <ComboBox fx:id="cmbCargo" maxWidth="1.7976931348623157E308" onAction="#filtrarPorCargo"
                           prefHeight="154.0" styleClass="combo-personalizado" GridPane.columnIndex="3"/>
-                <Label styleClass="label-formulario" text="Estado:" GridPane.columnIndex="2"
-                       GridPane.halignment="CENTER" GridPane.rowIndex="1"/>
+                <TextField fx:id="txtDetalles" onKeyReleased="#filtrarPorDetalles" promptText="..."
+                           styleClass="text-field-personalizado" GridPane.columnIndex="1"
+                           GridPane.rowIndex="1"/>
                 <ComboBox fx:id="cmbEstado" maxWidth="1.7976931348623157E308" onAction="#filtrarPorEstado"
                           prefHeight="31.0" styleClass="combo-personalizado" GridPane.columnIndex="3"
                           GridPane.rowIndex="1"/>
-                <TextField fx:id="txtNombre" onKeyReleased="#filtrarPorNombre" promptText="..."
-                           styleClass="text-field-personalizado" GridPane.columnIndex="1"/>
                 <Button mnemonicParsing="false" onAction="#limpiarFiltros" text="Limpiar"
                         GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                     <graphic>
@@ -107,10 +105,14 @@
                         <String fx:value="limpiar"/>
                     </styleClass>
                 </Button>
-                <Label styleClass="label-formulario" text="Buscar detalles:" GridPane.rowIndex="1"/>
-                <TextField fx:id="txtDetalles" onKeyReleased="#filtrarPorDetalles" promptText="..."
-                           styleClass="text-field-personalizado" GridPane.columnIndex="1"
-                           GridPane.rowIndex="1"/>
+                <Label prefHeight="27.0" styleClass="label-formulario"
+                       text="Buscar nombre:" GridPane.halignment="CENTER"/>
+                <Label styleClass="label-formulario" text="Cargo:"
+                       GridPane.columnIndex="2" GridPane.halignment="CENTER"/>
+                <Label styleClass="label-formulario" text="Estado:"
+                       GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1"/>
+                <Label styleClass="label-formulario" text="Buscar detalles:"
+                       GridPane.rowIndex="1"/>
             </GridPane>
             <TableView fx:id="tblInvolucrados" editable="true" layoutX="26.0" layoutY="92.0" prefHeight="380.0"
                        prefWidth="903.0" styleClass="tabla-personalizada" tableMenuButtonVisible="true">

@@ -38,24 +38,6 @@
                         <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="44.0"
                                         vgrow="SOMETIMES"/>
                     </rowConstraints>
-                    <Button mnemonicParsing="false" onAction="#seleccionarInvolucrado"
-                            GridPane.columnIndex="2" GridPane.rowIndex="1">
-                        <styleClass>
-                            <String fx:value="btn-personalizado"/>
-                            <String fx:value="buscar"/>
-                        </styleClass>
-                        <graphic>
-                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
-                                       preserveRatio="true">
-                                <Image url="@../../images/icons/buscar.png"/>
-                            </ImageView>
-                        </graphic>
-                    </Button>
-                    <ComboBox fx:id="cmbInvolucrado" editable="true" maxWidth="1.7976931348623157E308"
-                              prefHeight="31.0" styleClass="combo-personalizado" GridPane.columnIndex="1"
-                              GridPane.rowIndex="1"/>
-                    <Label styleClass="label-formulario" text="Expediente:"/>
-                    <Label styleClass="label-formulario" text="Involucrado:" GridPane.rowIndex="1"/>
                     <ComboBox fx:id="cmbExpediente" editable="true" maxWidth="1.7976931348623157E308"
                               prefHeight="31.0" styleClass="combo-personalizado" GridPane.columnIndex="1"/>
                     <Button mnemonicParsing="false" onAction="#seleccionarExpediente"
@@ -71,9 +53,29 @@
                             <String fx:value="buscar"/>
                         </styleClass>
                     </Button>
+                    <ComboBox fx:id="cmbInvolucrado" editable="true" maxWidth="1.7976931348623157E308"
+                              prefHeight="31.0" styleClass="combo-personalizado" GridPane.columnIndex="1"
+                              GridPane.rowIndex="1"/>
+                    <Button mnemonicParsing="false" onAction="#seleccionarInvolucrado"
+                            GridPane.columnIndex="2" GridPane.rowIndex="1">
+                        <styleClass>
+                            <String fx:value="btn-personalizado"/>
+                            <String fx:value="buscar"/>
+                        </styleClass>
+                        <graphic>
+                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                       preserveRatio="true">
+                                <Image url="@../../images/icons/buscar.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Label styleClass="label-formulario" text="Expediente:"/>
+                    <Label styleClass="label-formulario" text="Involucrado:"
+                           GridPane.rowIndex="1"/>
                 </GridPane>
                 <VBox spacing="10.0">
-                    <Label styleClass="label-formulario" text="Detalles Involucrado:"/>
+                    <Label styleClass="label-formulario"
+                           text="Detalles Involucrado:"/>
                     <TextArea fx:id="txtDetallesInvolucrado" prefHeight="300.0" prefWidth="200.0"
                               promptText="Opcional" styleClass="text-area-personalizado"/>
                 </VBox>

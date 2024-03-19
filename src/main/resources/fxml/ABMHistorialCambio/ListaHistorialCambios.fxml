@@ -26,7 +26,6 @@
             <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" spacing="20.0"
                   styleClass="titulo-principal-container" AnchorPane.leftAnchor="20.0"
                   AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
-
                 <Line endX="100.0" startX="-100.0"/>
                 <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titulo-principal"
                       text="Historial de Cambios"/>
@@ -45,12 +44,12 @@
                     <RowConstraints maxHeight="34.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                     <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
-                <Label prefHeight="27.0" styleClass="label-formulario" GridPane.halignment="CENTER"/>
-                <Label styleClass="label-formulario" text="Responsable:" GridPane.columnIndex="2"
-                       GridPane.halignment="CENTER"/>
+                <DatePicker fx:id="dtpFechaCambio" editable="false" maxWidth="1.7976931348623157E308"
+                            onAction="#filtrarPorFechaCambio" styleClass="datepicker-personalizado"
+                            GridPane.columnIndex="1"/>
                 <ComboBox fx:id="cmbResponsable" editable="true" maxWidth="1.7976931348623157E308"
-                          onAction="#filtrarPorResponsable" prefHeight="154.0"
-                          styleClass="combo-personalizado" GridPane.columnIndex="3"/>
+                          onAction="#filtrarPorResponsable" prefHeight="154.0" styleClass="combo-personalizado"
+                          GridPane.columnIndex="3"/>
                 <Button mnemonicParsing="false" onAction="#seleccionarResponsable" GridPane.columnIndex="4">
                     <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
@@ -63,13 +62,6 @@
                         <String fx:value="buscar"/>
                     </styleClass>
                 </Button>
-                <Label styleClass="label-formulario" text="Tipo:" GridPane.halignment="CENTER"
-                       GridPane.rowIndex="1"/>
-                <DatePicker fx:id="dtpFechaCambio" editable="false" maxWidth="1.7976931348623157E308"
-                            onAction="#filtrarPorFechaCambio" styleClass="datepicker-personalizado"
-                            GridPane.columnIndex="1"/>
-                <Label styleClass="label-formulario" text="Buscar detalles:" GridPane.columnIndex="2"
-                       GridPane.halignment="CENTER" GridPane.rowIndex="1"/>
                 <ComboBox fx:id="cmbTipo" maxWidth="1.7976931348623157E308" onAction="#filtrarPorTipo"
                           prefHeight="31.0" styleClass="combo-personalizado" GridPane.columnIndex="1"
                           GridPane.rowIndex="1"/>
@@ -89,6 +81,12 @@
                         <String fx:value="limpiar"/>
                     </styleClass>
                 </Button>
+                <Label styleClass="label-formulario" text="Responsable:"
+                       GridPane.columnIndex="2" GridPane.halignment="CENTER"/>
+                <Label styleClass="label-formulario" text="Tipo:"
+                       GridPane.halignment="CENTER" GridPane.rowIndex="1"/>
+                <Label styleClass="label-formulario" text="Buscar detalles:"
+                       GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1"/>
                 <Label styleClass="label-formulario" text="Fecha cambio:"/>
             </GridPane>
             <TableView fx:id="tblCambios" editable="true" layoutX="10.0" layoutY="160.0" prefHeight="428.0"
@@ -107,11 +105,10 @@
                 </columnResizePolicy>
             </TableView>
             <VBox layoutX="20.0" layoutY="667.0" spacing="10.0">
-                <HBox spacing="10.0" styleClass="center-acciones-container"
-                      AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0">
-                    <Button layoutX="43.0" layoutY="673.0" mnemonicParsing="false"
-                            onAction="#agregarCambio" stylesheets="@../../styles/_styles.css"
-                            text="Agregar">
+                <HBox spacing="10.0" styleClass="center-acciones-container" AnchorPane.bottomAnchor="20.0"
+                      AnchorPane.leftAnchor="20.0">
+                    <Button layoutX="43.0" layoutY="673.0" mnemonicParsing="false" onAction="#agregarCambio"
+                            stylesheets="@../../styles/_styles.css" text="Agregar">
                         <graphic>
                             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                        preserveRatio="true">

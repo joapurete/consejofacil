@@ -33,7 +33,7 @@ public class MainLayoutController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         // Establecemos la vista central inicial
         if (bpMainLayout.getCenter() == null) {
-            viewCentro = FXMLView.ListaExpedientes;
+            viewCentro = FXMLView.Inicio;
             Node centroInicial = stageManager.loadView(viewCentro.getFxmlFile());
             bpMainLayout.setCenter(centroInicial);
         }
@@ -47,9 +47,6 @@ public class MainLayoutController implements Initializable {
         Node centroActual = bpMainLayout.getCenter();
         // Obtenemos el nodo raiz del nuevo centro a colocar en el contenedor
         Node nuevoCentro = stageManager.loadView(view.getFxmlFile());
-
-
-        System.out.println(viewCentro.getTitle());
 
         // Cambiamos el título de la ventana principal
         stageManager.setTitle(view.getTitle());

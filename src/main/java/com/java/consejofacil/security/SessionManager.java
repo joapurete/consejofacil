@@ -83,6 +83,10 @@ public class SessionManager {
         return validarSesion() && getUsuario().equals(miembro);
     }
 
+    public boolean tieneCargoMiembro(){
+        return validarSesion() && getUsuario().getCargo().getCargo().equals("Miembro del Consejo")
+        && getUsuario().getCargo().getPrioridad() <= 1;
+    }
 
     public void validarAccesoMiembro() {
         // Verificamos si está en sesion y está activo en el sistema
@@ -91,10 +95,10 @@ public class SessionManager {
 
                 // Verificamos si se encuentra dentro de una de las vistas para gestionar los miembros y si tiene la prioridad necesaria
                 if (mainLayoutControlador.getViewCentro().getTitle().contains("Miembro") &&
-                        getUsuario().getCargo().getPrioridad() <= 1) {
+                        tieneCargoMiembro()) {
 
                     // Cambiamos de centro
-                    mainLayoutControlador.cambiarCentro(FXMLView.ListaExpedientes);
+                    mainLayoutControlador.cambiarCentro(FXMLView.Inicio);
                 }
 
             } else {

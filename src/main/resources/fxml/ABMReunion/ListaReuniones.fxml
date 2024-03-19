@@ -26,7 +26,6 @@
             <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" spacing="20.0"
                   styleClass="titulo-principal-container" AnchorPane.leftAnchor="20.0"
                   AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
-
                 <Line endX="100.0" startX="-100.0"/>
                 <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titulo-principal"
                       text="Lista de Reuniones"/>
@@ -44,8 +43,8 @@
                 <rowConstraints>
                     <RowConstraints maxHeight="34.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
-                <Label prefHeight="27.0" styleClass="label-formulario" text="Buscar asunto:"
-                       GridPane.halignment="CENTER"/>
+                <TextField fx:id="txtAsunto" onKeyReleased="#filtrarPorAsunto"
+                           styleClass="text-field-personalizado" GridPane.columnIndex="1"/>
                 <DatePicker fx:id="dtpFechaReunion" editable="false" onAction="#filtrarPorFechaReunion"
                             prefWidth="274.0" styleClass="datepicker-personalizado" GridPane.columnIndex="3"/>
                 <Button mnemonicParsing="false" onAction="#limpiarFiltros" text="Limpiar"
@@ -61,9 +60,10 @@
                         <String fx:value="limpiar"/>
                     </styleClass>
                 </Button>
-                <Label prefHeight="27.0" styleClass="label-formulario" text="Fecha:" GridPane.columnIndex="2"/>
-                <TextField fx:id="txtAsunto" onKeyReleased="#filtrarPorAsunto"
-                           styleClass="text-field-personalizado" GridPane.columnIndex="1"/>
+                <Label prefHeight="27.0" styleClass="label-formulario"
+                       text="Buscar asunto:" GridPane.halignment="CENTER"/>
+                <Label prefHeight="27.0" styleClass="label-formulario" text="Fecha:"
+                       GridPane.columnIndex="2"/>
             </GridPane>
             <TableView fx:id="tblReuniones" editable="true" layoutX="10.0" layoutY="160.0" prefHeight="488.0"
                        styleClass="tabla-personalizada" stylesheets="@../../styles/_styles.css"

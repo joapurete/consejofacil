@@ -7,13 +7,16 @@ import com.java.consejofacil.model.Cargo;
 import com.java.consejofacil.model.Miembro;
 import com.java.consejofacil.security.SessionManager;
 import com.java.consejofacil.view.FXMLView;
-import javafx.event.ActionEvent;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
@@ -35,8 +38,11 @@ public class MenuController implements Initializable {
 
     // Botones del menu lateral
     @FXML
+    @Getter
     private Button btnInicio, btnExpedientes, btnReuniones, btnInvolucrados, btnAcciones, btnMinutas, btnMiembros,
             btnAsistencias, btnRevisiones, btnHistorialCambios;
+    @FXML
+    private HBox hboxPerfil;
 
     // Controladores de los fxml
     @Autowired
@@ -68,30 +74,38 @@ public class MenuController implements Initializable {
 
         // Actualizamos la información del usuario
         actualizarMenu();
+
+        // Establecemos un handler cuando se presiona Enter en el Vbox del perfil
+        // Establecemos foco en boton de inicio
+        hboxPerfil.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                // Llamar a la función que deseas ejecutar aquí
+                modificarPerfil();
+            }
+        });
+        Platform.runLater(() -> btnInicio.requestFocus());
+
     }
 
     // Listeners de los items del menu
 
     private void addListeners() {
         // Establecemos los handlers correspondientes a cada boton
-        btnInicio.setOnAction(event -> onMenuItemSelected(FXMLView.Inicio, event));
-        btnExpedientes.setOnAction(event -> onMenuItemSelected(FXMLView.ListaExpedientes, event));
-        btnReuniones.setOnAction(event -> onMenuItemSelected(FXMLView.ListaReuniones, event));
-        btnMiembros.setOnAction(event -> onMenuItemSelected(FXMLView.ListaMiembros, event));
-        btnAcciones.setOnAction(event -> onMenuItemSelected(FXMLView.ListaAcciones, event));
-        btnMinutas.setOnAction(event -> onMenuItemSelected(FXMLView.ListaMinutas, event));
-        btnInvolucrados.setOnAction(event -> onMenuItemSelected(FXMLView.ListaInvolucrados, event));
-        btnAsistencias.setOnAction(event -> onMenuItemSelected(FXMLView.ListaAsistencias, event));
-        btnRevisiones.setOnAction(event -> onMenuItemSelected(FXMLView.ListaRevisiones, event));
-        btnHistorialCambios.setOnAction(event -> onMenuItemSelected(FXMLView.ListaHistorialCambios, event));
+        btnInicio.setOnAction(event -> redireccionarMenu(FXMLView.Inicio, (Button) event.getSource()));
+        btnExpedientes.setOnAction(event -> redireccionarMenu(FXMLView.ListaExpedientes, (Button) event.getSource()));
+        btnReuniones.setOnAction(event -> redireccionarMenu(FXMLView.ListaReuniones, (Button) event.getSource()));
+        btnMiembros.setOnAction(event -> redireccionarMenu(FXMLView.ListaMiembros, (Button) event.getSource()));
+        btnAcciones.setOnAction(event -> redireccionarMenu(FXMLView.ListaAcciones, (Button) event.getSource()));
+        btnMinutas.setOnAction(event -> redireccionarMenu(FXMLView.ListaMinutas, (Button) event.getSource()));
+        btnInvolucrados.setOnAction(event -> redireccionarMenu(FXMLView.ListaInvolucrados, (Button) event.getSource()));
+        btnAsistencias.setOnAction(event -> redireccionarMenu(FXMLView.ListaAsistencias, (Button) event.getSource()));
+        btnRevisiones.setOnAction(event -> redireccionarMenu(FXMLView.ListaRevisiones, (Button) event.getSource()));
+        btnHistorialCambios.setOnAction(event -> redireccionarMenu(FXMLView.ListaHistorialCambios, (Button) event.getSource()));
     }
 
     // Meotodo para cambiar el contenido central del main
 
-    private void onMenuItemSelected(FXMLView view, ActionEvent event) {
-        // Obtenemos el boton que disparo el evento
-        Button btn = (Button) event.getSource();
-
+    public void redireccionarMenu(FXMLView view, Button btn) {
         // Verificamos si el boton no tiene la clase actual, lo que significa que no está actualmente seleccionado
         if (!btn.getStyleClass().contains("actual")) {
             // Itera sobre la lista de items y remueve la clase actual de cada boton, si la tienen

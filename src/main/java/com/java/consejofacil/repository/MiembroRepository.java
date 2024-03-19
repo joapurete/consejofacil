@@ -24,4 +24,8 @@ public interface MiembroRepository extends JpaRepository<Miembro, Integer> {
     @Query(value = "UPDATE public.miembros SET clave = :clave " +
             "WHERE dni_miembro = :dni_miembro", nativeQuery = true)
     int cambiarContrasena(@Param("clave") String clave, @Param("dni_miembro") int dni_miembro);
+
+    @Query(value = "SELECT e.estado_miembro, COUNT(m.*) FROM public.miembros m RIGHT JOIN public.estados_miembros e " +
+            "on e.id_estado_miembro = m.id_estado_miembro GROUP BY e.estado_miembro", nativeQuery = true)
+    List<Object[]> contarCantidadMiembrosPorEstado();
 }

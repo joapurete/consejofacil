@@ -72,47 +72,47 @@
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                         </rowConstraints>
-                        <Label styleClass="label-formulario" text="DNI:"/>
-                        <Label styleClass="label-formulario" text="Teléfono:" GridPane.rowIndex="2"/>
-                        <DatePicker fx:id="dtpFechaNac" editable="false"
-                                    maxWidth="1.7976931348623157E308" promptText="Opcional"
-                                    styleClass="datepicker-personalizado" GridPane.columnIndex="3"
-                                    GridPane.rowIndex="1"/>
-                        <Label styleClass="label-formulario" text="Apellido/s:" GridPane.rowIndex="1"/>
-                        <Label fx:id="lblCargo" styleClass="label-formulario" text="Cargo:"
-                               GridPane.rowIndex="4"/>
                         <TextField fx:id="txtDni" styleClass="text-field-personalizado"
                                    GridPane.columnIndex="1"/>
                         <TextField fx:id="txtNombre" styleClass="text-field-personalizado"
                                    GridPane.columnIndex="3"/>
-                        <Label prefHeight="21.0" styleClass="label-formulario" text="Nombre/s:"
-                               GridPane.columnIndex="2"/>
-                        <Label styleClass="label-formulario" text="Fecha de Nac:"
-                               GridPane.columnIndex="2" GridPane.rowIndex="1"/>
                         <TextField fx:id="txtApellido" styleClass="text-field-personalizado"
                                    GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                        <Label styleClass="label-formulario" text="Dirección:" GridPane.columnIndex="2"
-                               GridPane.rowIndex="2"/>
-                        <Label fx:id="lblContrasena" styleClass="label-formulario" text="Contraseña:"
-                               GridPane.columnIndex="2" GridPane.rowIndex="3"/>
-                        <PasswordField fx:id="txtContrasena" styleClass="password-field-personalizado"
-                                       GridPane.columnIndex="3" GridPane.rowIndex="3"/>
+                        <DatePicker fx:id="dtpFechaNac" editable="false"
+                                    maxWidth="1.7976931348623157E308" promptText="Opcional"
+                                    styleClass="datepicker-personalizado" GridPane.columnIndex="3"
+                                    GridPane.rowIndex="1"/>
+                        <TextField fx:id="txtTelefono" promptText="Opcional"
+                                   styleClass="text-field-personalizado" GridPane.columnIndex="1"
+                                   GridPane.rowIndex="2"/>
                         <TextField fx:id="txtDireccion" promptText="Opcional"
                                    styleClass="text-field-personalizado" GridPane.columnIndex="3"
                                    GridPane.rowIndex="2"/>
                         <TextField fx:id="txtCorreo" promptText="Opcional"
                                    styleClass="text-field-personalizado" GridPane.columnIndex="1"
                                    GridPane.rowIndex="3"/>
-                        <TextField fx:id="txtTelefono" promptText="Opcional"
-                                   styleClass="text-field-personalizado" GridPane.columnIndex="1"
-                                   GridPane.rowIndex="2"/>
-                        <Label styleClass="label-formulario" text="Correo:" GridPane.rowIndex="3"/>
+                        <PasswordField fx:id="txtContrasena" styleClass="password-field-personalizado"
+                                       GridPane.columnIndex="3" GridPane.rowIndex="3"/>
                         <ComboBox fx:id="cmbCargo" maxWidth="1.7976931348623157E308"
                                   styleClass="combo-personalizado" GridPane.columnIndex="1"
                                   GridPane.rowIndex="4"/>
                         <ComboBox fx:id="cmbEstado" maxWidth="1.7976931348623157E308"
                                   styleClass="combo-personalizado" GridPane.columnIndex="3"
                                   GridPane.rowIndex="4"/>
+                        <Label styleClass="label-formulario" text="DNI:"/>
+                        <Label styleClass="label-formulario" text="Teléfono:" GridPane.rowIndex="2"/>
+                        <Label styleClass="label-formulario" text="Apellido/s:" GridPane.rowIndex="1"/>
+                        <Label fx:id="lblCargo" styleClass="label-formulario" text="Cargo:"
+                               GridPane.rowIndex="4"/>
+                        <Label prefHeight="21.0" styleClass="label-formulario" text="Nombre/s:"
+                               GridPane.columnIndex="2"/>
+                        <Label styleClass="label-formulario" text="Fecha de Nac:"
+                               GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                        <Label styleClass="label-formulario" text="Dirección:" GridPane.columnIndex="2"
+                               GridPane.rowIndex="2"/>
+                        <Label fx:id="lblContrasena" styleClass="label-formulario" text="Contraseña:"
+                               GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+                        <Label styleClass="label-formulario" text="Correo:" GridPane.rowIndex="3"/>
                         <Label fx:id="lblEstado" styleClass="label-formulario" text="Estado:"
                                GridPane.columnIndex="2" GridPane.rowIndex="4"/>
                     </GridPane>

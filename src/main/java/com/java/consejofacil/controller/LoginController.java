@@ -58,10 +58,12 @@ public class LoginController implements Initializable {
 
         // Cargar las credenciales si existen
         securityConfig.autocargarCredenciales(txtDni, txtContrasena);
+
+        txtDni.requestFocus();
     }
 
     @FXML
-    void iniciarSesion() {
+    private void iniciarSesion() {
 
         if (validarCamposFormulario()) {
 
@@ -83,7 +85,7 @@ public class LoginController implements Initializable {
     }
 
     @FXML
-    void crearCuenta() {
+    private void crearCuenta() {
         miembroManager.cargarFormulario(null, this);
     }
 

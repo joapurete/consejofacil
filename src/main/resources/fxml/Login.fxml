@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.*?>
 <?import java.net.*?>
 <?import javafx.geometry.*?>
@@ -23,7 +22,7 @@
             <VBox.margin>
                 <Insets bottom="20.0"/>
             </VBox.margin>
-            <Image url="@../images/logo.png"/>
+            <Image url="@../images/logo2.png"/>
         </ImageView>
         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Consejo Fácil"/>
     </VBox>
@@ -58,28 +57,35 @@
                                         vgrow="SOMETIMES"/>
                         <RowConstraints maxHeight="-Infinity" minHeight="10.0" vgrow="SOMETIMES"/>
                     </rowConstraints>
-                    <Label styleClass="label-formulario" text="Contraseña:" GridPane.rowIndex="1"/>
-                    <Label styleClass="label-formulario" text="DNI:"/>
-                    <Button mnemonicParsing="false" onAction="#iniciarSesion"
-                            styleClass="btn-personalizado" stylesheets="@../styles/_styles.css"
-                            text="Entrar" GridPane.rowIndex="4"/>
-                    <PasswordField fx:id="txtContrasena" styleClass="password-field-personalizado"
-                                   GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                    <Button mnemonicParsing="false" onAction="#crearCuenta"
-                            styleClass="btn-personalizado" stylesheets="@../styles/_styles.css"
-                            text="Crear cuenta" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-                    <Text onMouseClicked="#olvidasteContrasena" strokeType="OUTSIDE" strokeWidth="0.0"
-                          text="¿Te olvidaste la contraseña?" GridPane.columnIndex="1"
-                          GridPane.halignment="RIGHT" GridPane.rowIndex="2">
-                        <cursor>
-                            <Cursor fx:constant="HAND"/>
-                        </cursor>
-                    </Text>
-                    <CheckBox fx:id="checkRecordar" mnemonicParsing="false"
-                              styleClass="check-box-personalizado" text="Recordar"
-                              GridPane.rowIndex="2"/>
                     <TextField fx:id="txtDni" styleClass="text-field-personalizado"
                                GridPane.columnIndex="1"/>
+                    <PasswordField fx:id="txtContrasena" styleClass="password-field-personalizado"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <CheckBox fx:id="checkRecordar" mnemonicParsing="false"
+                              styleClass="check-box-personalizado" text="Recordar" GridPane.rowIndex="2"/>
+                    <Button fx:id="btnOlvidasteContrasena" alignment="CENTER_RIGHT" contentDisplay="RIGHT"
+                            maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="link"
+                            textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.halignment="RIGHT"
+                            GridPane.rowIndex="2">
+                        <graphic>
+                            <Text onMouseClicked="#olvidasteContrasena" strokeType="OUTSIDE"
+                                  strokeWidth="0.0" text="¿Te olvidaste la contraseña?"
+                                  textAlignment="RIGHT">
+                                <cursor>
+                                    <Cursor fx:constant="HAND"/>
+                                </cursor>
+                            </Text>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="btnEntrar" mnemonicParsing="false" onAction="#iniciarSesion"
+                            styleClass="btn-personalizado" stylesheets="@../styles/_styles.css"
+                            text="Entrar" GridPane.rowIndex="4"/>
+                    <Button fx:id="btnCrearCuenta" mnemonicParsing="false" onAction="#crearCuenta"
+                            styleClass="btn-personalizado" stylesheets="@../styles/_styles.css"
+                            text="Crear cuenta" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                    <Label styleClass="label-formulario" text="DNI:"/>
+                    <Label styleClass="label-formulario" text="Contraseña:"
+                           GridPane.rowIndex="1"/>
                 </GridPane>
             </VBox>
         </AnchorPane>

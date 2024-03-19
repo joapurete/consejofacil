@@ -50,4 +50,13 @@ public class ReunionServiceImpl implements ReunionService, CrudService<Reunion> 
     public List<Reunion> encontrarReunionesHastaHoy() {
         return repository.encontrarReunionesHastaHoy();
     }
+
+    @Override
+    public List<Reunion> encontrarProximasReuniones(int limite) { return repository.encontrarProximasReuniones(limite); }
+
+    @Override
+    public List<Reunion> encontrarUltimasReuniones(int limite) { return repository.encontrarUltimasReuniones(limite); }
+
+    @Override
+    public List<Object[]> contarCantidadRevAsisMinPorExpediente(int limite) { return repository.contarCantidadRevAsisMinPorExpediente(limite); }
 }

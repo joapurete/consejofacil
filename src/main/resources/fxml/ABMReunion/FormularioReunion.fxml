@@ -36,13 +36,14 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                     </rowConstraints>
-                    <Label styleClass="label-formulario" text="Asunto:"/>
+                    <TextField fx:id="txtAsunto" styleClass="text-field-personalizado"
+                               GridPane.columnIndex="1"/>
                     <DatePicker fx:id="dtpFechaReunion" editable="false" maxWidth="1.7976931348623157E308"
                                 styleClass="datepicker-personalizado" GridPane.columnIndex="1"
                                 GridPane.rowIndex="1"/>
-                    <Label styleClass="label-formulario" text="Fecha Reunión:" GridPane.rowIndex="1"/>
-                    <TextField fx:id="txtAsunto" styleClass="text-field-personalizado"
-                               GridPane.columnIndex="1"/>
+                    <Label styleClass="label-formulario" text="Asunto:"/>
+                    <Label styleClass="label-formulario" text="Fecha Reunión:"
+                           GridPane.rowIndex="1"/>
                 </GridPane>
                 <GridPane>
                     <columnConstraints>

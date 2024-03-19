@@ -52,4 +52,13 @@ public class ExpedienteServiceImpl implements ExpedienteService, CrudService<Exp
     public List<Expediente> encontrarExpedientesAbiertos() {
         return repository.findByestadoExpediente_estadoExpediente("Abierto");
     }
+
+    @Override
+    public List<Object[]> contarCantidadExpedientesPorEstado() { return repository.contarCantidadExpedientesPorEstado(); }
+
+    @Override
+    public List<Expediente> encontrarUltimosExpedientes(int limite) { return repository.encontrarUltimosExpedientes(limite); }
+
+    @Override
+    public List<Object[]> contarCantidadInvAccPorExpediente(int limite) { return repository.contarCantidadInvAccPorExpediente(limite); }
 }

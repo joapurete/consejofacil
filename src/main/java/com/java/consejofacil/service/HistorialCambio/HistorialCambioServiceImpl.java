@@ -47,4 +47,7 @@ public class HistorialCambioServiceImpl implements HistorialCambioService, CrudS
     public List<HistorialCambio> findAll() {
         return repository.findAll();
     }
+
+    @Override
+    public List<HistorialCambio> encontrarUltimosCambios(int limite) { return repository.encontrarUltimosCambios(limite); }
 }

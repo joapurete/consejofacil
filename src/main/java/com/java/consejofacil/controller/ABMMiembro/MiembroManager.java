@@ -290,7 +290,7 @@ public class MiembroManager {
             cargoSeleccionado = abmMiembroControlador.getCargos().getFirst();
             estadoMiembroSeleccionado = abmMiembroControlador.getEstadosMiembros().getLast();
         } else {
-            if (tieneCargoMiembro()) {
+            if (sessionManager.tieneCargoMiembro()) {
                 cargoSeleccionado = sessionManager.getUsuario().getCargo();
                 estadoMiembroSeleccionado = sessionManager.getUsuario().getEstadoMiembro();
             } else {
@@ -599,7 +599,7 @@ public class MiembroManager {
         }
 
         // Si el usuario no está en sesion o es un miembro del consejo, desactivamos los cargos y estados
-        if (!sessionManager.validarSesion() || tieneCargoMiembro()) {
+        if (!sessionManager.validarSesion() || sessionManager.tieneCargoMiembro()) {
             abmMiembroControlador.getCmbCargo().setDisable(true);
             abmMiembroControlador.getCmbCargo().setVisible(false);
             abmMiembroControlador.getLblCargo().setVisible(false);
@@ -611,11 +611,6 @@ public class MiembroManager {
     }
 
     // Metdodos para validar los campos del formulario
-
-    public boolean tieneCargoMiembro() {
-        return sessionManager.validarSesion() &&
-                sessionManager.getUsuario().getCargo().getCargo().equals("Miembro del Consejo");
-    }
 
     public boolean validarCamposFormulario(Object controlador) {
         ArrayList<String> errores = new ArrayList<>();

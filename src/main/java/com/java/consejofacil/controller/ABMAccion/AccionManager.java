@@ -174,7 +174,7 @@ public class AccionManager {
 
     // Metodos para agregar, modificar y eliminar acciones
 
-    public Accion obtenerDatosFormulario(){
+    public Accion obtenerDatosFormulario() {
         // Obtenemos la información en los campos
         String detallesAccion = abmAccionControlador.getTxtDetallesAccion().getText().trim();
         LocalDate fechaAccion = abmAccionControlador.getDtpFechaAccion().getValue();
@@ -280,7 +280,7 @@ public class AccionManager {
 
     // Metodo para construir texto para los detalles del cambio realizado
 
-    public String obtenerDetallesCambioAccion(Accion accion, String tipoCambio){
+    public String obtenerDetallesCambioAccion(Accion accion, String tipoCambio) {
         return "Se ha registrado la " + tipoCambio.toLowerCase() + " de la acción N° " + accion.getId() + ". " +
                 "Detalles de la acción: [" + accion.getDetallesAccion() + "]. " +
                 "Fecha de la acción: " + DateFormatterHelper.formatearFechaSimple(accion.getFechaAccion()) + ". " +
@@ -388,7 +388,7 @@ public class AccionManager {
 
     // Metodos para limpiar campos
 
-    public void limpiarFiltros(){
+    public void limpiarFiltros() {
         // Guardamos los eventos de los filtros
         EventHandler<ActionEvent> handlerExpediente = listaAccionesControlador.getCmbExpediente().getOnAction();
         EventHandler<ActionEvent> handlerFechaAccion = listaAccionesControlador.getDtpFechaAccion().getOnAction();
@@ -419,7 +419,7 @@ public class AccionManager {
 
     // Metodos para interactuar con los selectores
 
-    public void seleccionarExpediente(ComboBox<Expediente> combo) throws Exception {
+    public void seleccionarExpediente(ComboBox<Expediente> combo) {
         selectorControlador.seleccionarExpediente(combo);
     }
 

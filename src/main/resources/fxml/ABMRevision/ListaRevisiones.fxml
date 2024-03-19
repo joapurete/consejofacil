@@ -26,11 +26,11 @@
             <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" spacing="20.0"
                   styleClass="titulo-principal-container" AnchorPane.leftAnchor="20.0"
                   AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+
                 <Line endX="100.0" startX="-100.0"/>
                 <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titulo-principal"
                       text="Lista de Revisiones"/>
                 <Line endX="100.0" startX="-100.0"/>
-
             </HBox>
             <GridPane hgap="10.0" layoutX="10.0" layoutY="76.0" vgap="30.0" AnchorPane.leftAnchor="20.0"
                       AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="76.0">
@@ -45,13 +45,13 @@
                     <RowConstraints maxHeight="34.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                     <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
-                <Label styleClass="label-formulario" text="Reunión:" GridPane.columnIndex="2"
-                       GridPane.halignment="CENTER"/>
+                <TextField fx:id="txtDetalles" maxWidth="1.7976931348623157E308"
+                           onKeyPressed="#filtrarPorDetalles" styleClass="text-field-personalizado"
+                           GridPane.columnIndex="1"/>
                 <ComboBox fx:id="cmbReunion" editable="true" maxWidth="1.7976931348623157E308"
                           onAction="#filtrarPorReunion" styleClass="combo-personalizado"
                           GridPane.columnIndex="3"/>
-                <Button mnemonicParsing="false" onAction="#seleccionarReunion"
-                        GridPane.columnIndex="4">
+                <Button mnemonicParsing="false" onAction="#seleccionarReunion" GridPane.columnIndex="4">
                     <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                    preserveRatio="true">
@@ -63,9 +63,24 @@
                         <String fx:value="buscar"/>
                     </styleClass>
                 </Button>
-                <Button mnemonicParsing="false" onAction="#limpiarFiltros"
-                        text="Limpiar" GridPane.columnIndex="4" GridPane.halignment="CENTER"
+                <ComboBox fx:id="cmbExpediente" editable="true" maxWidth="1.7976931348623157E308"
+                          onAction="#filtrarPorExpediente" styleClass="combo-personalizado"
+                          GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <Button mnemonicParsing="false" onAction="#seleccionarExpediente" GridPane.columnIndex="2"
                         GridPane.rowIndex="1">
+                    <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <Image url="@../../images/icons/buscar.png"/>
+                        </ImageView>
+                    </graphic>
+                    <styleClass>
+                        <String fx:value="btn-personalizado"/>
+                        <String fx:value="buscar"/>
+                    </styleClass>
+                </Button>
+                <Button mnemonicParsing="false" onAction="#limpiarFiltros" text="Limpiar"
+                        GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                     <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                    preserveRatio="true">
@@ -77,27 +92,11 @@
                         <String fx:value="limpiar"/>
                     </styleClass>
                 </Button>
-                <Label styleClass="label-formulario" text="Expediente:" GridPane.rowIndex="1"/>
-                <ComboBox fx:id="cmbExpediente" editable="true" maxWidth="1.7976931348623157E308"
-                          onAction="#filtrarPorExpediente" styleClass="combo-personalizado"
-                          GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                <Button mnemonicParsing="false"
-                        onAction="#seleccionarExpediente" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                    <graphic>
-                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
-                                   preserveRatio="true">
-                            <Image url="@../../images/icons/buscar.png"/>
-                        </ImageView>
-                    </graphic>
-                    <styleClass>
-                        <String fx:value="btn-personalizado"/>
-                        <String fx:value="buscar"/>
-                    </styleClass>
-                </Button>
+                <Label styleClass="label-formulario" text="Reunión:"
+                       GridPane.columnIndex="2" GridPane.halignment="CENTER"/>
+                <Label styleClass="label-formulario" text="Expediente:"
+                       GridPane.rowIndex="1"/>
                 <Label styleClass="label-formulario" text="Buscar detalles:"/>
-                <TextField fx:id="txtDetalles" maxWidth="1.7976931348623157E308"
-                           onKeyPressed="#filtrarPorDetalles" styleClass="text-field-personalizado"
-                           GridPane.columnIndex="1"/>
             </GridPane>
             <TableView fx:id="tblRevisiones" editable="true" layoutX="10.0" layoutY="160.0" prefHeight="428.0"
                        styleClass="tabla-personalizada" stylesheets="@../../styles/_styles.css"
@@ -169,12 +168,12 @@
                     <rowConstraints>
                         <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
                     </rowConstraints>
-                    <CheckBox fx:id="checkLista" mnemonicParsing="false"
-                              styleClass="check-box-personalizado"
-                              text="Agregar o modificar lista de revisiones" GridPane.columnIndex="1"/>
                     <CheckBox fx:id="checkAutocompletado" mnemonicParsing="false"
                               styleClass="check-box-personalizado"
                               text="Utilizar filtros actuales para autocompletar formulario"/>
+                    <CheckBox fx:id="checkLista" mnemonicParsing="false"
+                              styleClass="check-box-personalizado"
+                              text="Agregar o modificar lista de revisiones" GridPane.columnIndex="1"/>
                 </GridPane>
             </VBox>
         </VBox>

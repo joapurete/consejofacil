@@ -26,7 +26,6 @@
             <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" spacing="20.0"
                   styleClass="titulo-principal-container" AnchorPane.leftAnchor="20.0"
                   AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
-
                 <Line endX="100.0" startX="-100.0"/>
                 <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titulo-principal"
                       text="Lista de Miembros"/>
@@ -45,24 +44,16 @@
                     <RowConstraints maxHeight="34.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                     <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
-                <Label prefHeight="27.0" styleClass="label-formulario" text="Buscar nombre:"
-                       GridPane.halignment="CENTER"/>
-                <Label styleClass="label-formulario" text="Cargo:" GridPane.columnIndex="2"
-                       GridPane.halignment="CENTER"/>
+                <TextField fx:id="txtNombre" onKeyReleased="#filtrarPorNombre" promptText="..."
+                           styleClass="text-field-personalizado" GridPane.columnIndex="1"/>
                 <ComboBox fx:id="cmbCargo" maxWidth="1.7976931348623157E308" onAction="#filtrarPorCargo"
                           prefHeight="154.0" styleClass="combo-personalizado" GridPane.columnIndex="3"/>
-                <Label styleClass="label-formulario" text="Fecha Nac:" GridPane.halignment="CENTER"
-                       GridPane.rowIndex="1"/>
                 <DatePicker fx:id="dtpFechaNac" editable="false" maxWidth="1.7976931348623157E308"
                             onAction="#filtrarPorFechaNac" styleClass="datepicker-personalizado"
                             GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                <Label styleClass="label-formulario" text="Estado:" GridPane.columnIndex="2"
-                       GridPane.halignment="CENTER" GridPane.rowIndex="1"/>
                 <ComboBox fx:id="cmbEstado" maxWidth="1.7976931348623157E308" onAction="#filtrarPorEstado"
                           prefHeight="31.0" styleClass="combo-personalizado" GridPane.columnIndex="3"
                           GridPane.rowIndex="1"/>
-                <TextField fx:id="txtNombre" onKeyReleased="#filtrarPorNombre" promptText="..."
-                           styleClass="text-field-personalizado" GridPane.columnIndex="1"/>
                 <Button mnemonicParsing="false" onAction="#limpiarFiltro" text="Limpiar"
                         GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                     <graphic>
@@ -76,6 +67,14 @@
                         <String fx:value="limpiar"/>
                     </styleClass>
                 </Button>
+                <Label prefHeight="27.0" styleClass="label-formulario"
+                       text="Buscar nombre:" GridPane.halignment="CENTER"/>
+                <Label styleClass="label-formulario" text="Cargo:"
+                       GridPane.columnIndex="2" GridPane.halignment="CENTER"/>
+                <Label styleClass="label-formulario" text="Fecha Nac:"
+                       GridPane.halignment="CENTER" GridPane.rowIndex="1"/>
+                <Label styleClass="label-formulario" text="Estado:"
+                       GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1"/>
             </GridPane>
             <TableView fx:id="tblMiembros" editable="true" layoutX="10.0" layoutY="160.0" prefHeight="428.0"
                        styleClass="tabla-personalizada" stylesheets="@../../styles/_styles.css"

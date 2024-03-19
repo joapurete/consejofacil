@@ -18,14 +18,3 @@
     -fx-max-width: 90px;
     -fx-max-height: 100px;
 }
-
-/*  Enlace si se olvidó la contraseña */
-.login-formulario-grid Text{
-    -fx-font-size: 1em;
-    -fx-fill: -link;
-    -fx-transition: fill 0.3s;
-}
-.login-formulario-grid Text:hover{
-    -fx-fill: -link-hover;
-    -fx-underline: true;
-}

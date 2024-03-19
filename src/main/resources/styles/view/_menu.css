@@ -27,7 +27,8 @@
     -fx-padding: 10;
     fx-transition: background-color 0.3s;
 }
-.menu-items-container .menu-perfil-container:hover{
+.menu-items-container .menu-perfil-container:hover,
+.menu-items-container .menu-perfil-container:focused{
     -fx-background-color: -gris-claro;
     -fx-cursor: hand;
 }
@@ -58,7 +59,8 @@
     -fx-transition: text-fill 0.3s;
     -fx-transition: background-color 0.3s;
 }
-.menu-items-container .btn-link:hover{
+.menu-items-container .btn-link:hover,
+.menu-items-container .btn-link:focused{
     -fx-text-fill: black;
     -fx-background-color: -gris-claro;
     -fx-cursor: hand;

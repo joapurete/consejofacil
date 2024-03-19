@@ -52,6 +52,11 @@ public class ListaAccionesController implements Initializable {
     @Getter
     private ComboBox<Expediente> cmbExpediente;
 
+    // Botones utilizados
+    @FXML
+    @Getter
+    private Button btnSeleccionarExpediente, btnLimpiar, btnAgregar, btnModificar, btnEliminar;
+
     // CheckBox Autocompletado
     @FXML
     @Getter
@@ -128,5 +133,5 @@ public class ListaAccionesController implements Initializable {
     private void limpiarFiltro() { accionManager.limpiarFiltros(); }
 
     @FXML
-    private void seleccionarExpediente() throws Exception { accionManager.seleccionarExpediente(cmbExpediente); }
+    private void seleccionarExpediente() { accionManager.seleccionarExpediente(cmbExpediente); }
 }

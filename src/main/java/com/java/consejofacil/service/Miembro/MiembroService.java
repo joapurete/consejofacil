@@ -10,4 +10,6 @@ public interface MiembroService {
     int modificarDni(int dni_nuevo, int dni_actual);
 
     int cambiarContrasena(String clave, int dni_miembro);
+
+    List<Object[]> contarCantidadMiembrosPorEstado();
 }

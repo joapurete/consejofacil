@@ -153,7 +153,8 @@
     -fx-background-color: transparent;
 }
 .check-box-personalizado .box:hover,
-.check-box-personalizado:hover .box{
+.check-box-personalizado:hover .box,
+.check-box-personalizado:focused .box{
     -fx-background-color: -gris-claro;
     -fx-border-color: -primary;
 }
@@ -172,3 +173,21 @@
 .btn-personalizado.nuevo ImageView{
     -fx-background-image: url('/images/icons/nuevo.png');
 }
+
+/* Link */
+.link{
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+.link Text {
+    -fx-font-size: 1em;
+    -fx-fill: -link;
+    -fx-transition: fill 0.3s;
+}
+.link:hover Text,
+.link:focused Text{
+    -fx-fill: -link-hover;
+    -fx-underline: true;
+}
+

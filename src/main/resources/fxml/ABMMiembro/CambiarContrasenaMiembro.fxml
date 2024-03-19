@@ -37,11 +37,6 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                     </rowConstraints>
-                    <Label styleClass="label-formulario" text="Contraseña actual:"/>
-                    <Label styleClass="label-formulario" text="Contraseña nueva:"
-                           GridPane.rowIndex="1"/>
-                    <Label styleClass="label-formulario" text="Repetir contraseña:"
-                           GridPane.rowIndex="2"/>
                     <PasswordField fx:id="txtContrasenaActual" maxWidth="1.7976931348623157E308"
                                    styleClass="password-field-personalizado" GridPane.columnIndex="1"/>
                     <PasswordField fx:id="txtContrasenaNueva" maxWidth="1.7976931348623157E308"
@@ -50,6 +45,12 @@
                     <PasswordField fx:id="txtRepetirContrasenaNueva" maxWidth="1.7976931348623157E308"
                                    styleClass="password-field-personalizado" GridPane.columnIndex="1"
                                    GridPane.rowIndex="2"/>
+                    <Label styleClass="label-formulario"
+                           text="Contraseña actual:"/>
+                    <Label styleClass="label-formulario" text="Contraseña nueva:"
+                           GridPane.rowIndex="1"/>
+                    <Label styleClass="label-formulario" text="Repetir contraseña:"
+                           GridPane.rowIndex="2"/>
                 </GridPane>
                 <GridPane>
                     <columnConstraints>

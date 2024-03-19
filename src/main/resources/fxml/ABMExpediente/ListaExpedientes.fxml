@@ -26,11 +26,11 @@
             <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" spacing="20.0"
                   styleClass="titulo-principal-container" AnchorPane.leftAnchor="20.0"
                   AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+
                 <Line endX="100.0" startX="-100.0"/>
                 <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titulo-principal"
                       text="Lista de Expedientes"/>
                 <Line endX="100.0" startX="-100.0"/>
-
             </HBox>
             <GridPane hgap="10.0" layoutX="10.0" layoutY="76.0" vgap="30.0" AnchorPane.leftAnchor="20.0"
                       AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="76.0">
@@ -45,15 +45,12 @@
                     <RowConstraints maxHeight="34.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                     <RowConstraints maxHeight="33.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 </rowConstraints>
-                <Label prefHeight="27.0" styleClass="label-formulario" text="Buscar nota:"
-                       GridPane.halignment="CENTER"/>
-                <Label styleClass="label-formulario" text="Iniciante:" GridPane.columnIndex="2"
-                       GridPane.halignment="CENTER"/>
+                <TextField fx:id="txtNota" onKeyReleased="#filtrarPorNota" promptText="..."
+                           styleClass="text-field-personalizado" GridPane.columnIndex="1"/>
                 <ComboBox fx:id="cmbIniciante" editable="true" maxWidth="1.7976931348623157E308"
                           onAction="#filtrarPorIniciante" prefHeight="154.0" styleClass="combo-personalizado"
                           GridPane.columnIndex="3"/>
-                <Button mnemonicParsing="false" onAction="#seleccionarIniciante"
-                        GridPane.columnIndex="4">
+                <Button mnemonicParsing="false" onAction="#seleccionarIniciante" GridPane.columnIndex="4">
                     <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                    preserveRatio="true">
@@ -65,21 +62,14 @@
                         <String fx:value="buscar"/>
                     </styleClass>
                 </Button>
-                <Label styleClass="label-formulario" text="Fecha Ingreso:" GridPane.halignment="CENTER"
-                       GridPane.rowIndex="1"/>
                 <DatePicker fx:id="dtpFechaIngreso" editable="false" maxWidth="1.7976931348623157E308"
                             onAction="#filtrarPorFechaIngreso" styleClass="datepicker-personalizado"
                             GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                <Label styleClass="label-formulario" text="Estado:" GridPane.columnIndex="2"
-                       GridPane.halignment="CENTER" GridPane.rowIndex="1"/>
                 <ComboBox fx:id="cmbEstado" maxWidth="1.7976931348623157E308" onAction="#filtrarPorEstado"
                           prefHeight="31.0" styleClass="combo-personalizado" GridPane.columnIndex="3"
                           GridPane.rowIndex="1"/>
-                <TextField fx:id="txtNota" onKeyReleased="#filtrarPorNota" promptText="..."
-                           styleClass="text-field-personalizado" GridPane.columnIndex="1"/>
-                <Button mnemonicParsing="false" onAction="#limpiarFiltro"
-                        text="Limpiar" GridPane.columnIndex="4" GridPane.halignment="CENTER"
-                        GridPane.rowIndex="1">
+                <Button mnemonicParsing="false" onAction="#limpiarFiltro" text="Limpiar"
+                        GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                     <graphic>
                         <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
                                    preserveRatio="true">
@@ -91,6 +81,14 @@
                         <String fx:value="limpiar"/>
                     </styleClass>
                 </Button>
+                <Label prefHeight="27.0" styleClass="label-formulario"
+                       text="Buscar nota:" GridPane.halignment="CENTER"/>
+                <Label styleClass="label-formulario" text="Iniciante:"
+                       GridPane.columnIndex="2" GridPane.halignment="CENTER"/>
+                <Label styleClass="label-formulario" text="Fecha Ingreso:"
+                       GridPane.halignment="CENTER" GridPane.rowIndex="1"/>
+                <Label styleClass="label-formulario" text="Estado:"
+                       GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1"/>
             </GridPane>
             <TableView fx:id="tblExpedientes" editable="true" layoutX="10.0" layoutY="160.0" prefHeight="428.0"
                        styleClass="tabla-personalizada" stylesheets="@../../styles/_styles.css"
